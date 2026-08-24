@@ -495,6 +495,19 @@
   }
   .sup-door:focus-visible { outline: none; }
 
+  /* THE REDRAW'S SILENT FRAME. drawPanel collapses the window instantly
+     before drawing it out again — but an inline `transition:none` on the
+     panel reaches ONLY the panel: measured, ::after kept `top,left` at
+     0.5s and the content child kept `opacity` at 0.41s, so the traveling
+     corner slid back over half a second while the frame snapped, and the
+     redraw did not read as the bs-window mechanic at all. This class
+     silences all three for exactly that one frame. ID beats the
+     component's class selectors, so no !important is needed. */
+  #bs-panel.sup-nofx,
+  #bs-panel.sup-nofx::before,
+  #bs-panel.sup-nofx::after,
+  #bs-panel.sup-nofx > * { transition: none; }
+
   /* Commit-arrival resolve for browsers WITHOUT view transitions (the
      shared chrome carries the real cross-document morph): the two morph
      participants fade in on the tempo's companion fade. Cold boot never
@@ -685,6 +698,14 @@ var ITEMS = [
 // Request types — PLACEHOLDER SET pending Eric's manifest confirm.
 var REQ_TYPES = ['supReqConsulting', 'supReqOrder', 'supReqWarranty', 'supReqReturns', 'supReqBusiness'];
 
+// ── Wordmark route (clean paths in production, .html locally) ─────────────
+// Both sibling away pages carry this line; support shipped without it, so
+// the wordmark pointed at a literal home.html and would 404 on the clean-
+// path deployment — while the ‹ control and the Esc boundary, which both
+// go through C.ROUTES, resolved correctly. Dates to phase one, not the
+// two-level rebuild.
+document.getElementById('bs-wordmark-link').setAttribute('href', C.ROUTES.home);
+
 // ── DOM ───────────────────────────────────────────────────────────────────
 var menuEl   = document.getElementById('bs-support-menu');
 var panel    = document.getElementById('bs-panel');
@@ -698,6 +719,18 @@ var chosenEl = document.getElementById('sup-f-type');
 var excerptKicker = document.getElementById('sup-excerpt-kicker');
 var excerptCopy   = document.getElementById('sup-excerpt-copy');
 var noteEl   = document.getElementById('sup-note');
+// The note is dual-purpose: static copy from a STR key, AND a transient
+// submit/validation message. Writing textContent alone meant a locale swap
+// re-rendered the STATIC key over a live message while leaving .is-said
+// stuck on it — the honest "nothing was sent" erased, the generic
+// invitation left glowing in committed ink. Routing every write through
+// setNote keeps data-str pointing at whatever is actually displayed, so
+// renderStrings re-renders the RIGHT string in the new locale for free.
+function setNote(key, said){
+  noteEl.setAttribute('data-str', key || 'supFormNote');
+  noteEl.textContent = T(key || 'supFormNote');
+  noteEl.classList.toggle('is-said', !!said);
+}
 var emailBtn = document.getElementById('sup-email');
 var doorBtn  = document.getElementById('sup-door');
 var cornerEl = document.getElementById('bs-corner');
@@ -873,15 +906,17 @@ function showFace(i, locked){ setFace(i, locked); }
 // swapped and re-measured while collapsed, so nothing of the outgoing
 // item is ever visible inside the incoming frame.
 function drawPanel(i, locked){
-  var prev = panel.style.transition;
-  panel.style.transition = 'none';
+  // .sup-nofx silences the panel AND its corner pseudo-elements AND the
+  // content child — an inline transition:none on the panel alone leaves
+  // the traveler and the content fade still running (measured).
+  panel.classList.add('sup-nofx');
   panel.classList.remove('is-open');
   panel.classList.remove('is-hidden');
   void panel.offsetWidth;                 // commit the collapsed seed square
   setFace(i, locked);                     // swap + resize while invisible
   void panel.offsetWidth;
-  panel.style.transition = prev || '';
-  void panel.offsetWidth;                 // commit the restored transition
+  panel.classList.remove('sup-nofx');
+  void panel.offsetWidth;                 // commit the restored transitions
   panel.classList.add('is-open');         // …then draw out on the tempo
 }
 function hidePanel(){
@@ -995,6 +1030,11 @@ function unlock(){
   var i = lockIdx;
   lockIdx = null;
   focusIdx = i;
+  // Retreating a level must not leave the keyboard inside the panel: the
+  // form's controls are about to be untabbable, and a stranded focus
+  // silently eats the menu's own keys.
+  var _a = document.activeElement;
+  if (_a && panel.contains(_a) && _a.blur) _a.blur();
   showFace(i, false);
   render();
   SoundBus.play('detent'); hapticTick();
@@ -1019,7 +1059,11 @@ function goBack(){
     if (a && panel.contains(a) && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')){
       lastRung = 'field';
       a.blur();
-      try { panelBody.focus({ preventScroll: true }); } catch (e) {}
+      // Deliberately do NOT park focus on the panel body. Chrome makes a
+      // scroller focusable, and focus sitting there meant the panel's own
+      // keydown swallowed every later key — measured: after Esc out of a
+      // field, W/S no longer walked the menu at PREVIEW, breaking the
+      // ratified parity rule. Blurring hands the keys back to the machine.
       return;
     }
     // 2. LOCKED retreats to PREVIEW (which, for the real item, IS the
@@ -1087,10 +1131,14 @@ emailBtn.addEventListener('click', function(){
   wake();
   var addr = T('supEmail');
   var said = function(){
+    emailBtn.setAttribute('data-str', 'supEmailCopied');
     emailBtn.textContent = T('supEmailCopied');
     SoundBus.play('commit'); hapticTick();
     clearTimeout(_copyT);
-    _copyT = setTimeout(function(){ emailBtn.textContent = T('supEmail'); }, 1400);
+    _copyT = setTimeout(function(){
+      emailBtn.setAttribute('data-str', 'supEmail');
+      emailBtn.textContent = T('supEmail');
+    }, 1400);
   };
   var failed = function(){ denyOn(emailBtn); };   // nothing fails silently
   if (navigator.clipboard && navigator.clipboard.writeText){
@@ -1152,8 +1200,7 @@ vForm.addEventListener('submit', function(e){
     }
   }
   if (bad){
-    noteEl.textContent = T('supInvalid');
-    noteEl.classList.remove('is-said');
+    setNote('supInvalid', false);
     denyOn(bad.closest('.sup-field') || bad);
     try { bad.focus({ preventScroll: true }); } catch (err) {}
     return;
@@ -1161,8 +1208,7 @@ vForm.addEventListener('submit', function(e){
   SoundBus.play('commit'); hapticTick();
   // ══ SUBMIT SEAM — the wiring ruling lands HERE ══════════════════════
   // if (ENDPOINT) fetch(ENDPOINT, {...}); else if (MAILTO) ...; else:
-  noteEl.textContent = T('supSubmitPending');
-  noteEl.classList.add('is-said');
+  setNote('supSubmitPending', true);
 });
 
 // ── Corner nav ────────────────────────────────────────────────────────────
@@ -1252,7 +1298,12 @@ C.init({
     // belongs to the panel's native scroll and the bridge hands off
     // entirely (ends clamp silently, as everywhere).
     wheelNative:    function(e){
-      return isLocked() && panelBody.contains(e.target);
+      if (!panelBody.contains(e.target)) return false;
+      if (isLocked()) return true;          // the locked panel owns its wheel outright
+      // At PREVIEW the wheel belongs to the MENU (the parity rule) —
+      // UNLESS the panel is genuinely clipped, which the provisional
+      // narrow-width cap can do; its own content must stay reachable.
+      return panelBody.scrollHeight > panelBody.clientHeight + 1;
     },
     wheelStep:      focusStep,
     wheelPitch:     function(){ return menuPitch; },
