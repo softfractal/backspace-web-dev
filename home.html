@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#040402">
+<title>backspace</title>
+<!--
+  backspace — homepage (title screen), v5: THIN PAGE over the shared
+  chrome pair. FACTORING RATIFIED (Eric, Aug 23 2026, community-phase
+  decision batch): this file supersedes backspace_home.html as the
+  shipped homepage; the certified v3 single-file build stays archived
+  as the frozen witness.
+
+  This file carries ONLY what is the homepage's own: the blank stage
+  (VIDEO TRIGGER SEAM returns with the real scene work), the wordmark at
+  the title position, the home-iteration menu with commit/back and the
+  airlock stub, and the film-selection strip. Everything else — tokens,
+  fonts, the input machine, utility cluster, denial, sound bus, i18n —
+  mounts from shared/bs-chrome.css + shared/bs-chrome.js.
+
+  CROSS-PAGE SEMANTICS (Part B.3): committing a section WITH A PAGE is
+  REAL NAVIGATION through real browser history — back crosses the page
+  boundary as a true pop. Route-driven: a section commits the moment its
+  page appears in C.ROUTES (software Aug 22, community Aug 23); the
+  airlock stub remains only for the pageless (hardware / support).
+  RULED (Eric, Aug 23, decision batch): NAVIGATE-IMMEDIATELY is law —
+  the shipped default is ratified; the overlay-then-navigate variant is
+  retired (nothing architecturally precluded it, none needed).
+-->
+<link rel="stylesheet" href="shared/bs-chrome.css">
+<style>
+  /* ── Film-selection strip — .horizontal-strip port, rules verbatim ──
+     Placement from the demo's scene fractions: fx .40567 / fy .93465 /
+     fw .18229 of 1920 = 350px / fh .03760 of 1080 = 40.6px. */
+  .horizontal-strip {
+    --strip-value: 0%; --strip-pointer: 0%;
+    --strip-accent: #63c7ff;
+    position: fixed;
+    left: 49.68vw; top: 93.46vh;
+    transform: translateX(-50%);
+    width: calc(350px * var(--ui-scale));
+    height: calc(40.6px * var(--ui-scale));
+    z-index: 20;
+    cursor: var(--cursor-target);
+    pointer-events: auto; touch-action: none;
+  }
+  .horizontal-strip:focus-visible { outline: none; }
+  .horizontal-strip-rail { width: 100%; height: 100%; position: relative; }
+  .horizontal-strip-tick, .horizontal-strip-marker, .horizontal-strip-playhead {
+    pointer-events: none; position: absolute;
+  }
+  .horizontal-strip-tick {
+    --strip-heat: 0; --strip-heat-pct: 0%; --strip-lift: 0px; --strip-scale: 1;
+    top: var(--strip-tick-y); left: var(--strip-tick-x);
+    width: max(1px, calc(1px * var(--ui-scale)));
+    height: var(--strip-tick-h);
+    background: color-mix(in srgb, #fefefe9e, var(--strip-accent) var(--strip-heat-pct));
+    box-shadow: 0 0 calc(8px + 10px * var(--strip-heat)) color-mix(in srgb, #ffffff47, var(--strip-accent) var(--strip-heat-pct));
+    opacity: calc(.55 + var(--strip-heat) * .45);
+    transform: translateX(-50%) translateY(var(--strip-lift)) scaleY(var(--strip-scale));
+    transform-origin: bottom;
+    transition: background .12s, box-shadow .12s, opacity .12s, transform .12s;
+  }
+  .horizontal-strip-marker {
+    top: var(--strip-marker-y); left: var(--strip-marker-x);
+    width: max(3.5px, calc(3.5px * var(--ui-scale)));
+    height: max(3.5px, calc(3.5px * var(--ui-scale)));
+    background: #fefefed6; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px #ffffff6b;
+  }
+  .horizontal-strip-playhead {
+    top: 0; bottom: 0; left: var(--strip-pointer);
+    opacity: 0; background: #fefefef2; width: 1px;
+    transition: opacity .16s;
+    transform: translate(-50%);
+    box-shadow: 0 0 12px #ffffffc7;
+  }
+  .horizontal-strip.has-strip-pointer .horizontal-strip-playhead,
+  .horizontal-strip:focus-visible .horizontal-strip-playhead,
+  .horizontal-strip.is-dragging .horizontal-strip-playhead { opacity: 1; }
+
+  /* ── Airlock stub — the seam where the section stream attaches ─────── */
+  #bs-airlock {
+    position: fixed; inset: 0; z-index: 20;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  }
+  #bs-airlock.is-open {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transition: opacity 0.3s ease, visibility 0s;
+  }
+  #bs-airlock-title {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(18px, 2.2vw, 30px); letter-spacing: 0.3em;
+    color: var(--ink); text-shadow: var(--glow-text);
+  }
+  #bs-airlock-sub {
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(10px * var(--ui-scale)); letter-spacing: 0.22em;
+    color: var(--mid);
+  }
+  #bs-airlock-hint {
+    position: absolute; bottom: 6vh;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(9px * var(--ui-scale)); letter-spacing: 0.28em;
+    color: var(--mid);
+  }
+
+  @media (max-width: 560px) {
+    #bs-panel { width: 86vw; }
+  }
+</style>
+</head>
+<body data-bs-page="home">
+
+<!-- Blank stage. The scene (video triggers / bake) mounts here later —
+     the panel frame and its per-section content binding were removed on
+     Eric's ruling (Aug 20) and return with the real scene work. -->
+<div id="bs-stage"></div>
+
+<img id="bs-wordmark" src="assets/bs_wordmark.svg" alt="backspace">
+
+<!-- Utility cluster — injected by the shared chrome. -->
+<div id="bs-icons"></div>
+
+<nav id="bs-menu" aria-label="Sections"></nav>
+
+<!-- Film-selection strip — .figma-horizontal-strip port, 1:1 (geometry
+     read from the demo's rendered DOM; behavior from its bundle). -->
+<div id="bs-strip" class="horizontal-strip" role="slider" aria-label="Film selection"
+     aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" aria-valuetext="Film 1 of 3"
+     tabindex="0" data-strip-value="0.00">
+  <div class="horizontal-strip-rail" aria-hidden="true"></div>
+</div>
+
+<div id="bs-airlock" aria-hidden="true">
+  <div id="bs-airlock-title"></div>
+  <div id="bs-airlock-sub">AIRLOCK — SECTION STREAM ATTACHES HERE</div>
+  <div id="bs-airlock-hint">ESC — BACK</div>
+</div>
+
+<input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
+
+<script src="shared/bs-chrome.js"></script>
+<script>
+(function(){
+'use strict';
+var C = window.BSChrome;
+var T = C.T, SECTIONS = C.SECTIONS, SoundBus = C.SoundBus;
+var wake = C.wake, denyOn = C.denyOn, shakeEl = C.shakeEl, clickOk = C.clickOk, hapticTick = C.hapticTick;
+
+// ── State — the home page's half of the one focus variable ────────────────
+// -1 = nothing focused. committed = the airlock lock. Hover and the
+// keyboard cursor are the same state — every input path funnels into
+// setFocus.
+var focusIdx  = -1;
+var committed = null;
+
+function denyLocked(){
+  // Once per shake: an event stream (wheel, key repeat, drag) must not
+  // restart the keyframe per event or spam the deny sample.
+  // The airlock stub covers the menu, so the locked item's shake is
+  // invisible — shake the airlock's ESC hint too, so denial stays VISIBLE
+  // while the overlay is up.
+  var locked = document.querySelector('#bs-menu .bs-item.active');
+  if (locked && !locked.classList.contains('bs-shake')) denyOn(locked);
+  var hint = document.getElementById('bs-airlock-hint');
+  if (hint && !hint.classList.contains('bs-shake')) shakeEl(hint);
+}
+
+// ── Menu DOM ──────────────────────────────────────────────────────────────
+var menuEl = document.getElementById('bs-menu');
+var navItems = [];
+SECTIONS.forEach(function(key, idx){
+  var item = document.createElement('button');
+  item.type = 'button';
+  item.className = 'bs-item';
+  item.id = 'bs-nav-' + key;
+  var span = document.createElement('span');
+  span.className = 'bs-nav-label';
+  span.textContent = T(key);
+  item.appendChild(span);
+  // hover = cursor: mouse hover and the keyboard cursor are the same focus
+  // state (one variable). Suppressed for good once touch is seen.
+  item.addEventListener('mouseenter', function(){
+    if (C.rail.isTouch() || committed) return;
+    wake();
+    if (focusIdx !== idx) setFocus(idx);
+  });
+  // Leaving the item's vicinity pops it back in (Eric, Aug 20). Only the
+  // mouse can "leave" — a keyboard-set cursor persists until stepped,
+  // Escaped, or idled out.
+  item.addEventListener('mouseleave', function(){
+    if (C.rail.isTouch() || committed) return;
+    if (focusIdx === idx) setFocus(-1);
+  });
+  // Click: travel → commit (the inherited two-step). While locked, an
+  // off-item click shakes the LOCKED item; the locked item = one BACK.
+  item.addEventListener('click', function(){
+    wake();
+    if (committed){
+      if (key === committed){ if (clickOk()) goBack(); }
+      else denyLocked();
+      return;
+    }
+    if (focusIdx === idx){ if (clickOk()) commit(); }
+    else setFocus(idx);
+  });
+  menuEl.appendChild(item);
+  navItems.push(item);
+});
+
+// Menu pitch — MEASURED (item top → next item top), never hardcoded, so
+// the wheel trigger follows any spacing tune (journal binding rule).
+var menuPitch = 55;
+function measurePitch(){
+  if (navItems.length > 1){
+    var a = navItems[0].getBoundingClientRect(), b = navItems[1].getBoundingClientRect();
+    var p = b.top - a.top;
+    if (p > 0) menuPitch = p;
+  }
+}
+
+// ── Render from state ─────────────────────────────────────────────────────
+function render(){
+  for (var i = 0; i < navItems.length; i++){
+    navItems[i].classList.toggle('kb-hover', i === focusIdx && !committed);
+    navItems[i].classList.toggle('active', committed === SECTIONS[i]);
+  }
+}
+function setFocus(idx){
+  if (idx === focusIdx) return;
+  if (idx >= 0 && C.rail.index() >= 0) C.rail.focus(-1);   // one cursor — leaving the icon rail
+  focusIdx = idx;
+  render();
+  if (idx >= 0){ SoundBus.play('detent'); hapticTick(); }
+}
+
+// ── Focus stepper — every modality lands here ─────────────────────────────
+// One gesture = one step. Cold entry: down → first, up → last. Ends CLAMP
+// silently — no wrap (global rule).
+function focusStep(dir){
+  if (committed){ denyLocked(); return false; }
+  var next;
+  if (focusIdx < 0){
+    next = dir > 0 ? 0 : SECTIONS.length - 1;
+  } else {
+    next = focusIdx + dir;
+    if (next < 0 || next >= SECTIONS.length) return false;  // wall — no wrap
+  }
+  setFocus(next);
+  return true;
+}
+
+// ── Commit / back — strict LIFO, history-integrated ───────────────────────
+// A section WITH A ROUTE commits into REAL NAVIGATION (Part B.3, ruled
+// navigate-immediately Aug 23): the browser makes the history entry, and
+// back across the page boundary is a true pop. Route-driven — each
+// section flips from stub to navigation by appearing in C.ROUTES.
+// Sections without pages keep the certified airlock stub.
+function commit(){
+  if (committed || focusIdx < 0) return;
+  var section = SECTIONS[focusIdx];
+  SoundBus.play('commit');
+  if (C.ROUTES[section]){
+    // Hold the committed look for the frame the navigation leaves on —
+    // the away page's corner element answers it on arrival (the morph
+    // rides the view-transition tags where supported).
+    committed = section;
+    render();
+    C.nav.commit(section);
+    return;
+  }
+  committed = section;
+  var alk = document.getElementById('bs-airlock');
+  document.getElementById('bs-airlock-title').textContent = T(committed);
+  alk.classList.add('is-open');
+  alk.setAttribute('aria-hidden', 'false');
+  render();
+  if (!history.state || !history.state.bs){
+    try { history.pushState({ bs: 1 }, '', '#' + committed); } catch (e) {}
+  } else if (location.hash !== '#' + committed){
+    // The guard suppressed a re-push over a restored entry — sync the hash
+    // so the URL can never name a section other than the open one.
+    try { history.replaceState(history.state, '', '#' + committed); } catch (e) {}
+  }
+  alk.setAttribute('tabindex', '-1');
+  try { alk.focus({ preventScroll: true }); } catch (e) { alk.focus(); }
+}
+function doBack(){
+  if (committed){
+    committed = null;
+    var alk = document.getElementById('bs-airlock');
+    alk.classList.remove('is-open');
+    alk.setAttribute('aria-hidden', 'true');
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    render();
+  } else if (focusIdx >= 0){
+    // Focused → idle. No history entry at this level.
+    setFocus(-1);
+  }
+}
+// _popPending absorbs back-requests while a pop is IN FLIGHT — one level
+// per press, no exceptions, including at key-repeat speed.
+var _popPending = false;
+var _popFallbackT = null;
+function armPopPending(){
+  // history.back() normally lands a popstate within a frame or two — but a
+  // truncated session restore can leave our state entry as the ONLY entry,
+  // and back() then silently no-ops. Without a fallback the flag latches
+  // and Escape is dead for the session. Same elision-guard pattern as the
+  // shake fallback timer.
+  _popPending = true;
+  clearTimeout(_popFallbackT);
+  _popFallbackT = setTimeout(function(){
+    if (_popPending){ _popPending = false; if (committed) doBack(); }
+  }, 350);
+}
+function goBack(){
+  if (_popPending) return;
+  if (committed && history.state && history.state.bs){
+    armPopPending();
+    history.back();
+    return;
+  }
+  doBack();
+}
+window.addEventListener('popstate', function(){
+  _popPending = false;
+  clearTimeout(_popFallbackT);
+  if (committed){ doBack(); return; }
+  // FORWARD resurrected a stale airlock entry: neutralise it in place.
+  if (history.state && history.state.bs){
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  }
+});
+// Returning across the page boundary (browser back from /software, often
+// a bfcache restore): the title screen greets in attract — nothing
+// pre-lit, no stale cursor under a parked pointer.
+window.addEventListener('pageshow', function(e){
+  if (e.persisted){ committed = null; setFocus(-1); render(); }
+});
+
+// ── Film-selection strip — behavior port from the demo bundle ─────────────
+// Geometry read 1:1 from the demo's rendered DOM (20 ticks, 5 markers).
+// Mechanics: pointer proximity heats ticks within a 10%-of-width radius
+// (heat → color toward accent, scale 1+1.55·heat, lift −7px·heat); the
+// playhead line follows the pointer while hovered/dragging/focused; value
+// SNAPS to one of 3 film segments on pointerdown/up (hover never scrubs in
+// film mode) or arrow keys. Selection lands in a stub — the film binding
+// attaches there with the scene work.
+(function(){
+  var strip = document.getElementById('bs-strip');
+  var rail  = strip.querySelector('.horizontal-strip-rail');
+  var TICKS = [
+    [5.7143, 21.4286], [10.3905, 0], [14.9302, 10.2143], [19.4698, 20.4286],
+    [24.0095, 20.4286], [28.5714, 20.4286], [33.0889, 20.4286], [37.6286, 20.4286],
+    [42.1683, 20.4286], [46.7079, 20.4286], [51.2508, 20.4286], [55.7905, 20.4286],
+    [60.3302, 20.4286], [64.8698, 20.4286], [69.4095, 20.4286], [73.9492, 20.4286],
+    [78.4889, 20.4286], [83.4825, 20.4286], [88.0222, 20.4286], [92.5619, 20.4286]
+  ];
+  var TICK_H = 51.0714;
+  var MARKERS = [
+    [5.7143, 42.8571], [28.5714, 57.8810], [51.2508, 30.6429],
+    [73.9492, 47.6667], [92.5619, 26.1905]
+  ];
+  var SEGMENTS = 3;
+  var RADIUS = 10;            // reaction radius, % of strip width
+  var ticks = [];
+  TICKS.forEach(function(t){
+    var s = document.createElement('span');
+    s.className = 'horizontal-strip-tick';
+    s.dataset.stripX = t[0];
+    s.style.setProperty('--strip-tick-x', t[0] + '%');
+    s.style.setProperty('--strip-tick-y', t[1] + '%');
+    s.style.setProperty('--strip-tick-h', TICK_H + '%');
+    rail.appendChild(s);
+    ticks.push(s);
+  });
+  MARKERS.forEach(function(m){
+    var d = document.createElement('span');
+    d.className = 'horizontal-strip-marker';
+    d.style.setProperty('--strip-marker-x', m[0] + '%');
+    d.style.setProperty('--strip-marker-y', m[1] + '%');
+    rail.appendChild(d);
+  });
+  var playhead = document.createElement('span');
+  playhead.className = 'horizontal-strip-playhead';
+  rail.appendChild(playhead);
+
+  var clampP = function(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); };
+  function pct(e){
+    var r = strip.getBoundingClientRect();
+    return r.width <= 0 ? 0 : (e.clientX - r.left) / r.width * 100;
+  }
+  // Pointer feedback: playhead + per-tick heat. null = pointer gone.
+  function feedback(p){
+    strip.classList.toggle('has-strip-pointer', p !== null);
+    if (p !== null) strip.style.setProperty('--strip-pointer', clampP(p, 0, 100) + '%');
+    ticks.forEach(function(t){
+      var x = Number(t.dataset.stripX || 0);
+      var d = p === null ? Infinity : Math.abs(x - p);
+      var heat = p === null ? 0 : clampP(1 - d / RADIUS, 0, 1);
+      t.style.setProperty('--strip-heat', heat.toFixed(3));
+      t.style.setProperty('--strip-heat-pct', Math.round(heat * 100) + '%');
+      t.style.setProperty('--strip-scale', (1 + heat * 1.55).toFixed(3));
+      t.style.setProperty('--strip-lift', (-7 * heat).toFixed(2) + 'px');
+    });
+  }
+  // Film-selection commit: snap to the nearest segment.
+  function setValue(p){
+    var seg = clampP(Math.round(clampP(p, 0, 100) / 100 * (SEGMENTS - 1)), 0, SEGMENTS - 1);
+    var r = seg / (SEGMENTS - 1) * 100;
+    strip.style.setProperty('--strip-value', r + '%');
+    strip.style.setProperty('--strip-pointer', r + '%');
+    strip.dataset.stripValue = r.toFixed(2);
+    strip.setAttribute('aria-valuenow', String(seg + 1));
+    strip.setAttribute('aria-valuetext', 'Film ' + (seg + 1) + ' of ' + SEGMENTS);
+    // FILM BINDING SEAM: seg selects the recording once films exist.
+  }
+  strip.addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    wake();
+    strip.classList.add('is-dragging');
+    try { strip.setPointerCapture(e.pointerId); } catch (err) {}
+    var p = pct(e);
+    feedback(p); setValue(p);
+  });
+  strip.addEventListener('pointermove', function(e){
+    var p = pct(e);
+    feedback(p);
+    if (strip.classList.contains('is-dragging')) setValue(p);
+  });
+  strip.addEventListener('pointerup', function(e){
+    strip.classList.remove('is-dragging');
+    var p = pct(e);
+    feedback(p); setValue(p);
+  });
+  strip.addEventListener('pointercancel', function(){
+    strip.classList.remove('is-dragging');
+    feedback(null);
+  });
+  strip.addEventListener('pointerleave', function(){
+    if (!strip.classList.contains('is-dragging')) feedback(null);
+  });
+  strip.addEventListener('keydown', function(e){
+    var n = Number(strip.dataset.stripValue || 0);
+    var seg = Math.round(n / 100 * (SEGMENTS - 1));
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown'){
+      e.preventDefault(); e.stopPropagation();   // the strip owns its arrows — never the menu's
+      wake();
+      setValue(Math.max(0, seg - 1) / (SEGMENTS - 1) * 100);
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp'){
+      e.preventDefault(); e.stopPropagation();
+      wake();
+      setValue(Math.min(SEGMENTS - 1, seg + 1) / (SEGMENTS - 1) * 100);
+    }
+  });
+})();
+
+// ── History hygiene on boot ───────────────────────────────────────────────
+if (history.state && history.state.bs){
+  armPopPending();   // the boot pop is in flight — absorb back-requests (with the no-popstate fallback)
+  history.back();
+} else if (SECTIONS.indexOf(location.hash.slice(1)) !== -1){
+  // Strip only OUR OWN stale section hash.
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+}
+
+// ── Mount the shared chrome ───────────────────────────────────────────────
+C.init({
+  page: 'home',
+  touchSurfaces: [document.getElementById('bs-stage'), menuEl],
+  hooks: {
+    isLocked:       function(){ return committed !== null; },
+    denyLocked:     denyLocked,
+    goBack:         goBack,
+    escapeFromRail: function(){ setFocus(0); },                 // icons → menu (one level)
+    enterAtPrimary: function(){
+      if (focusIdx < 0){ setFocus(0); return; }   // cold Enter claims the first section
+      commit();
+    },
+    verticalStep:   function(down){
+      // At the FIRST menu item, W/↑ hands the cursor to the icon bar
+      // (Eric's rule) — the top wall becomes a zone transition instead of
+      // a clamp.
+      if (!down && focusIdx === 0){ C.rail.focus(0); return; }
+      focusStep(down ? 1 : -1);
+    },
+    railVertical:   function(down){
+      // In the icon bar: S/↓ returns to the menu; W/↑ clamps (nothing above).
+      if (down){ C.rail.focus(-1); setFocus(0); }
+    },
+    horizontalCold: function(){ /* A/D drive the rail and nothing else — inert in the menu (wake already ran) */ },
+    wheelStep:      focusStep,
+    wheelPitch:     function(){ return menuPitch; },
+    clearPrimary:   function(){ if (focusIdx >= 0){ focusIdx = -1; render(); } },
+    idleReset:      function(){ setFocus(-1); },   // idle → everything pops back in
+    onLangChange:   function(T){
+      for (var i = 0; i < SECTIONS.length; i++){
+        navItems[i].querySelector('.bs-nav-label').textContent = T(SECTIONS[i]);
+      }
+      document.title = T('homeTitle');
+    },
+    onFontsReady:   measurePitch,
+    devState:       function(){ return { focusIdx: focusIdx, committed: committed, menuPitch: menuPitch }; }
+  }
+});
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+measurePitch();
+render();
+
+})();
+</script>
+</body>
+</html>

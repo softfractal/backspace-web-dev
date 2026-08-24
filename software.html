@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#040402">
+<title>BACKSPACE — Software</title>
+<!--
+  backspace — /software (page two), v1: the global chrome contract's
+  proving ground (Aug 21 GM addendum, Part B).
+
+  Visible content is one coming-soon line (through the i18n surface);
+  the page's purpose is the nav's AWAY ITERATION and the end of
+  copy-paste chrome. Mounts the shared pair (shared/bs-chrome.css/.js).
+
+  AWAY ITERATION AUTHORITY: the /software dev build Eric supplied at
+  phase initiation (dev-bc957c…pressbackspace.com) — the preferred
+  witness per the addendum. Ported from its stylesheet/bundle at exact
+  values: the top-left corner element (site-header__nav) = round back
+  control + a 34px circle that grows into a capsule carrying the four
+  sections; the committed section renders full-ink weight-600 with
+  aria-current="page" and NO dot (the witness strikes it with
+  content:none armor — kept). Expansion/fade durations are the ONLY
+  deviation: superseded by --pop-motion/--pop-fade per Eric's Aug 20
+  universal-tempo ruling. The witness's en-only language status pill is
+  NOT ported — the certified 4-language picker stands (CN precluded by
+  nothing, per mandate).
+
+  STAGE: blank black by Eric's Aug 21 ruling — the concrete room mounts
+  later; its file format (video / bake / still) is OPEN and nothing here
+  precludes any of the three. SCENE SEAM is #bs-stage, as on the
+  homepage.
+
+  MACHINE LAW on this page: one cursor on one rail — the top strip
+  [back, sections-pill, lang, sound, cart, account] walked by A/D with
+  silent clamps; Enter locks the sections pill and A/D walks its links
+  (its tray axis is horizontal; W/S refuses loudly while locked); Esc
+  pops exactly one level: link-lock → rail → idle → the page boundary
+  (commit-arrival only — one TRUE history pop, strict LIFO: after a
+  lateral hop from a sibling section it returns there, while the round
+  ‹ control and the wordmark keep their labeled HOME semantic —
+  divergence by design, both on record).
+  Cold boot (deep link) has nothing to pop: Esc at idle is silent, the
+  round ‹ control and the wordmark lead home as forward navigation.
+  Denial: the current section (you are here — RULED deny, Eric Aug 23)
+  and the sections whose pages don't exist yet refuse with the shake —
+  nothing fails silently. COMMUNITY commits as real navigation since its
+  page landed (Aug 23).
+-->
+<link rel="stylesheet" href="shared/bs-chrome.css">
+<style>
+  /* ── Coming-soon copy — the page's one visible content. Geometry from
+     the witness's A-2 SOFTWARE-01 layer config (1728×1117 frame,
+     fractions carried to the viewport per the certified port
+     convention): sub width 787/1728 → 45.54vw; both 16px/300 on the UI
+     face, full ink, resting glow (glow-ladder as shipped). Text arrives
+     through STR keys — never hardcoded here.
+     VERTICAL ANCHORS (RULED — Eric, Aug 23, superseding the witness's
+     y 886/977): the block reads clearly higher than the sibling pages'
+     bottom furniture (community row 1058/1117, home strip band), so it
+     moved DOWN AS A WHOLE, internal 91px gap preserved: the SUB line
+     rides the section-page bottom line — the community row's own
+     witness anchor 1058/1117 → 94.72vh — and the headline keeps the
+     pair's gap at 967/1117 → 86.57vh. Cross-page rhythm: the last text
+     line sits on the same 94.72vh line on both section pages. ───────── */
+  .bs-coming {
+    position: fixed; left: 50%;
+    transform: translateX(-50%);
+    z-index: 12; pointer-events: none;
+    text-align: center;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(16px * var(--ui-scale));
+    line-height: calc(20px * var(--ui-scale));
+    letter-spacing: 0;
+    text-shadow: var(--glow-text);
+    white-space: nowrap;
+  }
+  #bs-coming { top: 86.57vh; }
+  /* ONE line (Eric, Aug 22 — supersedes the witness frame's two-line
+     box): the sub inherits the base nowrap and sizes to its content. */
+  #bs-coming-sub { top: 94.72vh; }
+  @media (max-width: 560px) {
+    /* PROVISIONAL: narrow portrait alone may wrap — collision rule only,
+       until Eric's mobile grammar. */
+    #bs-coming-sub { width: 86vw; white-space: normal; }
+  }
+
+  /* Commit-arrival resolve for browsers WITHOUT view transitions (the
+     shared chrome carries the real cross-document morph): the two morph
+     participants fade in on the tempo's companion fade. Cold boot never
+     runs this — T0 discipline, nothing choreographs at a deep link. */
+  @keyframes bs-arrive { from { opacity: 0; } }
+  html.bs-arrive #bs-corner,
+  html.bs-arrive #bs-wordmark { animation: bs-arrive var(--pop-fade); }
+  @media (prefers-reduced-motion: reduce) {
+    html.bs-arrive #bs-corner,
+    html.bs-arrive #bs-wordmark { animation: none; }
+  }
+</style>
+</head>
+<body data-bs-page="software">
+
+<script>
+// Pre-paint arrival read (inline so the entrance class exists at first
+// paint; runs in microseconds — T0 interactivity is untouched). The flag
+// is consumed HERE, once; the machine reads window.__bsArrival.
+(function(){
+  var from = null;
+  try {
+    from = sessionStorage.getItem('bs-nav-from');
+    sessionStorage.removeItem('bs-nav-from');
+  } catch (e) {}
+  // Arrivals commit from home or a sibling section (community, Aug 23).
+  window.__bsArrival = (from === 'home' || from === 'community');
+  window.__bsArrivalFrom = window.__bsArrival ? from : null;
+  // Fallback resolve only where the browser cannot run the shared
+  // chrome's view-transition morph.
+  if (window.__bsArrival && !(window.CSS && CSS.supports && CSS.supports('view-transition-name: a'))){
+    document.documentElement.classList.add('bs-arrive');
+  }
+})();
+</script>
+
+<!-- Blank stage — SCENE SEAM. The concrete room mounts here when Eric
+     rules its file format (video / bake / still all remain possible). -->
+<div id="bs-stage"></div>
+
+<!-- Wordmark at the witness's section-scene anchor; a control here
+     (witness .is-clickable grammar): it leads home. -->
+<a id="bs-wordmark-link" href="home.html" aria-label="backspace — home">
+  <img id="bs-wordmark" src="assets/bs_wordmark.svg" alt="backspace">
+</a>
+
+<!-- The away iteration — witness markup (classes kept verbatim so the
+     port audits against the source bundle), carried in the utility
+     cluster's .bs-hit pads: the same loosened mouse vicinity, the same
+     8+8+8 rhythm between circles (Eric, Aug 22). -->
+<div id="bs-corner" class="site-header__nav site-header__nav--primary" aria-label="Section navigation">
+  <div class="bs-hit"><button id="bs-back" class="site-round-button site-header__back-button" type="button" aria-label="Home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button></div>
+  <div class="bs-hit"><nav id="bs-primary" class="site-primary-nav" aria-label="Primary" aria-expanded="false">
+    <button class="site-primary-nav__forward-button" type="button" aria-label="Open section navigation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <button class="site-primary-nav__link site-primary-nav__link--hardware" type="button" data-section="hardware">HARDWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--software is-active is-active-nav" type="button" aria-current="page" data-section="software">SOFTWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--community" type="button" data-section="community">COMMUNITY</button>
+    <button class="site-primary-nav__link site-primary-nav__link--support" type="button" data-section="support">SUPPORT</button>
+  </nav></div>
+</div>
+
+<!-- Utility cluster — injected by the shared chrome. -->
+<div id="bs-icons"></div>
+
+<!-- The coming-soon line, through the i18n surface. -->
+<div id="bs-coming" class="bs-coming"></div>
+<div id="bs-coming-sub" class="bs-coming"></div>
+
+<input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
+
+<script src="shared/bs-chrome.js"></script>
+<script>
+(function(){
+'use strict';
+var C = window.BSChrome;
+var T = C.T, SECTIONS = C.SECTIONS;
+var wake = C.wake, denyOn = C.denyOn, clickOk = C.clickOk;
+
+var arrival = window.__bsArrival === true;   // commit-arrival vs cold boot
+
+// ── Wordmark route (clean paths in production, .html locally) ─────────────
+document.getElementById('bs-wordmark-link').setAttribute('href', C.ROUTES.home);
+
+// ── Corner nav ────────────────────────────────────────────────────────────
+var cornerEl = document.getElementById('bs-corner');
+var backBtn  = document.getElementById('bs-back');
+var primary  = document.getElementById('bs-primary');
+var fwdBtn   = primary.querySelector('.site-primary-nav__forward-button');
+var links    = Array.prototype.slice.call(primary.querySelectorAll('.site-primary-nav__link'));
+
+// The pill runs on the shared pill machinery — hover grows it (unpinned),
+// Enter locks it, a press outside dissolves everything. The witness's
+// click-to-pin maps onto the same lock the keyboard uses: one lock state,
+// two doors in.
+var pillPrimary = C.bindPill(primary, fwdBtn);
+// Closed pill links leave the Tab order (witness tabIndex discipline);
+// aria-expanded mirrors onto the nav element per the witness DOM contract.
+pillPrimary.onOpenChange = function(open){
+  links.forEach(function(l){ l.tabIndex = open ? 0 : -1; });
+  primary.setAttribute('aria-expanded', String(open));
+};
+pillPrimary.onOpenChange(false);
+
+// ── Back across the page boundary ─────────────────────────────────────────
+// The ‹ control and the wordmark LEAD HOME by label (witness grammar):
+// arriving from home that is one true pop; arriving from a sibling
+// section (community, Aug 23) or cold it is a forward navigation. Esc at
+// idle is the strict-LIFO boundary pop instead — one level through real
+// history, wherever it leads (house law); the two diverge by design when
+// a lateral section hop is on the stack. The elision fallback keeps the
+// control alive if a restored session has no entry to pop (same guard
+// pattern as the certified shake/pop timers).
+var arrivalFrom = window.__bsArrivalFrom;
+var _leaving = false;
+function leaveHome(){
+  if (_leaving || !clickOk()) return;
+  _leaving = true;
+  if (arrival && arrivalFrom === 'home'){
+    setTimeout(function(){
+      if (_leaving && !document.hidden){ _leaving = false; location.assign(C.ROUTES.home); }
+    }, 350);
+    history.back();
+    return;
+  }
+  location.assign(C.ROUTES.home);
+}
+function popBoundary(){
+  if (_leaving) return;
+  _leaving = true;
+  setTimeout(function(){
+    if (_leaving && !document.hidden){ _leaving = false; location.assign(C.ROUTES.home); }
+  }, 350);
+  history.back();
+}
+// Bound on the hit pad so clicks in the vicinity count (the cart's
+// plain-circle precedent); the visible control still renders the state.
+(backBtn.closest('.bs-hit') || backBtn).addEventListener('click', function(){ wake(); leaveHome(); });
+
+// ── Section links — commit semantics on the away nav ──────────────────────
+// RULED (Eric, Aug 23, decision batch): SOFTWARE ("you are here") DENIES
+// with the shake — the away-nav grammar is law (already here — nothing
+// fails silently, nothing re-navigates). Sections with routes commit as
+// real navigation (community landed Aug 23); the rest deny until their
+// pages land (route-driven — they flip by appearing in C.ROUTES).
+links.forEach(function(link){
+  link.addEventListener('click', function(e){
+    e.stopPropagation();   // the pill ground's pin-toggle must not fire
+    wake();
+    var sec = link.getAttribute('data-section');
+    if (sec !== 'software' && C.ROUTES[sec]){
+      if (clickOk()) C.nav.commit(sec);
+      return;
+    }
+    denyOn(link);
+  });
+});
+
+// Witness pin: a press on the pill ground (not a link) toggles the pin —
+// the same lock Enter drives, so pinned-open and keyboard-locked are one
+// state. Touch's first tap only opens (certified head grammar).
+primary.addEventListener('click', function(e){
+  if (e.target.closest('.site-primary-nav__link')) return;
+  wake();
+  if (pillPrimary.touchOpenConsumed()) return;
+  if (C.rail.lockIndex() === RAIL_PILL) C.rail.unlock();
+  else C.rail.lock(RAIL_PILL);
+});
+
+// ── Rail registration — [back, pill] lead the utility four ────────────────
+var RAIL_BACK = 0, RAIL_PILL = 1;
+C.init({
+  page: 'software',
+  leadingControls: [
+    { headEl: backBtn, pill: null, activate: leaveHome },
+    { headEl: primary, pill: pillPrimary, trayAxis: 'x',
+      trayItems: function(){ return links; } }
+  ],
+  touchSurfaces: [document.getElementById('bs-stage')],
+  sweepRoots: [cornerEl],
+  hooks: {
+    // No page lock exists here — the stage is blank and nothing commits
+    // in place. The hooks keep the certified dispatcher's shape.
+    isLocked:       function(){ return false; },
+    denyLocked:     function(){},
+    goBack:         function(){ if (arrival) popBoundary(); },   // Esc at idle: TRUE pop of the boundary (LIFO); cold boot = silent bottom
+    escapeFromRail: function(){},                              // rail → idle (one level)
+    enterAtPrimary: function(){ C.rail.focus(0); },            // cold Enter claims the rail
+    verticalStep:   function(down){
+      // The top strip is the page's only surface: W/↑ hands the cursor
+      // up to it (the homepage's top-wall zone-transition rule); S/↓ at
+      // idle clamps silently.
+      if (!down) C.rail.focus(0);
+    },
+    railVertical:   function(down){
+      // In the rail: S/↓ returns to idle; W/↑ clamps (nothing above).
+      if (down) C.rail.focus(-1);
+    },
+    horizontalCold: function(dir){
+      // A/D own the horizontal axis — cold entry claims the rail from
+      // its near end, one gesture one step, ends clamp silently.
+      C.rail.focus(dir > 0 ? 0 : C.rail.count() - 1);
+    },
+    wheelStep:      function(){ return false; },   // no vertical surface — the bridge idles (walls are silent)
+    wheelPitch:     function(){ return 55; },
+    clearPrimary:   function(){},
+    idleReset:      function(){ C.rail.focus(-1); },   // attract: the cursor clears
+    onLangChange:   function(T){
+      links.forEach(function(l){ l.textContent = T(l.getAttribute('data-section')); });
+      document.getElementById('bs-coming').textContent = T('softwareComingSoon');
+      document.getElementById('bs-coming-sub').textContent = T('softwareComingSoonSub');
+      document.title = T('softwareTitle');
+    },
+    onFontsReady:   function(){},
+    devState:       function(){ return { arrival: arrival, leaving: _leaving }; }
+  }
+});
+
+// ── Boot — cold or arrived, interactive at first paint ────────────────────
+document.getElementById('bs-coming').textContent = T('softwareComingSoon');
+document.getElementById('bs-coming-sub').textContent = T('softwareComingSoonSub');
+links.forEach(function(l){ l.textContent = T(l.getAttribute('data-section')); });
+
+// A bfcache return to this page re-arms attract and clears the leaving
+// latch (the certified pageshow discipline).
+window.addEventListener('pageshow', function(e){
+  if (e.persisted){ _leaving = false; C.rail.focus(-1); }
+});
+
+})();
+</script>
+</body>
+</html>

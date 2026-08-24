@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#040402">
+<title>BACKSPACE — Community</title>
+<!--
+  backspace — /community (page three), v1: first page mounted on the
+  RATIFIED shared chrome pair (factoring ratified Eric, Aug 23 2026 —
+  community-phase decision batch).
+
+  CONTENT AUTHORITY: the witness build Eric supplied at initiation
+  (dev-bc957c…pressbackspace.com — the /hall shell; the whole scene
+  registry rides in its boot bundle). Frame A-3 COMMUNITY (figmaNodeId
+  1:211, 1728×1117, variant site-header): six social links on one row —
+  Instagram / YouTube / TikTok / X / Discord / Facebook — layer y 1058
+  (Discord/Facebook carry a 1px Figma jitter at 1059, normalized to the
+  row), 14px/300, full ink, resting glow, PERFECT 50px gaps, row centered
+  on the frame axis (864.5 ≈ 864, sub-pixel). Ported per the certified
+  frame-fraction convention: y 1058/1117 → 94.72vh, gap 50/1728 → 2.894vw,
+  type on --ui-scale. The witness titles the scene "BACKSPACE - Community"
+  (em dash per the shipped title convention).
+
+  RULED (Eric, Aug 23, decision batch): the six socials carry their slug
+  URLs (handle: pressbackspace — PROPOSAL until accounts exist) behind the
+  witness's THIRD PARTY overlay, which gains a Continue that opens the
+  slug in a new tab; Cancel/Esc backs out one level. Overlay markup and
+  values are the witness's external-overlay set verbatim (class names
+  kept auditable), durations superseded by the tempo tokens per the
+  Aug 20 universal-tempo ruling. The witness shipped Cancel-only with
+  "External destination pending." — still literally true until the
+  accounts are set up, so the copy ports verbatim; revisit at go-live.
+
+  RULED (Eric, Aug 23): current-section grammar on the away nav = DENY
+  with the shake ("you are here" refuses loudly) — the shipped software
+  grammar is now law, and this page implements it. SOFTWARE commits as
+  real navigation (route-driven); hardware/support deny until their pages
+  land.
+
+  LABELED DEVIATION (proposal): link hover/cursor renders #fff +
+  --glow-text-icons per the Aug 22 pill-sub-text ruling (the house
+  grammar for 14px/300 interactive text). The witness's own hover is a
+  bare #fefefe→#fff lift — imperceptible; one line reverts.
+
+  STAGE: blank black per the standing scene-format gate — the concrete
+  room mounts later; its format (video / bake / still) is OPEN and
+  nothing here precludes any of the three. SCENE SEAM is #bs-stage.
+
+  MACHINE LAW on this page: one cursor across two zones — the top strip
+  [back, sections-pill, lang, sound, cart, account] and the social row.
+  A/D walks the zone that holds the cursor (cold A/D claims the row from
+  its near end — the row is this page's primary surface); W/S is the
+  zone transition (row ↔ strip); ends clamp silently, no wrap. Enter
+  activates the cursored link → the THIRD PARTY overlay opens as the
+  page lock (the homepage airlock pattern): W/S/wheel deny with the
+  shake on the dialog, Esc pops it — exactly one level. Ladder: overlay →
+  row → idle → the page boundary. The boundary pop is a TRUE history pop
+  (strict LIFO): arriving from /software, Esc returns there; the round ‹
+  control and the wordmark lead HOME by label (witness grammar) — the
+  two diverge by design and both are on record. Cold boot has nothing to
+  pop: Esc at idle is silent. Denial is visible and audible; touch taps
+  are the certified two-step (first tap focuses, second commits).
+-->
+<link rel="stylesheet" href="shared/bs-chrome.css">
+<style>
+  /* ── The social row — the page's one visible content. Geometry from the
+     witness's A-3 COMMUNITY layer config (1728×1117 frame, fractions
+     carried per the certified port convention): row top 1058/1117 →
+     94.72vh, gaps 50/1728 → 2.894vw, centered on the frame axis; labels
+     14px/300 on the UI face, full ink, resting glow, 15px line. Text
+     arrives through STR keys — never hardcoded here (CN platform-set
+     swap stays a one-line seam). ─────────────────────────────────────── */
+  #bs-social {
+    position: fixed; top: 94.72vh; left: 50%;
+    transform: translateX(-50%);
+    z-index: 12;
+    display: flex; gap: 2.894vw;
+    white-space: nowrap;
+  }
+  .bs-social-link {
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(14px * var(--ui-scale));
+    line-height: calc(15px * var(--ui-scale));
+    letter-spacing: 0; white-space: nowrap;
+    text-shadow: var(--glow-text-word);
+    background: none; border: 0; padding: 0;
+    cursor: var(--cursor-target);
+    transition: color 0.16s, text-shadow 0.2s ease;
+  }
+  /* ONE visual channel for the cursor (house law): the bloom renders only
+     through .kb-hover — mouseenter and the keyboard both drive it via THE
+     focus variable; :focus-visible covers native Tab. Glow per the Aug 22
+     sub-text ruling — labeled deviation, see header.
+     WHOLE-WORD rule 6 (Eric, Aug 23, ruled ON this row): "X" measured
+     0.60x the long platforms' contour glow on hover — letter count was
+     deciding intensity. Both states ride the word tokens; the machine
+     solves f(n) per label at every STR render (normalizeWordGlow) and
+     the tokens' comp rings deliver it. Long platforms: f <= .07,
+     visually unchanged. Equation + dataset: reports/glow_audit.md. */
+  .bs-social-link.kb-hover, .bs-social-link:focus-visible {
+    color: #fff; outline: none;
+    text-shadow: var(--glow-text-icons-word);
+  }
+  @media (max-width: 560px) {
+    /* PROVISIONAL: narrow portrait alone may wrap — collision rule only,
+       until Eric's mobile grammar (the six labels fit 320px by
+       arithmetic, but a locale swap may not). */
+    #bs-social { max-width: 92vw; flex-wrap: wrap; justify-content: center;
+                 row-gap: calc(12px * var(--ui-scale)); }
+  }
+
+  /* ── THIRD PARTY overlay — witness .external-overlay set at exact
+     values (backdrop #0000009e + 5px blur; dialog min(34vw,420px)/280px
+     floor, 24px×ui pad, #0c0c0cd6 on a 1px #ffffff52 line, 80px halo;
+     kicker/copy #ffffff94 10px×ui ls .18em uppercase; h2 15px×ui ls
+     .12em; cancel 11px×ui in a 999px #ffffff6b ring). Witness durations
+     (.25s/.2s/.26s on the house curve) are superseded by the tempo
+     tokens per the Aug 20 ruling — the dialog's travel rides
+     --pop-motion, every fade rides --pop-fade. The CONTINUE action is
+     the Aug 23 extension (Eric's slug ruling): styled on the witness's
+     own action-button grammar (the auth OTP pill: #ffffff14 fill,
+     .5px #ffffffc7 ring, 24px halo; hover #ffffff29 / #fffffff2). ───── */
+  .external-overlay {
+    position: fixed; inset: 0; z-index: 30;
+    display: grid; place-items: center;
+    pointer-events: auto; opacity: 1;
+    transition: opacity var(--pop-fade);
+  }
+  .external-overlay[hidden] { display: none; }
+  .external-overlay.is-opening { opacity: 0; }
+  .external-overlay.is-closing { opacity: 0; pointer-events: none; }
+  .external-overlay-backdrop {
+    position: absolute; inset: 0;
+    background: #0000009e;
+    -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+    transition: opacity var(--pop-fade),
+                -webkit-backdrop-filter var(--pop-fade),
+                backdrop-filter var(--pop-fade);
+  }
+  .external-overlay.is-opening .external-overlay-backdrop {
+    opacity: 0;
+    -webkit-backdrop-filter: blur(); backdrop-filter: blur();
+  }
+  .external-overlay-dialog {
+    position: relative;
+    width: min(34vw, 420px); min-width: 280px;
+    padding: calc(24px * var(--ui-scale));
+    color: #fff; text-align: center;
+    text-shadow: var(--glow-text);
+    background: #0c0c0cd6;
+    border: 1px solid #ffffff52;
+    box-shadow: 0 0 80px #ffffff1f;
+    transition: opacity var(--pop-fade), transform var(--pop-motion);
+  }
+  .external-overlay.is-opening .external-overlay-dialog {
+    opacity: 0; transform: translateY(12px) scale(.96);
+  }
+  .external-overlay.is-closing .external-overlay-dialog {
+    opacity: 0; transform: translateY(-8px) scale(.98);
+  }
+  .external-overlay-kicker, .external-overlay-copy {
+    margin: 0;
+    color: #ffffff94;
+    font-size: calc(10px * var(--ui-scale));
+    letter-spacing: .18em; text-transform: uppercase;
+  }
+  .external-overlay-dialog h2 {
+    margin: calc(10px * var(--ui-scale)) 0 calc(14px * var(--ui-scale));
+    font-size: calc(15px * var(--ui-scale));
+    letter-spacing: .12em;
+  }
+  .external-overlay-actions {
+    margin-top: calc(18px * var(--ui-scale));
+    display: flex; justify-content: center;
+    gap: calc(12px * var(--ui-scale));
+  }
+  .external-overlay-continue, .external-overlay-cancel {
+    padding: calc(8px * var(--ui-scale)) calc(18px * var(--ui-scale));
+    color: #fff;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .1em;
+    line-height: normal;
+    text-decoration: none;
+    cursor: var(--cursor-target);
+    background: none; border: 1px solid #ffffff6b; border-radius: 999px;
+    transition: background 0.16s, border-color 0.16s;
+  }
+  .external-overlay-continue {
+    background: #ffffff14;
+    border: .5px solid #ffffffc7;
+    box-shadow: 0 0 24px 5px #ffffff1f;
+    /* The one TRUE EXTERNAL LINK in the interface today — the slug
+       anchor. Consumes the link-role token (and carries the
+       data-cursor-link marker): the +/link variant is PARKED (Eric,
+       Aug 23 — plain rings everywhere for now), so this renders the
+       same rings; the semantic slot stays for the revival. */
+    cursor: var(--cursor-link);
+  }
+  .external-overlay-continue:hover, .external-overlay-continue:focus-visible {
+    background: #ffffff29; border-color: #fffffff2; outline: none;
+  }
+  .external-overlay-cancel:hover, .external-overlay-cancel:focus-visible {
+    border-color: #ffffffc7; outline: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .external-overlay, .external-overlay-backdrop, .external-overlay-dialog {
+      transition: none;
+    }
+    .external-overlay.is-opening .external-overlay-dialog,
+    .external-overlay.is-closing .external-overlay-dialog { transform: none; }
+    .external-overlay-backdrop {
+      -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+  }
+
+  /* Commit-arrival resolve for browsers WITHOUT view transitions (the
+     shared chrome carries the real cross-document morph): the two morph
+     participants fade in on the tempo's companion fade. Cold boot never
+     runs this — T0 discipline, nothing choreographs at a deep link. */
+  @keyframes bs-arrive { from { opacity: 0; } }
+  html.bs-arrive #bs-corner,
+  html.bs-arrive #bs-wordmark { animation: bs-arrive var(--pop-fade); }
+  @media (prefers-reduced-motion: reduce) {
+    html.bs-arrive #bs-corner,
+    html.bs-arrive #bs-wordmark { animation: none; }
+  }
+</style>
+</head>
+<body data-bs-page="community">
+
+<script>
+// Pre-paint arrival read (inline so the entrance class exists at first
+// paint; runs in microseconds — T0 interactivity is untouched). The flag
+// is consumed HERE, once; the machine reads window.__bsArrival. Arrivals
+// commit from home OR software now that sections link laterally; the flag
+// value (which page stamped it) steers the ‹ control's back semantics.
+(function(){
+  var from = null;
+  try {
+    from = sessionStorage.getItem('bs-nav-from');
+    sessionStorage.removeItem('bs-nav-from');
+  } catch (e) {}
+  window.__bsArrival = (from === 'home' || from === 'software');
+  window.__bsArrivalFrom = window.__bsArrival ? from : null;
+  // Fallback resolve only where the browser cannot run the shared
+  // chrome's view-transition morph.
+  if (window.__bsArrival && !(window.CSS && CSS.supports && CSS.supports('view-transition-name: a'))){
+    document.documentElement.classList.add('bs-arrive');
+  }
+})();
+</script>
+
+<!-- Blank stage — SCENE SEAM. The concrete room mounts here when Eric
+     rules its file format (video / bake / still all remain possible). -->
+<div id="bs-stage"></div>
+
+<!-- Wordmark at the section-scene berth; a control here (witness
+     .is-clickable grammar): it leads home. -->
+<a id="bs-wordmark-link" href="home.html" aria-label="backspace — home">
+  <img id="bs-wordmark" src="assets/bs_wordmark.svg" alt="backspace">
+</a>
+
+<!-- The away iteration — witness markup (classes kept verbatim so the
+     port audits against the source bundle), carried in the utility
+     cluster's .bs-hit pads: the same loosened mouse vicinity, the same
+     8+8+8 rhythm between circles (Eric, Aug 22). COMMUNITY is committed:
+     full ink weight-600, no dot, aria-current (canon committed grammar,
+     ratified in the Aug 23 batch alongside the deny ruling). -->
+<div id="bs-corner" class="site-header__nav site-header__nav--primary" aria-label="Section navigation">
+  <div class="bs-hit"><button id="bs-back" class="site-round-button site-header__back-button" type="button" aria-label="Home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button></div>
+  <div class="bs-hit"><nav id="bs-primary" class="site-primary-nav" aria-label="Primary" aria-expanded="false">
+    <button class="site-primary-nav__forward-button" type="button" aria-label="Open section navigation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <button class="site-primary-nav__link site-primary-nav__link--hardware" type="button" data-section="hardware">HARDWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--software" type="button" data-section="software">SOFTWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--community is-active is-active-nav" type="button" aria-current="page" data-section="community">COMMUNITY</button>
+    <button class="site-primary-nav__link site-primary-nav__link--support" type="button" data-section="support">SUPPORT</button>
+  </nav></div>
+</div>
+
+<!-- Utility cluster — injected by the shared chrome. -->
+<div id="bs-icons"></div>
+
+<!-- The social row — witness A-3 content, order by layer x
+     (569/696/814/915/975/1084). Buttons, not anchors: activation runs
+     through the THIRD PARTY airlock (Eric, Aug 23); the slug anchor is
+     the overlay's Continue. Labels re-render through STR keys at boot. -->
+<nav id="bs-social" aria-label="Community platforms">
+  <button class="bs-social-link" type="button" data-social="socialInstagram">Instagram</button>
+  <button class="bs-social-link" type="button" data-social="socialYouTube">YouTube</button>
+  <button class="bs-social-link" type="button" data-social="socialTikTok">TikTok</button>
+  <button class="bs-social-link" type="button" data-social="socialX">X</button>
+  <button class="bs-social-link" type="button" data-social="socialDiscord">Discord</button>
+  <button class="bs-social-link" type="button" data-social="socialFacebook">Facebook</button>
+</nav>
+
+<!-- THIRD PARTY overlay — witness external-overlay markup verbatim
+     (+ the ratified Continue). Hidden and inert until a link commits. -->
+<div id="bs-external" class="external-overlay" hidden>
+  <div class="external-overlay-backdrop" data-external-close></div>
+  <section class="external-overlay-dialog" role="dialog" aria-modal="true" aria-labelledby="bs-external-title">
+    <p class="external-overlay-kicker" id="bs-external-kicker">THIRD PARTY</p>
+    <h2 id="bs-external-title">CONTINUE</h2>
+    <p class="external-overlay-copy" id="bs-external-copy">External destination pending.</p>
+    <div class="external-overlay-actions">
+      <a class="external-overlay-continue" id="bs-external-continue" href="#" target="_blank" rel="noopener noreferrer" data-cursor-link>Continue</a>
+      <button class="external-overlay-cancel" id="bs-external-cancel" type="button" data-external-close>Cancel</button>
+    </div>
+  </section>
+</div>
+
+<input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
+
+<script src="shared/bs-chrome.js"></script>
+<script>
+(function(){
+'use strict';
+var C = window.BSChrome;
+var T = C.T, SoundBus = C.SoundBus;
+var wake = C.wake, denyOn = C.denyOn, shakeEl = C.shakeEl, clickOk = C.clickOk, hapticTick = C.hapticTick;
+
+var arrival     = window.__bsArrival === true;    // commit-arrival vs cold boot
+var arrivalFrom = window.__bsArrivalFrom;         // 'home' | 'software' | null
+
+// ── The slug map — PROPOSAL (Eric, Aug 23: "build the corresponding url
+// slugs"). Handle derived from the house domain (pressbackspace); Eric
+// confirms each as the accounts are created. Discord rides the vanity
+// invite form — claiming it needs the server's vanity URL unlocked. ──────
+var SOCIALS = [
+  { key: 'socialInstagram', url: 'https://www.instagram.com/pressbackspace/' },
+  { key: 'socialYouTube',   url: 'https://www.youtube.com/@pressbackspace' },
+  { key: 'socialTikTok',    url: 'https://www.tiktok.com/@pressbackspace' },
+  { key: 'socialX',         url: 'https://x.com/pressbackspace' },
+  { key: 'socialDiscord',   url: 'https://discord.gg/pressbackspace' },
+  { key: 'socialFacebook',  url: 'https://www.facebook.com/pressbackspace' }
+];
+
+// ── Wordmark route (clean paths in production, .html locally) ─────────────
+document.getElementById('bs-wordmark-link').setAttribute('href', C.ROUTES.home);
+
+// ── DOM handles ───────────────────────────────────────────────────────────
+var cornerEl = document.getElementById('bs-corner');
+var backBtn  = document.getElementById('bs-back');
+var primary  = document.getElementById('bs-primary');
+var fwdBtn   = primary.querySelector('.site-primary-nav__forward-button');
+var links    = Array.prototype.slice.call(primary.querySelectorAll('.site-primary-nav__link'));
+var socialEl = document.getElementById('bs-social');
+var rowLinks = Array.prototype.slice.call(socialEl.querySelectorAll('.bs-social-link'));
+
+var extEl       = document.getElementById('bs-external');
+var extDialog   = extEl.querySelector('.external-overlay-dialog');
+var extTitle    = document.getElementById('bs-external-title');
+var extContinue = document.getElementById('bs-external-continue');
+var extCancel   = document.getElementById('bs-external-cancel');
+
+// ── The social row — this page's half of the one focus variable ───────────
+// -1 = nothing focused. Hover and the keyboard cursor are the same state;
+// every input path funnels into setRowFocus (the homepage menu pattern).
+var rowIdx = -1;
+function renderRow(){
+  for (var i = 0; i < rowLinks.length; i++){
+    rowLinks[i].classList.toggle('kb-hover', i === rowIdx);
+  }
+}
+function setRowFocus(i){
+  if (i === rowIdx) return;
+  if (i >= 0 && C.rail.index() >= 0) C.rail.focus(-1);   // one cursor — leaving the icon rail
+  rowIdx = i;
+  renderRow();
+  if (i >= 0){ SoundBus.play('detent'); hapticTick(); }
+}
+function rowStep(dir){
+  var next = rowIdx + dir;
+  if (next < 0 || next >= rowLinks.length) return;   // wall — clamp, no wrap
+  setRowFocus(next);
+}
+rowLinks.forEach(function(link, idx){
+  link.tabIndex = 0;
+  link.addEventListener('mouseenter', function(){
+    if (C.rail.isTouch() || extOpen) return;
+    wake();
+    if (rowIdx !== idx) setRowFocus(idx);
+  });
+  link.addEventListener('mouseleave', function(){
+    if (C.rail.isTouch() || extOpen) return;
+    if (rowIdx === idx) setRowFocus(-1);
+  });
+  // Click: travel → commit (the certified two-step). Mouse hover has
+  // already focused, so a click commits; touch's first tap only focuses.
+  link.addEventListener('click', function(){
+    wake();
+    if (extOpen) return;
+    if (rowIdx === idx){ if (clickOk()) openExternal(idx); }
+    else setRowFocus(idx);
+  });
+});
+
+// ── THIRD PARTY overlay — the page lock (the homepage airlock pattern) ────
+// While open: W/S/wheel deny on the dialog, Esc closes — exactly one
+// level. Focus is trapped in the dialog; everything behind goes inert
+// (witness discipline); close restores cursor and focus to the invoker.
+var extOpen = false;
+var _extInvoker = -1;
+var _extCloseT = null;
+var INERT_ROOTS = ['bs-stage', 'bs-wordmark-link', 'bs-corner', 'bs-icons', 'bs-social'];
+function reducedMotion(){
+  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+function setBackgroundInert(on){
+  INERT_ROOTS.forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.inert = on;
+  });
+}
+function openExternal(idx){
+  if (extOpen) return;
+  var s = SOCIALS[idx];
+  if (!s) return;
+  extOpen = true;
+  _extInvoker = idx;
+  clearTimeout(_extCloseT);
+  extEl.classList.remove('is-closing');
+  // Title per the witness grammar: CONTINUE TO {PLATFORM}; the slug rides
+  // the Continue anchor (new tab — the hall stays lit behind the door).
+  extTitle.textContent = T('extTitle').replace('{p}', T(s.key).toUpperCase());
+  extContinue.setAttribute('href', s.url);
+  extEl.hidden = false;
+  setBackgroundInert(true);
+  if (!reducedMotion()){
+    extEl.classList.add('is-opening');
+    void extEl.offsetWidth;
+    requestAnimationFrame(function(){ extEl.classList.remove('is-opening'); });
+  }
+  SoundBus.play('commit');
+  try { extCancel.focus({ preventScroll: true }); } catch (e) { extCancel.focus(); }   // witness focusOnOpen: the cancel
+}
+function closeExternal(instant){
+  if (!extOpen) return;
+  extOpen = false;
+  setBackgroundInert(false);
+  var finish = function(){
+    extEl.classList.remove('is-closing');
+    extEl.hidden = true;
+  };
+  clearTimeout(_extCloseT);
+  if (instant || reducedMotion()){ finish(); }
+  else {
+    extEl.classList.add('is-closing');
+    // Elision-guard timer (the shake pattern): if the fade never runs,
+    // the overlay must not strand half-closed.
+    _extCloseT = setTimeout(finish, 450);
+  }
+  // Cursor and focus return to the invoking link (witness
+  // restoreFocusOnClose, folded into THE focus variable).
+  var inv = _extInvoker; _extInvoker = -1;
+  if (inv >= 0){
+    setRowFocus(inv);
+    try { rowLinks[inv].focus({ preventScroll: true }); } catch (e) {}
+  }
+}
+// The overlay owns its keys while open — the machine stays blind (the
+// #bs-icons exemption pattern): Esc closes, Tab cycles the two actions,
+// Enter activates natively; everything else stops here.
+extEl.addEventListener('keydown', function(e){
+  if (!extOpen) return;
+  e.stopPropagation();
+  if (e.key === 'Escape'){ e.preventDefault(); wake(); closeExternal(); return; }
+  if (e.key === 'Tab'){
+    var f = [extContinue, extCancel];
+    var i = f.indexOf(document.activeElement);
+    e.preventDefault();
+    var n = e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i >= f.length - 1 ? 0 : i + 1);
+    try { f[n].focus({ preventScroll: true }); } catch (err) {}
+  }
+});
+extEl.querySelectorAll('[data-external-close]').forEach(function(el){
+  el.addEventListener('click', function(){ wake(); closeExternal(); });
+});
+extContinue.addEventListener('click', function(){
+  // Native anchor does the navigation (new tab, noopener); the airlock
+  // closes behind it.
+  wake();
+  closeExternal();
+});
+
+// ── Corner nav ────────────────────────────────────────────────────────────
+// The pill runs on the shared pill machinery — hover grows it (unpinned),
+// Enter locks it, a press outside dissolves everything.
+var pillPrimary = C.bindPill(primary, fwdBtn);
+pillPrimary.onOpenChange = function(open){
+  links.forEach(function(l){ l.tabIndex = open ? 0 : -1; });
+  primary.setAttribute('aria-expanded', String(open));
+};
+pillPrimary.onOpenChange(false);
+
+// ── Back across the page boundary ─────────────────────────────────────────
+// The ‹ control and the wordmark LEAD HOME by label (witness grammar):
+// arriving from home that is one true pop; arriving from software (or
+// cold) it is a forward navigation. Esc at idle is the strict-LIFO
+// boundary pop instead — one level through real history, wherever it
+// leads (house law); the two diverge by design when a lateral section
+// hop is on the stack. The elision fallback keeps the control alive if a
+// restored session has no entry to pop.
+var _leaving = false;
+function leaveHome(){
+  if (_leaving || !clickOk()) return;
+  _leaving = true;
+  if (arrival && arrivalFrom === 'home'){
+    setTimeout(function(){
+      if (_leaving && !document.hidden){ _leaving = false; location.assign(C.ROUTES.home); }
+    }, 350);
+    history.back();
+    return;
+  }
+  location.assign(C.ROUTES.home);
+}
+function popBoundary(){
+  if (_leaving) return;
+  _leaving = true;
+  setTimeout(function(){
+    if (_leaving && !document.hidden){ _leaving = false; location.assign(C.ROUTES.home); }
+  }, 350);
+  history.back();
+}
+(backBtn.closest('.bs-hit') || backBtn).addEventListener('click', function(){ wake(); leaveHome(); });
+
+// ── Section links — commit semantics on the away nav ──────────────────────
+// RULED (Eric, Aug 23): COMMUNITY ("you are here") DENIES with the shake.
+// Sections with routes commit as real navigation; the rest deny until
+// their pages land (route-driven — support/hardware flip by appearing in
+// C.ROUTES, no page edit).
+links.forEach(function(link){
+  link.addEventListener('click', function(e){
+    e.stopPropagation();   // the pill ground's pin-toggle must not fire
+    wake();
+    var sec = link.getAttribute('data-section');
+    if (sec !== 'community' && C.ROUTES[sec]){
+      if (clickOk()) C.nav.commit(sec);
+      return;
+    }
+    denyOn(link);
+  });
+});
+
+// Witness pin: a press on the pill ground (not a link) toggles the pin —
+// the same lock Enter drives. Touch's first tap only opens.
+primary.addEventListener('click', function(e){
+  if (e.target.closest('.site-primary-nav__link')) return;
+  wake();
+  if (pillPrimary.touchOpenConsumed()) return;
+  if (C.rail.lockIndex() === RAIL_PILL) C.rail.unlock();
+  else C.rail.lock(RAIL_PILL);
+});
+
+// ── Rail registration — [back, pill] lead the utility four ────────────────
+var RAIL_BACK = 0, RAIL_PILL = 1;
+C.init({
+  page: 'community',
+  leadingControls: [
+    { headEl: backBtn, pill: null, activate: leaveHome },
+    { headEl: primary, pill: pillPrimary, trayAxis: 'x',
+      trayItems: function(){ return links; } }
+  ],
+  touchSurfaces: [document.getElementById('bs-stage')],
+  sweepRoots: [cornerEl, socialEl],
+  hooks: {
+    // The THIRD PARTY overlay is the page lock — the homepage airlock
+    // pattern: input denies on the dialog, Esc/goBack pops it.
+    isLocked:       function(){ return extOpen; },
+    denyLocked:     function(){ if (!extDialog.classList.contains('bs-shake')) denyOn(extDialog); },
+    goBack:         function(){
+      if (extOpen){ closeExternal(); return; }        // overlay → row (one level)
+      if (rowIdx >= 0){ setRowFocus(-1); return; }    // row → idle (one level)
+      if (arrival) popBoundary();                     // idle: TRUE pop of the boundary; cold boot = silent bottom
+    },
+    escapeFromRail: function(){ setRowFocus(0); },     // rail → the primary surface (one level, homepage grammar)
+    enterAtPrimary: function(){
+      if (rowIdx < 0){ setRowFocus(0); return; }      // cold Enter claims the first link
+      openExternal(rowIdx);
+    },
+    verticalStep:   function(down){
+      // Two zones on one cursor: from the row W/↑ hands up to the strip
+      // (the top-wall zone-transition rule); S/↓ at the row clamps. At
+      // idle: S/↓ claims the row (the page's primary surface), W/↑ the
+      // strip.
+      if (rowIdx >= 0){
+        if (!down){ setRowFocus(-1); C.rail.focus(0); }
+        return;
+      }
+      if (down) setRowFocus(0);
+      else C.rail.focus(0);
+    },
+    railVertical:   function(down){
+      // In the rail: S/↓ descends to the row; W/↑ clamps (nothing above).
+      if (down){ C.rail.focus(-1); setRowFocus(0); }
+    },
+    horizontalCold: function(dir){
+      // A/D own the horizontal axis. The cursor's zone steps; cold A/D
+      // claims the ROW from its near end (the primary surface — the
+      // homepage's cold-entry grammar, horizontal), one gesture one
+      // step, ends clamp silently.
+      if (rowIdx >= 0){ rowStep(dir); return; }
+      setRowFocus(dir > 0 ? 0 : rowLinks.length - 1);
+    },
+    wheelStep:      function(){ return false; },   // no vertical surface — the bridge idles (walls are silent)
+    wheelPitch:     function(){ return 55; },
+    clearPrimary:   function(){ if (rowIdx >= 0){ rowIdx = -1; renderRow(); } },
+    idleReset:      function(){ setRowFocus(-1); C.rail.focus(-1); },   // attract: the cursor clears
+    onLangChange:   function(T){
+      links.forEach(function(l){ l.textContent = T(l.getAttribute('data-section')); });
+      rowLinks.forEach(function(l){ l.textContent = T(l.getAttribute('data-social')); });
+      document.getElementById('bs-external-kicker').textContent = T('extKicker');
+      document.getElementById('bs-external-copy').textContent = T('extPending');
+      extContinue.textContent = T('extContinue');
+      extCancel.textContent = T('extCancel');
+      if (extOpen && _extInvoker >= 0){
+        extTitle.textContent = T('extTitle').replace('{p}', T(SOCIALS[_extInvoker].key).toUpperCase());
+      }
+      document.title = T('communityTitle');
+    },
+    onFontsReady:   function(){},
+    devState:       function(){ return { arrival: arrival, arrivalFrom: arrivalFrom, leaving: _leaving, rowIdx: rowIdx, extOpen: extOpen }; }
+  }
+});
+
+// ── Boot — cold or arrived, interactive at first paint ────────────────────
+links.forEach(function(l){ l.textContent = T(l.getAttribute('data-section')); });
+rowLinks.forEach(function(l){ l.textContent = T(l.getAttribute('data-social')); });
+
+// A bfcache return to this page re-arms attract, clears the leaving
+// latch, and drops a stale overlay instantly (the certified pageshow
+// discipline — nothing pre-lit).
+window.addEventListener('pageshow', function(e){
+  if (e.persisted){
+    _leaving = false;
+    closeExternal(true);
+    setRowFocus(-1);
+    C.rail.focus(-1);
+  }
+});
+
+})();
+</script>
+</body>
+</html>

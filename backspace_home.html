@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#040402">
+<title>backspace</title>
+<!--
+  backspace — homepage (title screen), v3: interaction structural skeleton.
+  Production seed, written to be kept. Single file; assets self-hosted.
+
+  Eric's live rulings, Aug 20:
+  · Blank black stage — no room render yet; the scene (video/bake) mounts
+    behind the chrome later.
+  · Styling follows the /hall demo build (the previous engineer's), not
+    softfractal's look: its tokens, fonts (Chill Duan Sans / Wide on the UI),
+    cursors, glow language. Values below are ported from its stylesheet
+    verbatim (site-side-menu--home, figma-frame-video, site-utility-nav,
+    scene-logo), scaled by --ui-scale.
+  · The menu is the demo's iteration: all items the same size; hover pops
+    the item out to the right with easing (.26s cubic-bezier(.22,1,.36,1),
+    both ways) and it glows; a signal-red dot marks the hovered item.
+
+  Underneath is the inherited interaction skeleton: ONE focus variable;
+  detented wheel (C14/trough bridge, constants verbatim — DO NOT retune
+  here); W/S + arrows with hover/keyboard parity (mouse leaving an item pops
+  it back in; a keyboard cursor persists); Enter commits into the airlock
+  stub through real history (strict LIFO back); locked input shakes;
+  four-event sound bus unlocking at first gesture. The panel frame and its
+  per-section trigger binding were removed on Eric's later Aug 20 ruling —
+  the VIDEO TRIGGER SEAM returns with the real scene work. The bottom
+  film-selection strip is the demo's horizontal-strip, ported 1:1.
+
+  G-Octarine: still gated. The demo embeds Octarine; this build does NOT —
+  --font-sans falls back to Chill Duan Sans until Eric clears the license.
+-->
+<style>
+  /* ── Fonts — self-hosted, ported @font-face set (minus Octarine) ───── */
+  @font-face{font-family:"Chill Duan Sans";font-style:normal;font-weight:300;font-display:swap;src:url(assets/fonts/chillduan-light.woff2)format("woff2")}
+  @font-face{font-family:"Chill Duan Sans";font-style:normal;font-weight:500;font-display:swap;src:url(assets/fonts/chillduan-medium.woff2)format("woff2")}
+  @font-face{font-family:"Chill Duan Sans";font-style:normal;font-weight:900;font-display:swap;src:url(assets/fonts/chillduan-heavy.woff2)format("woff2")}
+  @font-face{font-family:"Chill Duan Sans Wide";font-style:normal;font-weight:300;font-display:swap;src:url(assets/fonts/chillduan-wide-light.woff2)format("woff2")}
+  @font-face{font-family:"Chill Duan Sans Wide";font-style:normal;font-weight:600;font-display:swap;src:url(assets/fonts/chillduan-wide-semibold.woff2)format("woff2")}
+  @font-face{font-family:"Syncopate";font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/syncopate-400.woff2)format("woff2")}
+  @font-face{font-family:"Syncopate";font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/syncopate-700.woff2)format("woff2")}
+
+  /* ── Tokens — ported from the demo stylesheet ──────────────────────── */
+  :root {
+    --bg:               #040402;
+    --ink:              #fefefe;
+    --text-soft:        #fefefed1;   /* menu items at rest */
+    --mid:              #b8b8ba;     /* urban fog */
+    --color-signal-red: #9d1f00;
+    --panel-line:       #fefefe42;
+    --glow-text:        0 0 9.6px rgba(255,255,255,0.58);
+    /* Hover OUTER GLOW (Eric, Aug 20): the resting glow plus two wider,
+       softer halos; same recipe as a filter chain for icon glyphs. */
+    --glow-text-hover:  0 0 9.6px rgba(255,255,255,0.92), 0 0 24px rgba(255,255,255,0.5), 0 0 46px rgba(255,255,255,0.28);
+    /* Icon glyphs are hairline strokes (weight-100 Material cuts), which
+       shed far less light than solid 600-weight text — so the chain runs
+       hotter to LAND at the same bloom as --glow-text-hover: a strong
+       brightness lift plus four stacked shadows whose radii mirror the
+       text glow's 9.6/24/46 spreads (each drop-shadow re-shadows the
+       already-haloed result, so they compound). */
+    /* INTENSITY doubling (Eric's ruling): alphas cap at 1, but intensity
+       does not cap there — REPEATING a ring composites it over itself and
+       fattens the bright shoulder of the falloff. Doubling means adding
+       light (repeated rings), never stretching it (wider radii read as
+       WEAKER — the halved feel). Icon chains compound serially, so one
+       extra pass of the mid rings goes a long way; text shadows sum in
+       parallel, so the tight rings are simply painted twice. */
+    --glow-icon-hover:  brightness(2) drop-shadow(0 0 3px rgba(255,255,255,1)) drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 10px rgba(255,255,255,0.7)) drop-shadow(0 0 24px rgba(255,255,255,0.8)) drop-shadow(0 0 48px rgba(255,255,255,0.6)) drop-shadow(0 0 96px rgba(255,255,255,0.4));
+    --glow-text-icons:  0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1), 0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95), 0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75), 0 0 96px rgba(255,255,255,0.5), 0 0 184px rgba(255,255,255,0.3);
+    /* The utility cluster runs 25% larger than the base UI scale (Eric). */
+    --icons-scale: calc(var(--ui-scale) * 1.25);
+    --font-display: "Syncopate", "Chill Duan Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-ui:      "Chill Duan Sans Wide", "Chill Duan Sans", ui-sans-serif, system-ui, sans-serif;
+    /* --font-sans omits Octarine until G-Octarine clears. */
+    --font-sans:    "Chill Duan Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --cursor-target: url(assets/ui/cursor-target.svg) 14 14, pointer;
+    --cursor-cross:  url(assets/ui/cursor-cross.svg) 12 12, crosshair;
+    --ui-scale: 1;                   /* set by JS: min(vw/1920, vh/1080), clamped */
+    /* UNIVERSAL INTERACTION TEMPO (Eric's ruling, Aug 20): every pop-out
+       and expansion in the interface runs 0.5s on this curve, with its
+       companion fades at 0.41s. One token pair — new surfaces inherit the
+       tempo by using these, never by writing their own durations. */
+    --pop-motion: .5s cubic-bezier(.22, 1, .36, 1);
+    --pop-fade: .41s ease;
+    --side-menu-shift-x: calc(33px * var(--ui-scale));
+    --side-menu-motion: var(--pop-motion);
+    --side-menu-fade: var(--pop-fade);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: var(--bg); color-scheme: dark; }
+  html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+  body {
+    background: var(--bg); color: var(--mid);
+    font-family: var(--font-ui); font-weight: 300;
+    cursor: var(--cursor-cross);   /* the demo's page-ground crosshair */
+    user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  }
+
+  /* ── Stage — blank black; the scene mounts here later ──────────────── */
+  #bs-stage { position: fixed; inset: 0; background: var(--bg); touch-action: none; }
+
+  /* (The panel frame / video trigger seam was removed on Eric's Aug 20
+     ruling — it returns with the real scene work.) */
+
+  /* ── Wordmark — .scene-logo port ───────────────────────────────────── */
+  #bs-wordmark {
+    position: fixed; top: calc(50px * var(--ui-scale)); left: 50%;
+    transform: translateX(-50%);
+    width: clamp(118px, 10.2vw, 177px); height: auto;
+    filter: drop-shadow(0 0 14px rgba(255,255,255,0.28));
+    z-index: 10; pointer-events: none;
+  }
+
+  /* ── Utility nav — .site-utility-nav port ──────────────────────────── */
+  #bs-icons {
+    position: fixed;
+    /* Anchors compensated by the .bs-hit pad (8px×scale) so the visible
+       circles sit exactly where the demo puts them. */
+    top: calc(41px * var(--ui-scale) - 8px * var(--icons-scale));
+    right: calc(58px * var(--ui-scale) - 8px * var(--icons-scale));
+    z-index: 11; display: flex; align-items: flex-start;   /* pills hang down from a common top line */
+    gap: calc(8px * var(--icons-scale));   /* 8 gap + 2×8 pads = the original 24 between circles */
+  }
+  /* Mouse-vicinity pad (Eric: like the menu's) — each control's hover and
+     click target extends 8px×scale on every side; the 8px gap between
+     pads keeps neighboring targets from ever overlapping. */
+  .bs-hit { padding: calc(8px * var(--icons-scale)); }
+  /* Plain circle (the cart — no expansion; it will redirect to the cart
+     page in the commerce realm). */
+  .bs-round {
+    width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
+    border-radius: 999px;
+    border: 0.3px solid var(--ink);
+    box-shadow: 0 0 calc(15px * var(--icons-scale)) calc(1px * var(--icons-scale)) rgba(255,255,255,0.14);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.94); background: rgba(0,0,0,0.04);   /* demo resolved rest values */
+    cursor: var(--cursor-target);
+    transition: color 0.16s;
+    position: relative;
+  }
+  /* ── Expanding pill (右上icon展开 mockup): the circle outline grows into
+     a capsule on hover/focus. Motion is the demo's primary-nav circle→pill
+     expansion (.19s cubic-bezier(.22,1,.36,1)), turned vertical. */
+  .bs-pill {
+    position: relative;
+    width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
+    border-radius: 999px;
+    border: 0.3px solid var(--ink);
+    background: rgba(0,0,0,0.24);
+    box-shadow: 0 0 calc(15px * var(--icons-scale)) calc(1px * var(--icons-scale)) rgba(255,255,255,0.14);
+    overflow: hidden;
+    transition: height var(--pop-motion);   /* the universal tempo */
+  }
+  .bs-pill.is-open { height: var(--open-h); }
+  @media (prefers-reduced-motion: reduce) {
+    .bs-pill { transition: none; }
+  }
+  .bs-head {
+    width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.94); background: transparent; border: 0; padding: 0;
+    /* Language text sits lighter than the icon glyphs: Chill Duan Sans
+       LIGHT (the non-wide cut), line-height 1 for true optical centering
+       in the circle. */
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(11px * var(--icons-scale));
+    line-height: 1;
+    cursor: var(--cursor-target);
+    transition: color 0.16s;
+    position: relative;
+  }
+  /* Icon sizes + glow per the demo: sound/account rasters 23px, cart 20px,
+     all with the icon-level drop-shadow. */
+  .bs-round img, .bs-head img {
+    width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale));
+    display: block;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.35));
+  }
+  #bs-cart img { width: calc(20px * var(--icons-scale)); height: calc(20px * var(--icons-scale)); }
+  @media (hover: hover) and (pointer: fine) {
+    .bs-round:hover, .bs-head:hover { color: #fff; }
+    /* Hover-glow rule (Eric): EXPANDABLE controls glow on their SUB items
+       only (the heads just lift color); a NON-expandable control — the
+       cart — glows itself. */
+    .bs-round:hover img { filter: var(--glow-icon-hover); }
+  }
+  /* Keyboard twins of the hover state: the native Tab cursor, and the
+     A/D icon-bar cursor (.kb-hover — same class the menu rail uses).
+     Under the bar cursor every head GLOWS (the cursor's affordance —
+     Enter is what expands); text heads bloom via text-shadow, glyph
+     heads via the filter chain. */
+  .bs-round:focus-visible, .bs-head:focus-visible,
+  .bs-round.kb-hover, .bs-head.kb-hover { color: #fff; outline: none; text-shadow: var(--glow-text-icons); }
+  .bs-round:focus-visible img, .bs-round.kb-hover img,
+  .bs-head.kb-hover img { filter: var(--glow-icon-hover); }
+  .bs-round img, .bs-head img { transition: filter 0.2s ease; }
+  /* STATE-LADDER DISCIPLINE (Eric): the outer glow is backspace's
+     translation of softfractal's ink-FOCUSED state — it lives in exactly
+     one place. When ANY pill is expanded, focus descends into its tray
+     (items, or the volume fill), so the head hands its glow off; only the
+     color lift remains on the "held" parent. */
+  .bs-pill.is-open .bs-head { text-shadow: none; }
+  .bs-pill.is-open .bs-head img { filter: drop-shadow(0 0 6px rgba(255,255,255,0.35)); }
+  /* Sound mute slash — .site-utility-nav__sound-control::after port
+     (muted: slash at .9, icon dimmed to .45). */
+  #bs-sound::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    width: calc(24px * var(--icons-scale)); height: 1px;
+    background: currentColor; box-shadow: 0 0 5px;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    opacity: 0; transition: opacity 0.14s; pointer-events: none;
+  }
+  #bs-sound.is-off::after { opacity: 0.9; }
+  #bs-sound img { transition: opacity 0.14s; }
+  #bs-sound.is-off img { opacity: 0.45; }
+  /* Tray — the expanded content. Items fade/slide in like the demo's
+     primary-nav links (opacity + a small offset resolving on open). */
+  .bs-tray { pointer-events: none; }
+  .bs-pill.is-open .bs-tray { pointer-events: auto; }
+  .bs-tray > * {
+    opacity: 0; transform: translateY(calc(-7px * var(--icons-scale)));
+    transition: opacity var(--pop-fade), transform var(--pop-motion);
+  }
+  .bs-pill.is-open .bs-tray > * { opacity: 1; transform: none; }
+  .bs-tray-item {
+    width: 100%; height: calc(38px * var(--icons-scale));
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-soft); background: transparent; border: 0; padding: 0;
+    font-family: var(--font-sans); font-weight: 300;   /* Chill Duan Sans light — matches the icons' weight feel */
+    font-size: calc(11px * var(--icons-scale)); letter-spacing: 0.06em;
+    line-height: 1;
+    cursor: var(--cursor-target);
+    /* The full list: this shorthand REPLACES the .bs-tray > * transition
+       on these items (tie broken by source order), so the entrance
+       opacity/transform must be carried here too or they snap. */
+    transition: color 0.16s, text-shadow 0.2s ease,
+                opacity var(--pop-fade), transform var(--pop-motion);
+  }
+  /* Sub icons match the head glyphs' size (Eric: they read undersized in
+     the grown pill at 17px). */
+  .bs-tray-item img { width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale)); display: block; transition: filter 0.2s ease; }
+  /* Breathing parity (Eric): the language rows hold ~11px text, the
+     account rows 23px glyphs — equal 38px rows leave the icons visually
+     tighter. Deeper rows for the icon tray give both pills the same
+     ~27px of air between elements. */
+  #bs-pill-account .bs-tray-item { height: calc(45px * var(--icons-scale)); }
+  @media (hover: hover) and (pointer: fine) {
+    .bs-tray-item:hover { color: #fff; text-shadow: var(--glow-text-icons); }
+    .bs-tray-item:hover img { filter: var(--glow-icon-hover); }
+  }
+  .bs-tray-item:focus-visible, .bs-tray-item.kb-hover { color: #fff; outline: none; text-shadow: var(--glow-text-icons); }
+  .bs-tray-item:focus-visible img, .bs-tray-item.kb-hover img { filter: var(--glow-icon-hover); }
+  .bs-tray-item.is-current { color: #fff; }
+  /* Volume bar (mockup 1:1): a track filling the pill below the speaker,
+     with a white capsule fill anchored at the bottom, glowing. */
+  #bs-vol-track {
+    width: 100%;
+    /* The track is everything below the head — the fill runs to the very
+       brim of the pill. --open-h is inherited from the pill's inline style. */
+    height: calc(var(--open-h) - 35px * var(--icons-scale));
+    position: relative;
+    cursor: var(--cursor-target);
+    outline: none;
+  }
+  /* No armed outline on the track — the intended design has no ring
+     around the volume region (it read as a max-volume indicator); the
+     moving fill itself is the keyboard feedback. */
+  #bs-vol-fill {
+    position: absolute;
+    /* Filled to the BRIM (Eric's reference): edge to edge and flush with
+       the pill's foot — the fill capsule's rounded end IS the pill's end
+       (same 999px radius; the pill's overflow clips them coincident). */
+    left: 0; right: 0; bottom: 0;
+    height: 70%;
+    background: #e8e8e8;
+    border-radius: 999px;
+    box-shadow: 0 0 calc(18px * var(--icons-scale)) rgba(255,255,255,0.35);
+  }
+
+  /* ── The menu — .site-side-menu--home port, verbatim iteration ─────
+     All items the same size. Hover/keyboard-cursor pops the label right
+     with easing (both ways), lifts it to white (the glow-text is always
+     on, so the lift reads as the glow-up), and the signal-red dot fades
+     in at the left edge. .kb-hover is the keyboard twin of :hover —
+     pixel-identical, driven by THE focus variable. */
+  #bs-menu {
+    position: fixed;
+    top: 42.17vh;
+    /* Demo anchor: max(edge-x, 3.76% of scene width); edge-x is a
+       clamp(34px, 3.8lvw, 68px) FLOOR — the 3.76vw term itself is uncapped. */
+    left: max(clamp(34px, 3.8vw, 68px), 3.76vw);
+    z-index: 16;
+    display: grid; gap: calc(40px * var(--ui-scale));
+    color: var(--text-soft);
+  }
+  .bs-item {
+    /* HIT AREA: the visual row is 15px but each item's hover/click target
+       extends 14px into the 40px gap on both sides (12px of true dead
+       space remains — targets never overlap). The negative margin returns
+       the extension to the grid, so track pitch and label positions are
+       unchanged; flex re-centers the label in the taller box. */
+    height: calc(43px * var(--ui-scale));
+    margin: calc(-14px * var(--ui-scale)) 0;
+    color: var(--text-soft);
+    /* Home-menu iteration override (boot.css): 14px / weight 600 — the
+       generic side-menu base is 12px/300, but the home menu out-specifies it. */
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(14px * var(--ui-scale));
+    line-height: calc(15px * var(--ui-scale));
+    letter-spacing: 0;
+    text-align: left; white-space: nowrap;
+    text-shadow: var(--glow-text);
+    background: none; border: 0; padding: 0;
+    display: flex; align-items: center;   /* re-centers the label in the taller hit box */
+    position: relative;
+    cursor: var(--cursor-target);
+    transition: color 0.16s, text-shadow 0.2s ease;
+  }
+  .bs-item > span {
+    display: inline-block;
+    transition: color .16s ease, opacity .16s ease, transform var(--side-menu-motion);
+  }
+  .bs-item::before {
+    content: ''; position: absolute; top: 50%; left: 0;
+    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+    background: var(--color-signal-red); border-radius: 50%;
+    box-shadow: 0 0 12px 2px rgba(157, 31, 0, 0.45);
+    transform: translateY(-50%);
+    opacity: 0; transition: opacity var(--side-menu-fade);
+  }
+  /* ONE visual channel for the cursor: the pop-out renders ONLY through
+     .kb-hover, which mouseenter and the keyboard both drive via THE focus
+     variable. Raw :hover rules were deliberately removed — a second CSS-
+     only cursor drifts from the machine the moment focus is cleared
+     programmatically (idle reset under a parked pointer, Escape, sticky
+     touch suppression on hybrid laptops). One focus variable, ruthlessly. */
+  .bs-item.kb-hover { color: #fff; text-shadow: var(--glow-text-hover); }
+  .bs-item.kb-hover > span { transform: translateX(var(--side-menu-shift-x)); }
+  .bs-item.kb-hover::before { opacity: 1; }
+  .bs-item:focus-visible { color: #fff; outline: none; text-shadow: var(--glow-text-hover); }
+  /* Committed lock — held out, dot on, glow held (weight already 600 at
+     rest, as in the demo's home menu). */
+  .bs-item.active { color: #fff; text-shadow: var(--glow-text-hover); }
+  .bs-item.active > span { transform: translateX(var(--side-menu-shift-x)); }
+  .bs-item.active::before { opacity: 1; }
+
+  /* iOS-style "locked" shake — denied input shakes; nothing fails
+     silently. Under reduced motion the shake becomes a non-motion blink. */
+  @keyframes bs-shake {
+    0%, 100% { transform: translateX(0); }
+    15% { transform: translateX(-5px); }
+    30% { transform: translateX(5px); }
+    45% { transform: translateX(-4px); }
+    60% { transform: translateX(4px); }
+    75% { transform: translateX(-2px); }
+    90% { transform: translateX(2px); }
+  }
+  .bs-shake { animation: bs-shake 0.4s ease; }
+  @keyframes bs-deny-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bs-shake { animation: bs-deny-blink 0.4s ease; }
+    .bs-item > span { transition: color .16s ease, opacity .16s ease; } /* pop-out lands instantly */
+  }
+
+  /* ── Film-selection strip — .horizontal-strip port, rules verbatim ──
+     Placement from the demo's scene fractions: fx .40567 / fy .93465 /
+     fw .18229 of 1920 = 350px / fh .03760 of 1080 = 40.6px. */
+  .horizontal-strip {
+    --strip-value: 0%; --strip-pointer: 0%;
+    --strip-accent: #63c7ff;
+    position: fixed;
+    left: 49.68vw; top: 93.46vh;
+    transform: translateX(-50%);
+    width: calc(350px * var(--ui-scale));
+    height: calc(40.6px * var(--ui-scale));
+    z-index: 20;
+    cursor: var(--cursor-target);
+    pointer-events: auto; touch-action: none;
+  }
+  .horizontal-strip:focus-visible { outline: none; }
+  .horizontal-strip-rail { width: 100%; height: 100%; position: relative; }
+  .horizontal-strip-tick, .horizontal-strip-marker, .horizontal-strip-playhead {
+    pointer-events: none; position: absolute;
+  }
+  .horizontal-strip-tick {
+    --strip-heat: 0; --strip-heat-pct: 0%; --strip-lift: 0px; --strip-scale: 1;
+    top: var(--strip-tick-y); left: var(--strip-tick-x);
+    width: max(1px, calc(1px * var(--ui-scale)));
+    height: var(--strip-tick-h);
+    background: color-mix(in srgb, #fefefe9e, var(--strip-accent) var(--strip-heat-pct));
+    box-shadow: 0 0 calc(8px + 10px * var(--strip-heat)) color-mix(in srgb, #ffffff47, var(--strip-accent) var(--strip-heat-pct));
+    opacity: calc(.55 + var(--strip-heat) * .45);
+    transform: translateX(-50%) translateY(var(--strip-lift)) scaleY(var(--strip-scale));
+    transform-origin: bottom;
+    transition: background .12s, box-shadow .12s, opacity .12s, transform .12s;
+  }
+  .horizontal-strip-marker {
+    top: var(--strip-marker-y); left: var(--strip-marker-x);
+    width: max(3.5px, calc(3.5px * var(--ui-scale)));
+    height: max(3.5px, calc(3.5px * var(--ui-scale)));
+    background: #fefefed6; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px #ffffff6b;
+  }
+  .horizontal-strip-playhead {
+    top: 0; bottom: 0; left: var(--strip-pointer);
+    opacity: 0; background: #fefefef2; width: 1px;
+    transition: opacity .16s;
+    transform: translate(-50%);
+    box-shadow: 0 0 12px #ffffffc7;
+  }
+  .horizontal-strip.has-strip-pointer .horizontal-strip-playhead,
+  .horizontal-strip:focus-visible .horizontal-strip-playhead,
+  .horizontal-strip.is-dragging .horizontal-strip-playhead { opacity: 1; }
+
+  /* ── Airlock stub — the seam where the section stream attaches ─────── */
+  #bs-airlock {
+    position: fixed; inset: 0; z-index: 20;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  }
+  #bs-airlock.is-open {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transition: opacity 0.3s ease, visibility 0s;
+  }
+  #bs-airlock-title {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(18px, 2.2vw, 30px); letter-spacing: 0.3em;
+    color: var(--ink); text-shadow: var(--glow-text);
+  }
+  #bs-airlock-sub {
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(10px * var(--ui-scale)); letter-spacing: 0.22em;
+    color: var(--mid);
+  }
+  #bs-airlock-hint {
+    position: absolute; bottom: 6vh;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(9px * var(--ui-scale)); letter-spacing: 0.28em;
+    color: var(--mid);
+  }
+
+  /* Haptic source — must stay renderable (journal canon). */
+  #bs-haptic { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+  /* PROVISIONAL narrow-portrait chrome — mobile grammar is Eric's later
+     design; this only prevents collisions meanwhile. */
+  @media (max-width: 560px) {
+    #bs-wordmark { left: 6vw; transform: none; width: 104px; }
+    #bs-menu { left: 6vw; }
+    #bs-panel { width: 86vw; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Blank stage. The scene (video triggers / bake) mounts here later —
+     the panel frame and its per-section content binding were removed on
+     Eric's ruling (Aug 20) and return with the real scene work. -->
+<div id="bs-stage"></div>
+
+<img id="bs-wordmark" src="assets/bs_wordmark.svg" alt="backspace">
+
+<!-- Utility pills (右上icon展开 mockup): each circle drops down into a pill
+     on hover/focus. The cart stays a plain circle — it will redirect to the
+     cart page (commerce realm, not built). -->
+<div id="bs-icons">
+  <div class="bs-hit"><div class="bs-pill" id="bs-pill-lang" style="--open-h: calc(157px * var(--icons-scale))">
+    <button class="bs-head" id="bs-lang" type="button" aria-label="Language" aria-haspopup="true" aria-expanded="false">EN</button>
+    <div class="bs-tray" id="bs-lang-tray"></div>
+  </div></div>
+  <div class="bs-hit"><div class="bs-pill" id="bs-pill-sound" style="--open-h: calc(209px * var(--icons-scale))">
+    <button class="bs-head" id="bs-sound" type="button" aria-label="Sound" aria-haspopup="true" aria-expanded="false">
+      <img src="assets/ui/icon-figma-brand-awareness.png" alt="" aria-hidden="true">
+    </button>
+    <div class="bs-tray">
+      <div id="bs-vol-track" role="slider" tabindex="0" aria-label="Volume"
+           aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" aria-orientation="vertical">
+        <div id="bs-vol-fill"></div>
+      </div>
+    </div>
+  </div></div>
+  <div class="bs-hit"><button class="bs-round" id="bs-cart" type="button" aria-label="Cart">
+    <img src="assets/ui/icon-cart-checkout.svg" alt="" aria-hidden="true">
+  </button></div>
+  <div class="bs-hit"><div class="bs-pill" id="bs-pill-account" style="--open-h: calc(178px * var(--icons-scale))">
+    <button class="bs-head" id="bs-account" type="button" aria-label="Account" aria-haspopup="true" aria-expanded="false">
+      <img src="assets/ui/icon-figma-person.png" alt="" aria-hidden="true">
+    </button>
+    <div class="bs-tray">
+      <button class="bs-tray-item" id="bs-acct-signin" type="button" aria-label="Sign in">
+        <img src="assets/ui/bs_icon_signin.png" alt="" aria-hidden="true">
+      </button>
+      <button class="bs-tray-item" id="bs-acct-details" type="button" aria-label="Account details">
+        <img src="assets/ui/bs_icon_account_details.png" alt="" aria-hidden="true">
+      </button>
+      <button class="bs-tray-item" id="bs-acct-orders" type="button" aria-label="Order lookup">
+        <img src="assets/ui/bs_icon_order_lookup.png" alt="" aria-hidden="true">
+      </button>
+    </div>
+  </div></div>
+</div>
+
+<nav id="bs-menu" aria-label="Sections"></nav>
+
+<!-- Film-selection strip — .figma-horizontal-strip port, 1:1 (geometry
+     read from the demo's rendered DOM; behavior from its bundle). -->
+<div id="bs-strip" class="horizontal-strip" role="slider" aria-label="Film selection"
+     aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" aria-valuetext="Film 1 of 3"
+     tabindex="0" data-strip-value="0.00">
+  <div class="horizontal-strip-rail" aria-hidden="true"></div>
+</div>
+
+<div id="bs-airlock" aria-hidden="true">
+  <div id="bs-airlock-title"></div>
+  <div id="bs-airlock-sub">AIRLOCK — SECTION STREAM ATTACHES HERE</div>
+  <div id="bs-airlock-hint">ESC — BACK</div>
+</div>
+
+<input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
+
+<script>
+(function(){
+'use strict';
+
+// ── Content + manifest ────────────────────────────────────────────────────
+// Nav canon: the four sections, confirmed by the Figma frame and the /hall
+// demo's own config. Nothing pre-lit at boot. STR is the i18n surface: EN
+// shipped, CN slots fall back (Chill Duan Sans is the CJK partner —
+// verify the shipped woff2 subsets carry CJK before CN copy lands).
+var STR = {
+  en: { hardware:'HARDWARE', software:'SOFTWARE', community:'COMMUNITY', support:'SUPPORT' },
+  zh: { /* populated when CN content lands; lookups fall back to en */ },
+  ja: {},
+  es: {}
+};
+// ISO 639-1 codes (the mockup's SP corrected to ES per Eric). Offering all
+// four in the picker is the ratified design; only EN carries content yet.
+var LANGS = ['en','zh','ja','es'];
+var LANG_ATTR = { en:'en', zh:'zh-CN', ja:'ja', es:'es' };
+var lang = 'en';
+function T(key){ return (STR[lang] && STR[lang][key]) || STR.en[key] || key; }
+
+// Sections. (The per-section trigger manifest left with the panel frame —
+// it returns with the real scene work.)
+var SECTIONS = ['hardware','software','community','support'];
+
+// ── State ─────────────────────────────────────────────────────────────────
+// ONE focus variable. -1 = nothing focused. committed = the airlock lock.
+// Hover and the keyboard cursor are the same state — every input path
+// funnels into setFocus.
+var focusIdx    = -1;
+var committed   = null;
+var _touchInput = false;   // sticky: any touch seen → hover suppression
+
+// ── Sound bus — four events, files land later ─────────────────────────────
+// RETRY-SAFE latch: `unlocked` only sets once the context actually runs —
+// a hover or Escape cannot burn the unlock.
+var SoundBus = {
+  ctx: null, unlocked: false, muted: false, samples: {},
+  unlock: function(){
+    if (this.unlocked) return;
+    var self = this;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC){ this.unlocked = true; return; }
+      if (!this.ctx) this.ctx = new AC();
+      var arm = function(){
+        if (!self.unlocked && self.ctx.state === 'running'){
+          self.unlocked = true;
+          self.play('ambient');
+        }
+      };
+      if (this.ctx.state === 'running'){ arm(); return; }
+      this.ctx.resume().then(arm).catch(function(){});
+    } catch (e) {}
+  },
+  play: function(name){
+    if (this.muted || !this.ctx) return;
+    var s = this.samples[name];           // detent | deny | commit | ambient
+    if (!s) return;                       // stub: sound engineer's files bind here
+  }
+};
+
+function hapticTick(){
+  var h = document.getElementById('bs-haptic');
+  if (h) { try { h.click(); } catch (e) {} }
+}
+
+// ── Shake denial — restart-safe, strand-safe ──────────────────────────────
+function shakeEl(el){
+  if (!el) return;
+  // Cancel the previous invocation's fallback timer FIRST — a stale timer
+  // from denial #1 firing ~0-50ms into denial #2's animation clips the new
+  // shake and that denial reads as silent.
+  if (el._bsShakeT){ clearTimeout(el._bsShakeT); el._bsShakeT = null; }
+  el.classList.remove('bs-shake');
+  void el.offsetWidth;
+  el.classList.add('bs-shake');
+  var clean = function(){ el.classList.remove('bs-shake'); };
+  el.addEventListener('animationend', function h(){
+    clean();
+    el.removeEventListener('animationend', h);
+  }, { once: true });
+  // If the animation is ever elided, animationend never fires — the guard
+  // class must not strand or every later denial goes silent.
+  el._bsShakeT = setTimeout(function(){ el._bsShakeT = null; clean(); }, 450);
+}
+function denyOn(el){ shakeEl(el); SoundBus.play('deny'); }
+function denyLocked(){
+  // Once per shake: an event stream (wheel, key repeat, drag) must not
+  // restart the keyframe per event or spam the deny sample.
+  // The airlock stub covers the menu, so the locked item's shake is
+  // invisible — shake the airlock's ESC hint too, so denial stays VISIBLE
+  // while the overlay is up. (The real section stream won't be an opaque
+  // blanket; this keeps the no-silent-failure contract meanwhile.)
+  var locked = document.querySelector('#bs-menu .bs-item.active');
+  if (locked && !locked.classList.contains('bs-shake')) denyOn(locked);
+  var hint = document.getElementById('bs-airlock-hint');
+  if (hint && !hint.classList.contains('bs-shake')) shakeEl(hint);
+}
+
+// ── Menu DOM ──────────────────────────────────────────────────────────────
+var menuEl = document.getElementById('bs-menu');
+var navItems = [];
+SECTIONS.forEach(function(key, idx){
+  var item = document.createElement('button');
+  item.type = 'button';
+  item.className = 'bs-item';
+  item.id = 'bs-nav-' + key;
+  var span = document.createElement('span');
+  span.className = 'bs-nav-label';
+  span.textContent = T(key);
+  item.appendChild(span);
+  // hover = cursor: mouse hover and the keyboard cursor are the same focus
+  // state (one variable). Suppressed for good once touch is seen.
+  item.addEventListener('mouseenter', function(){
+    if (_touchInput || committed) return;
+    wake();
+    if (focusIdx !== idx) setFocus(idx);
+  });
+  // Leaving the item's vicinity pops it back in (Eric, Aug 20). Only the
+  // mouse can "leave" — a keyboard-set cursor persists until stepped,
+  // Escaped, or idled out.
+  item.addEventListener('mouseleave', function(){
+    if (_touchInput || committed) return;
+    if (focusIdx === idx) setFocus(-1);
+  });
+  // Click: travel → commit (the inherited two-step). While locked, an
+  // off-item click shakes the LOCKED item; the locked item = one BACK.
+  item.addEventListener('click', function(){
+    wake();
+    if (committed){
+      if (key === committed){ if (clickOk()) goBack(); }
+      else denyLocked();
+      return;
+    }
+    if (focusIdx === idx){ if (clickOk()) commit(); }
+    else setFocus(idx);
+  });
+  menuEl.appendChild(item);
+  navItems.push(item);
+});
+
+// ── Film-selection strip — behavior port from the demo bundle ─────────────
+// Geometry read 1:1 from the demo's rendered DOM (20 ticks, 5 markers).
+// Mechanics: pointer proximity heats ticks within a 10%-of-width radius
+// (heat → color toward accent, scale 1+1.55·heat, lift −7px·heat); the
+// playhead line follows the pointer while hovered/dragging/focused; value
+// SNAPS to one of 3 film segments on pointerdown/up (hover never scrubs in
+// film mode) or arrow keys. Selection lands in a stub — the film binding
+// attaches there with the scene work.
+(function(){
+  var strip = document.getElementById('bs-strip');
+  var rail  = strip.querySelector('.horizontal-strip-rail');
+  var TICKS = [
+    [5.7143, 21.4286], [10.3905, 0], [14.9302, 10.2143], [19.4698, 20.4286],
+    [24.0095, 20.4286], [28.5714, 20.4286], [33.0889, 20.4286], [37.6286, 20.4286],
+    [42.1683, 20.4286], [46.7079, 20.4286], [51.2508, 20.4286], [55.7905, 20.4286],
+    [60.3302, 20.4286], [64.8698, 20.4286], [69.4095, 20.4286], [73.9492, 20.4286],
+    [78.4889, 20.4286], [83.4825, 20.4286], [88.0222, 20.4286], [92.5619, 20.4286]
+  ];
+  var TICK_H = 51.0714;
+  var MARKERS = [
+    [5.7143, 42.8571], [28.5714, 57.8810], [51.2508, 30.6429],
+    [73.9492, 47.6667], [92.5619, 26.1905]
+  ];
+  var SEGMENTS = 3;
+  var RADIUS = 10;            // reaction radius, % of strip width
+  var ticks = [];
+  TICKS.forEach(function(t){
+    var s = document.createElement('span');
+    s.className = 'horizontal-strip-tick';
+    s.dataset.stripX = t[0];
+    s.style.setProperty('--strip-tick-x', t[0] + '%');
+    s.style.setProperty('--strip-tick-y', t[1] + '%');
+    s.style.setProperty('--strip-tick-h', TICK_H + '%');
+    rail.appendChild(s);
+    ticks.push(s);
+  });
+  MARKERS.forEach(function(m){
+    var d = document.createElement('span');
+    d.className = 'horizontal-strip-marker';
+    d.style.setProperty('--strip-marker-x', m[0] + '%');
+    d.style.setProperty('--strip-marker-y', m[1] + '%');
+    rail.appendChild(d);
+  });
+  var playhead = document.createElement('span');
+  playhead.className = 'horizontal-strip-playhead';
+  rail.appendChild(playhead);
+
+  var clampP = function(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); };
+  function pct(e){
+    var r = strip.getBoundingClientRect();
+    return r.width <= 0 ? 0 : (e.clientX - r.left) / r.width * 100;
+  }
+  // Pointer feedback: playhead + per-tick heat. null = pointer gone.
+  function feedback(p){
+    strip.classList.toggle('has-strip-pointer', p !== null);
+    if (p !== null) strip.style.setProperty('--strip-pointer', clampP(p, 0, 100) + '%');
+    ticks.forEach(function(t){
+      var x = Number(t.dataset.stripX || 0);
+      var d = p === null ? Infinity : Math.abs(x - p);
+      var heat = p === null ? 0 : clampP(1 - d / RADIUS, 0, 1);
+      t.style.setProperty('--strip-heat', heat.toFixed(3));
+      t.style.setProperty('--strip-heat-pct', Math.round(heat * 100) + '%');
+      t.style.setProperty('--strip-scale', (1 + heat * 1.55).toFixed(3));
+      t.style.setProperty('--strip-lift', (-7 * heat).toFixed(2) + 'px');
+    });
+  }
+  // Film-selection commit: snap to the nearest segment.
+  function setValue(p){
+    var seg = clampP(Math.round(clampP(p, 0, 100) / 100 * (SEGMENTS - 1)), 0, SEGMENTS - 1);
+    var r = seg / (SEGMENTS - 1) * 100;
+    strip.style.setProperty('--strip-value', r + '%');
+    strip.style.setProperty('--strip-pointer', r + '%');
+    strip.dataset.stripValue = r.toFixed(2);
+    strip.setAttribute('aria-valuenow', String(seg + 1));
+    strip.setAttribute('aria-valuetext', 'Film ' + (seg + 1) + ' of ' + SEGMENTS);
+    // FILM BINDING SEAM: seg selects the recording once films exist.
+  }
+  strip.addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    wake();
+    strip.classList.add('is-dragging');
+    try { strip.setPointerCapture(e.pointerId); } catch (err) {}
+    var p = pct(e);
+    feedback(p); setValue(p);
+  });
+  strip.addEventListener('pointermove', function(e){
+    var p = pct(e);
+    feedback(p);
+    if (strip.classList.contains('is-dragging')) setValue(p);
+  });
+  strip.addEventListener('pointerup', function(e){
+    strip.classList.remove('is-dragging');
+    var p = pct(e);
+    feedback(p); setValue(p);
+  });
+  strip.addEventListener('pointercancel', function(){
+    strip.classList.remove('is-dragging');
+    feedback(null);
+  });
+  strip.addEventListener('pointerleave', function(){
+    if (!strip.classList.contains('is-dragging')) feedback(null);
+  });
+  strip.addEventListener('keydown', function(e){
+    var n = Number(strip.dataset.stripValue || 0);
+    var seg = Math.round(n / 100 * (SEGMENTS - 1));
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown'){
+      e.preventDefault(); e.stopPropagation();   // the strip owns its arrows — never the menu's
+      wake();
+      setValue(Math.max(0, seg - 1) / (SEGMENTS - 1) * 100);
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp'){
+      e.preventDefault(); e.stopPropagation();
+      wake();
+      setValue(Math.min(SEGMENTS - 1, seg + 1) / (SEGMENTS - 1) * 100);
+    }
+  });
+})();
+
+// One commit/back per 400ms window (journal canon) — a double-click's
+// second click must not instantly toggle back out.
+var _clickAt = 0;
+function clickOk(){
+  var n = Date.now();
+  if (n - _clickAt < 400) return false;
+  _clickAt = n;
+  return true;
+}
+
+// ── Render from state ─────────────────────────────────────────────────────
+function render(){
+  for (var i = 0; i < navItems.length; i++){
+    navItems[i].classList.toggle('kb-hover', i === focusIdx && !committed);
+    navItems[i].classList.toggle('active', committed === SECTIONS[i]);
+  }
+}
+function setFocus(idx){
+  if (idx === focusIdx) return;
+  if (idx >= 0 && iconIdx >= 0) setIconFocus(-1);   // one cursor — leaving the icon rail
+  focusIdx = idx;
+  render();
+  if (idx >= 0){ SoundBus.play('detent'); hapticTick(); }
+}
+
+// ── Focus stepper — every modality lands here ─────────────────────────────
+// One gesture = one step. Cold entry: down → first, up → last. Ends CLAMP
+// silently — no wrap (global rule).
+function focusStep(dir){
+  if (committed){ denyLocked(); return false; }
+  var next;
+  if (focusIdx < 0){
+    next = dir > 0 ? 0 : SECTIONS.length - 1;
+  } else {
+    next = focusIdx + dir;
+    if (next < 0 || next >= SECTIONS.length) return false;  // wall — no wrap
+  }
+  setFocus(next);
+  return true;
+}
+
+// ── Commit / back — strict LIFO, history-integrated ───────────────────────
+function commit(){
+  if (committed || focusIdx < 0) return;
+  committed = SECTIONS[focusIdx];
+  SoundBus.play('commit');
+  var alk = document.getElementById('bs-airlock');
+  document.getElementById('bs-airlock-title').textContent = T(committed);
+  alk.classList.add('is-open');
+  alk.setAttribute('aria-hidden', 'false');
+  render();
+  if (!history.state || !history.state.bs){
+    try { history.pushState({ bs: 1 }, '', '#' + committed); } catch (e) {}
+  } else if (location.hash !== '#' + committed){
+    // The guard suppressed a re-push over a restored entry — sync the hash
+    // so the URL can never name a section other than the open one.
+    try { history.replaceState(history.state, '', '#' + committed); } catch (e) {}
+  }
+  alk.setAttribute('tabindex', '-1');
+  try { alk.focus({ preventScroll: true }); } catch (e) { alk.focus(); }
+}
+function doBack(){
+  if (committed){
+    committed = null;
+    var alk = document.getElementById('bs-airlock');
+    alk.classList.remove('is-open');
+    alk.setAttribute('aria-hidden', 'true');
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    render();
+  } else if (focusIdx >= 0){
+    // Focused → idle. No history entry at this level.
+    setFocus(-1);
+  }
+}
+// _popPending absorbs back-requests while a pop is IN FLIGHT — one level
+// per press, no exceptions, including at key-repeat speed.
+var _popPending = false;
+var _popFallbackT = null;
+function armPopPending(){
+  // history.back() normally lands a popstate within a frame or two — but a
+  // truncated session restore can leave our state entry as the ONLY entry,
+  // and back() then silently no-ops. Without a fallback the flag latches
+  // and Escape is dead for the session. Same elision-guard pattern as the
+  // shake fallback timer.
+  _popPending = true;
+  clearTimeout(_popFallbackT);
+  _popFallbackT = setTimeout(function(){
+    if (_popPending){ _popPending = false; if (committed) doBack(); }
+  }, 350);
+}
+function goBack(){
+  if (_popPending) return;
+  if (committed && history.state && history.state.bs){
+    armPopPending();
+    history.back();
+    return;
+  }
+  doBack();
+}
+window.addEventListener('popstate', function(){
+  _popPending = false;
+  clearTimeout(_popFallbackT);
+  if (committed){ doBack(); return; }
+  // FORWARD resurrected a stale airlock entry: neutralise it in place.
+  if (history.state && history.state.bs){
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  }
+});
+
+// ── Attract / idle ────────────────────────────────────────────────────────
+var IDLE_MS = 60000;
+var _idleTimer = null;
+function armIdle(){
+  clearTimeout(_idleTimer);
+  _idleTimer = setTimeout(function(){
+    if (!committed){ setFocus(-1); }   // idle → everything pops back in
+    // Airlock dwell: keep the clock alive so a browser-gesture exit
+    // (no page input) still resets afterward.
+    else armIdle();
+  }, IDLE_MS);
+}
+function wake(){
+  SoundBus.unlock();
+  armIdle();
+}
+
+// ── Keyboard — game keys; every hover has a keyboard twin ─────────────────
+document.addEventListener('keydown', function(e){
+  var key = e.key;
+  // The UTILITY buttons own their own keys (Tab-focused lang/sound/cart/
+  // account activate natively). The menu items are buttons too, but they
+  // belong to the machine: their keys flow through — and the machine's
+  // preventDefault on Enter suppresses the native double-activation a
+  // focused menu button would otherwise add.
+  if (e.target && e.target.closest && e.target.closest('#bs-icons')) return;
+  // Browser/OS chords are not menu input.
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (key === 'Escape'){
+    e.preventDefault(); wake();
+    if (!committed && iconLock !== null){ unlockPill(); return; }              // locked pill → bar (one level)
+    if (!committed && iconIdx >= 0){ setIconFocus(-1); setFocus(0); return; }  // icons → menu (one level)
+    goBack();
+    return;
+  }
+  if (key === 'Enter'){
+    e.preventDefault(); wake();
+    if (committed) return;    // Enter only OPENS; Esc/back are the sole closers
+    if (iconIdx >= 0){
+      if (iconLock !== null){
+        // Inside a locked pill: Enter activates the sub-cursor's target
+        // (the volume pill's action is the head's own mute toggle).
+        if (ICONS[iconLock].headEl.id === 'bs-sound') ICONS[iconLock].headEl.click();
+        else { var ti = trayItems(iconLock)[trayIdx]; if (ti) ti.click(); }
+        return;
+      }
+      if (ICONS[iconIdx].pill){ lockPill(iconIdx); return; }   // expandable: Enter expands + LOCKS
+      ICONS[iconIdx].headEl.click();                            // cart: Enter activates
+      return;
+    }
+    if (focusIdx < 0){ setFocus(0); return; }   // cold Enter claims the first section
+    commit();
+    return;
+  }
+  if (key==='w'||key==='W'||key==='ArrowUp'||key==='s'||key==='S'||key==='ArrowDown'){
+    e.preventDefault(); wake();
+    if (committed){ denyLocked(); return; }
+    var down = (key==='s'||key==='S'||key==='ArrowDown');
+    if (iconLock !== null){ trayStep(down ? 1 : -1); return; }  // LOCKED: W/S walk the tray (or the volume)
+    if (iconIdx >= 0){
+      // In the icon bar: S/↓ returns to the menu; W/↑ clamps (nothing above).
+      if (down){ setIconFocus(-1); setFocus(0); }
+      return;
+    }
+    // At the FIRST menu item, W/↑ hands the cursor to the icon bar (Eric's
+    // rule) — the top wall becomes a zone transition instead of a clamp.
+    if (!down && focusIdx === 0){ setIconFocus(0); return; }
+    focusStep(down ? 1 : -1);
+    return;
+  }
+  if (key==='a'||key==='A'||key==='ArrowLeft'||key==='d'||key==='D'||key==='ArrowRight'){
+    // A/D are the HORIZONTAL axis — they drive the icon bar and nothing
+    // else (axes never double-book; in the menu they stay inert).
+    if (iconLock !== null && !committed){
+      // The rail is frozen while a pill is locked — locks refuse loudly.
+      e.preventDefault(); wake();
+      var lockedHead = ICONS[iconLock].headEl;
+      if (!lockedHead.classList.contains('bs-shake')) denyOn(lockedHead);
+      return;
+    }
+    if (iconIdx >= 0 && !committed){
+      e.preventDefault(); wake();
+      iconStep((key==='d'||key==='D'||key==='ArrowRight') ? 1 : -1);
+      return;
+    }
+    wake();
+    return;
+  }
+  wake();
+});
+
+// ── Wheel bridge — PORTED MECHANICALLY from the softfractal build ─────────
+// C14 lineage, trough-re-acceleration variant (SHIP, promoted 2026-08-09).
+// Constants calibrated on seven real device captures — they describe the
+// trackpad's event stream, not the surface, and transfer unchanged. DO NOT
+// retune here; derivations live in the source build.
+var WHEEL_MAX_STEPS     = 1;
+var WHEEL_QUIET_MS      = 30;
+var WHEEL_LONG_MS       = 250;
+var WHEEL_FADE_HITS     = 4;
+var WHEEL_NOTCH_PX      = 40;
+var WHEEL_STEP_RATIO    = 1.0;  // trigger = measured menu pitch × this
+var WHEEL_RA_MULT       = 1.8;
+var WHEEL_RA_FLOOR      = 8;
+var WHEEL_TROUGH_MIN    = 10;
+var WHEEL_COAST_MIN_MS  = 170;  // TIME, never an event count
+var WHEEL_RA_SUSTAIN    = 2;
+var WHEEL_STEP_FLOOR_MS = 150;
+var wheelSteps=0, wheelAccum=0, wheelLastMag=0, wheelFades=0, wheelCoasting=false,
+    wheelLastT=-1e9, wheelTrough=0, wheelCoastRun=0, wheelCoastT0=0, wheelRaRun=0,
+    wheelLastStepT=-1e9, wheelNowT=0;
+
+// Menu pitch — MEASURED (item top → next item top), never hardcoded, so the
+// trigger follows any spacing tune (journal binding rule).
+var menuPitch = 55;
+function measurePitch(){
+  if (navItems.length > 1){
+    var a = navItems[0].getBoundingClientRect(), b = navItems[1].getBoundingClientRect();
+    var p = b.top - a.top;
+    if (p > 0) menuPitch = p;
+  }
+}
+
+function wheelStepOne(dir){
+  if (wheelSteps >= WHEEL_MAX_STEPS) return false;   // budget spent — walls stay live
+  if (!focusStep(dir)) return false;                  // wall/lock — no budget, no stamp
+  wheelSteps++;
+  wheelLastStepT = wheelNowT;
+  return true;
+}
+
+window.addEventListener('wheel', function(e){
+  // ctrl+wheel / pinch is the browser's ZOOM, not menu input — pass through
+  // before the bridge can misread it.
+  if (e.ctrlKey) return;
+  e.preventDefault();
+  wake();
+  if (committed){ denyLocked(); return; }
+  var px = e.deltaY;
+  if (e.deltaMode === 1) px *= 16;
+  else if (e.deltaMode === 2) px *= window.innerHeight;
+  // e.timeStamp = when the INPUT happened — a stalled main thread (low
+  // power) cannot distort the measured cadence.
+  var t = (e.timeStamp != null) ? e.timeStamp : performance.now();
+  wheelNowT = t;
+  // ZERO-DELTA KEEPALIVE: fingers down but stationary still emit events —
+  // they must refresh the clock or a mid-gesture hold reads as a real
+  // pause and the release momentum steps a second time.
+  if (!px){ wheelLastT = t; return; }
+  var mag = Math.abs(px);
+  var gap = t - wheelLastT; wheelLastT = t;
+  if (gap >= WHEEL_LONG_MS){                    // real pause → fully from rest
+    wheelSteps=0; wheelAccum=0; wheelLastMag=0; wheelFades=0;
+    wheelCoasting=false; wheelTrough=0; wheelRaRun=0;
+  } else if (gap >= WHEEL_QUIET_MS && (wheelCoasting || wheelLastMag <= 0)){
+    // Deliberately does NOT clear wheelTrough — clearing it here is the
+    // low-power lockup (the trough zeroes before the re-accel test reads
+    // it and the sticky coast swallows every following swipe).
+    wheelSteps=0; wheelAccum=0;
+  }
+  var wasRest = (wheelLastMag <= 0);            // captured BEFORE the update
+  // TIME-FREE GESTURE BOUNDARY: momentum only decays — once the coast is
+  // ESTABLISHED, the tail's floor is a reference a new push must clear.
+  var _tr = Math.max(wheelTrough, WHEEL_TROUGH_MIN);
+  var raHit = (wheelCoasting && wheelTrough > 0 &&
+               (t - wheelCoastT0) >= WHEEL_COAST_MIN_MS &&
+               (t - wheelLastStepT) >= WHEEL_STEP_FLOOR_MS &&
+               mag >= _tr * WHEEL_RA_MULT && mag >= _tr + WHEEL_RA_FLOOR &&
+               mag > wheelLastMag);             // MUST BE RISING
+  wheelRaRun = raHit ? wheelRaRun + 1 : 0;      // a spike breaks its own run
+  var reaccel = (wheelRaRun >= WHEEL_RA_SUSTAIN);
+  // Decay tracking runs BEFORE the budget check so it sees every event.
+  // The rise branch does NOT clear wheelCoasting — STICKY COAST.
+  if (mag > wheelLastMag + 1){ wheelFades = 0; }
+  else if (mag < wheelLastMag - 1){ wheelFades++; }
+  wheelLastMag = mag;
+  if (wheelFades >= WHEEL_FADE_HITS){ if (!wheelCoasting){ wheelCoasting = true; wheelCoastRun = 0; wheelCoastT0 = t; } }
+  if (wheelCoasting){ wheelCoastRun++;
+    wheelTrough = (wheelTrough > 0 ? Math.min(wheelTrough, mag) : mag); }
+  if (reaccel){ wheelSteps=0; wheelAccum=0; wheelTrough=0; wheelCoastT0=t;
+                wheelCoasting=false; wheelFades=0; wheelCoastRun=0; wheelRaRun=0; }
+
+  if (wheelSteps >= WHEEL_MAX_STEPS) return;                       // 1. budget spent
+  if (e.deltaMode !== 0){ wheelStepOne(px > 0 ? 1 : -1); return; } // discrete line/page notch
+  if (wasRest && wheelAccum === 0 && mag >= WHEEL_NOTCH_PX){       // 2. mouse notch from rest
+    wheelStepOne(px > 0 ? 1 : -1); return;
+  }
+  if (wheelCoasting) return;                                       // 3. swallow the tail
+  wheelAccum += px;                                                // 4. bank the travel
+  var trigger = menuPitch * WHEEL_STEP_RATIO;
+  while (Math.abs(wheelAccum) >= trigger){
+    var wdir = wheelAccum > 0 ? 1 : -1;
+    if (!wheelStepOne(wdir)){ wheelAccum = 0; break; }             // wall or budget → drop the bank
+    wheelAccum -= wdir * trigger;
+  }
+}, { passive: false });
+
+// ── Touch bridge — journal port ───────────────────────────────────────────
+// ACCUMULATE, not gesture-lock: finger travel is honest 1:1 with no
+// momentum tail — a long deliberate drag SHOULD walk (uncapped by design).
+// Bound to the menu AND the stage: users grab the thing they're looking
+// at. The LOCK lives here in the JS guard, not in touch-action.
+var TOUCH_STEP_RATIO = 1.0;
+var TOUCH_CLAIM_PX   = 10;
+function bindTouchDrum(el){
+  if (!el) return;
+  var t0 = null, owned = false;
+  el.addEventListener('touchstart', function(e){
+    // NEVER preventDefault on touchstart — it kills the synthetic click.
+    _touchInput = true;
+    owned = false;
+    if (e.touches.length !== 1){ t0 = null; return; }
+    t0 = e.touches[0].clientY;
+  }, { passive: true });
+  el.addEventListener('touchmove', function(e){
+    if (t0 === null || e.touches.length !== 1) return;
+    var dy = t0 - e.touches[0].clientY;
+    if (!owned && Math.abs(dy) < TOUCH_CLAIM_PX) return;   // still a tap candidate
+    e.preventDefault();                                     // claimed
+    if (!owned){ owned = true; wake(); }
+    if (committed){ denyLocked(); return; }
+    var pitch = menuPitch * TOUCH_STEP_RATIO;
+    if (Math.abs(dy) >= pitch){
+      focusStep(dy > 0 ? 1 : -1);          // one item per pitch of travel
+      t0 = e.touches[0].clientY;           // re-base → a long drag walks
+    }
+  }, { passive: false });
+  var end = function(){ t0 = null; owned = false; };
+  el.addEventListener('touchend', end, { passive: true });
+  el.addEventListener('touchcancel', end, { passive: true });
+}
+bindTouchDrum(document.getElementById('bs-stage'));
+bindTouchDrum(menuEl);
+
+// Any tap counts for attract + audio unlock (retry-safe).
+document.addEventListener('pointerdown', function(){ wake(); }, { passive: true });
+
+// ── UI scale — the demo's --ui-scale, derived from the 1920×1080 design
+// frame; every ported px value multiplies by it. ─────────────────────────
+function setScale(){
+  var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  s = Math.max(0.7, Math.min(1.4, s));
+  document.documentElement.style.setProperty('--ui-scale', s);
+}
+var _rzTimer = null;
+window.addEventListener('resize', function(){
+  setScale();
+  clearTimeout(_rzTimer);
+  _rzTimer = setTimeout(measurePitch, 150);
+});
+
+// ── Utility pills (右上icon展开) ──────────────────────────────────────────
+// Hover/focus grows the circle into a capsule; touch taps the head to open
+// first, then the head's action fires on the next tap. A tap outside
+// closes everything. The cart stays a plain circle (it will redirect to
+// the cart page — commerce realm, not built — so for now it denies).
+function bindPill(pillId, headId){
+  var pill = document.getElementById(pillId);
+  var head = document.getElementById(headId);
+  function open(){
+    if (!pill.classList.contains('is-open')){
+      pill.classList.add('is-open');
+      head.setAttribute('aria-expanded', 'true');
+    }
+  }
+  var api;
+  function close(){
+    // A LOCKED pill (Enter-expanded) ignores the ambient close paths —
+    // hover-leave and focus-out. Only unlockPill()/forceClose dissolve it.
+    if (api && api.lockHold) return;
+    pill.classList.remove('is-open');
+    head.setAttribute('aria-expanded', 'false');
+  }
+  // Hover binds on the .bs-hit pad — the mouse vicinity, wider than the
+  // visible pill (Eric: like the menu's hit areas).
+  var hit = pill.closest('.bs-hit') || pill;
+  hit.addEventListener('pointerenter', function(e){ if (e.pointerType === 'mouse') open(); });
+  hit.addEventListener('pointerleave', function(e){ if (e.pointerType === 'mouse') close(); });
+  pill.addEventListener('focusin', open);
+  pill.addEventListener('focusout', function(e){ if (!pill.contains(e.relatedTarget)) close(); });
+  api = {
+    el: pill, head: head, open: open, close: close,
+    lockHold: false,
+    forceClose: function(){
+      api.lockHold = false;
+      pill.classList.remove('is-open');
+      head.setAttribute('aria-expanded', 'false');
+    },
+    isOpen: function(){ return pill.classList.contains('is-open'); },
+    // Touch: the first tap on the head only EXPANDS. Returns true when it
+    // consumed the tap, so the head's own action waits for the second.
+    touchOpenConsumed: function(){
+      if (_touchInput && !this.isOpen()){ open(); return true; }
+      return false;
+    }
+  };
+  return api;
+}
+var pillLang    = bindPill('bs-pill-lang', 'bs-lang');
+var pillSound   = bindPill('bs-pill-sound', 'bs-sound');
+var pillAccount = bindPill('bs-pill-account', 'bs-account');
+document.addEventListener('pointerdown', function(e){
+  // A press outside the cluster dissolves an Enter-lock first (close() is
+  // lock-guarded, so the unlock must come before the sweep), then closes
+  // the hover-open pills and clears the icon cursor.
+  var inCluster = document.getElementById('bs-icons').contains(e.target);
+  if (iconLock !== null && !inCluster) unlockPill();
+  [pillLang, pillSound, pillAccount].forEach(function(p){
+    if (!p.el.contains(e.target)) p.close();
+  });
+  if (iconIdx >= 0 && !inCluster) setIconFocus(-1);
+}, { passive: true });
+
+// ── The icon-bar cursor — the horizontal rail of the one cursor ──────────
+// The cursor lives on exactly one rail at a time: setFocus (menu) and
+// setIconFocus (icons) each clear the other. The cursored icon renders as
+// its hover state (expandable pills open under it; the cart glows itself),
+// so keyboard and mouse stay pixel-identical.
+var ICONS = [
+  { headEl: document.getElementById('bs-lang'),    pill: pillLang },
+  { headEl: document.getElementById('bs-sound'),   pill: pillSound },
+  { headEl: document.getElementById('bs-cart'),    pill: null },
+  { headEl: document.getElementById('bs-account'), pill: pillAccount }
+];
+var iconIdx = -1;
+// The pill LOCK (Eric's rule): the bar cursor only GLOWS a head — Enter
+// expands its pill and locks it, remapping W/S to the tray inside (the
+// commit-lock pattern: contexts lock and controls re-map). Esc pops the
+// lock. Without the lock, S would yank the user back to the menu and the
+// trays would be unreachable by keyboard.
+var iconLock = null;   // index of the Enter-locked pill, or null
+var trayIdx  = -1;     // sub-cursor inside the locked pill's tray (list pills)
+function trayItems(i){
+  return Array.prototype.slice.call(ICONS[i].pill.el.querySelectorAll('.bs-tray-item'));
+}
+function renderTray(){
+  if (iconLock === null) return;
+  if (ICONS[iconLock].headEl.id === 'bs-sound'){
+    document.getElementById('bs-vol-track').classList.add('kb-hover');   // the slider arms as a whole
+    return;
+  }
+  trayItems(iconLock).forEach(function(b, i){ b.classList.toggle('kb-hover', i === trayIdx); });
+}
+function lockPill(i){
+  var c = ICONS[i];
+  if (!c.pill) return false;
+  iconLock = i;
+  c.pill.lockHold = true;
+  c.pill.open();
+  trayIdx = 0;
+  renderTray();
+  SoundBus.play('commit');
+  hapticTick();
+  return true;
+}
+function unlockPill(){
+  if (iconLock === null) return;
+  var c = ICONS[iconLock];
+  if (c.headEl.id === 'bs-sound') document.getElementById('bs-vol-track').classList.remove('kb-hover');
+  else trayItems(iconLock).forEach(function(b){ b.classList.remove('kb-hover'); });
+  c.pill.forceClose();
+  iconLock = null;
+  trayIdx = -1;
+}
+function trayStep(dir){
+  if (ICONS[iconLock].headEl.id === 'bs-sound'){
+    // The volume tray is a slider, not a list: W/↑ louder, S/↓ quieter.
+    setVolume(SoundBus.volume + (dir < 0 ? 0.05 : -0.05));
+    SoundBus.play('detent'); hapticTick();
+    return;
+  }
+  var items = trayItems(iconLock);
+  var next = Math.max(0, Math.min(items.length - 1, trayIdx + dir));
+  if (next === trayIdx) return;   // ends clamp silently
+  trayIdx = next;
+  renderTray();
+  SoundBus.play('detent'); hapticTick();
+}
+function setIconFocus(i){
+  if (i === iconIdx) return;
+  if (iconLock !== null) unlockPill();   // moving the cursor dissolves the lock
+  var prev = iconIdx;
+  iconIdx = i;
+  if (prev >= 0) ICONS[prev].headEl.classList.remove('kb-hover');
+  if (i >= 0){
+    if (focusIdx >= 0){ focusIdx = -1; render(); }   // one cursor — the menu pops back in
+    ICONS[i].headEl.classList.add('kb-hover');       // GLOW only — Enter expands
+    SoundBus.play('detent');
+    hapticTick();
+  }
+}
+function iconStep(dir){
+  var next = Math.max(0, Math.min(ICONS.length - 1, (iconIdx < 0 ? 0 : iconIdx) + dir));
+  setIconFocus(next);   // ends clamp silently — no wrap
+}
+// Mouse parity: hovering a head puts the cursor there; leaving the control
+// clears it (the pill's own hover open/close is idempotent alongside).
+ICONS.forEach(function(c, i){
+  var hit = c.headEl.closest('.bs-hit') || (c.pill ? c.pill.el : c.headEl);
+  hit.addEventListener('mouseenter', function(){
+    if (_touchInput || committed) return;
+    setIconFocus(i);
+  });
+  hit.addEventListener('pointerleave', function(e){
+    if (e.pointerType !== 'mouse') return;
+    if (iconIdx === i) setIconFocus(-1);
+  });
+});
+
+// Language — the head shows the current code; the tray lists the others.
+// Selecting re-renders every visible string (EN-only content today; other
+// dicts fall back). The document lang attribute is only claimed once the
+// selected dict actually has content — otherwise screen readers switch
+// voices over English fallback text.
+var langHead = document.getElementById('bs-lang');
+var langTray = document.getElementById('bs-lang-tray');
+function setLang(code){
+  lang = code;
+  langHead.textContent = code.toUpperCase();
+  var live = Object.keys(STR[code] || {}).length > 0;
+  document.documentElement.setAttribute('lang', live ? LANG_ATTR[code] : 'en');
+  for (var i = 0; i < SECTIONS.length; i++){
+    navItems[i].querySelector('.bs-nav-label').textContent = T(SECTIONS[i]);
+  }
+  buildLangTray();
+}
+function buildLangTray(){
+  langTray.innerHTML = '';
+  LANGS.forEach(function(code){
+    if (code === lang) return;                 // the head IS the current entry
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'bs-tray-item';
+    b.textContent = code.toUpperCase();
+    b.setAttribute('aria-label', 'Switch language: ' + code.toUpperCase());
+    b.addEventListener('click', function(){
+      wake();
+      setLang(code);
+      unlockPill();        // a selection dissolves an Enter-lock…
+      pillLang.close();    // …and the hover-open case closes normally
+    });
+    langTray.appendChild(b);
+  });
+}
+buildLangTray();
+langHead.addEventListener('click', function(){ wake(); pillLang.touchOpenConsumed(); });
+
+// Volume — the mockup's bar: a white capsule fill anchored at the bottom,
+// height = level. Click/drag sets it; ↑/↓ nudge it when focused; the head
+// toggles mute (slash). The bus carries the level for when samples land.
+var volTrack = document.getElementById('bs-vol-track');
+var volFill  = document.getElementById('bs-vol-fill');
+var soundHead = document.getElementById('bs-sound');
+SoundBus.volume = 0.7;
+function syncVolumeUI(){
+  volFill.style.height = Math.round(SoundBus.volume * 100) + '%';
+  volTrack.setAttribute('aria-valuenow', Math.round(SoundBus.volume * 100));
+  soundHead.classList.toggle('is-off', SoundBus.muted || SoundBus.volume === 0);
+}
+function setVolume(v){
+  SoundBus.volume = Math.max(0, Math.min(1, v));
+  if (SoundBus.volume > 0) SoundBus.muted = false;   // moving the bar unmutes
+  syncVolumeUI();
+}
+function volFromPointer(e){
+  var r = volTrack.getBoundingClientRect();
+  if (r.height <= 0) return;
+  setVolume(1 - (e.clientY - r.top) / r.height);
+}
+var _volDragging = false;
+volTrack.addEventListener('pointerdown', function(e){
+  e.preventDefault();
+  _volDragging = true;
+  try { volTrack.setPointerCapture(e.pointerId); } catch (err) {}
+  wake();
+  volFromPointer(e);
+});
+volTrack.addEventListener('pointermove', function(e){ if (_volDragging) volFromPointer(e); });
+var _volEnd = function(){ _volDragging = false; };
+volTrack.addEventListener('pointerup', _volEnd);
+volTrack.addEventListener('pointercancel', _volEnd);
+volTrack.addEventListener('keydown', function(e){
+  if (e.key === 'ArrowUp' || e.key === 'ArrowDown'){
+    e.preventDefault(); e.stopPropagation();
+    wake();
+    setVolume(SoundBus.volume + (e.key === 'ArrowUp' ? 0.05 : -0.05));
+  }
+});
+soundHead.addEventListener('click', function(){
+  wake();
+  if (pillSound.touchOpenConsumed()) return;
+  SoundBus.muted = !SoundBus.muted;
+  syncVolumeUI();
+});
+syncVolumeUI();
+
+// Account — expands into sign-in / account details / order lookup (Eric's
+// icons). All three are commerce-realm stubs today: they deny loudly.
+['bs-acct-signin', 'bs-acct-details', 'bs-acct-orders'].forEach(function(id){
+  var b = document.getElementById(id);
+  b.addEventListener('click', function(){ wake(); denyOn(b); });
+});
+document.getElementById('bs-account').addEventListener('click', function(){
+  wake();
+  pillAccount.touchOpenConsumed();
+});
+
+// Cart — redirects to the cart page when it exists; denies meanwhile.
+// (Bound on the hit pad so clicks in the vicinity count; the shake still
+// lands on the visible button.)
+(function(){
+  var cart = document.getElementById('bs-cart');
+  (cart.closest('.bs-hit') || cart).addEventListener('click', function(){ wake(); denyOn(cart); });
+})();
+
+// ── History hygiene on boot ───────────────────────────────────────────────
+if (history.state && history.state.bs){
+  armPopPending();   // the boot pop is in flight — absorb back-requests (with the no-popstate fallback)
+  history.back();
+} else if (SECTIONS.indexOf(location.hash.slice(1)) !== -1){
+  // Strip only OUR OWN stale section hash.
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+setScale();
+measurePitch();
+render();
+// Boot sits in attract (screen dormant, prompt on, nothing pre-lit);
+// wake() arms the idle clock on first input. Re-measure pitch once the
+// webfonts land.
+if (document.fonts && document.fonts.ready){
+  document.fonts.ready.then(measurePitch);
+}
+
+// Dev hook — `?dev` exposes state for instrumented/headless captures
+// (softfractal precedent: the LOGGING build variant).
+if (/[?&]dev\b/.test(location.search)){
+  window.__bs = {
+    state: function(){ return { focusIdx: focusIdx, committed: committed, menuPitch: menuPitch,
+                                iconIdx: iconIdx, iconLock: iconLock, trayIdx: trayIdx,
+                                volume: SoundBus.volume, muted: SoundBus.muted, lang: lang }; }
+  };
+}
+
+})();
+</script>
+</body>
+</html>

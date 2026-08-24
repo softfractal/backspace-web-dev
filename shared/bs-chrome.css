@@ -1,0 +1,772 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   backspace — SHARED CHROME (stylesheet half of the pair), v1.1.
+   FACTORING RATIFIED (Eric, Aug 23 2026, community-phase decision batch):
+   the shared pair is law; home.html supersedes backspace_home.html as the
+   shipped homepage, and the certified v3 file stays archived as the frozen
+   witness. Originally built as the Aug 21 GM addendum Part B deliverable 1,
+   extracted from the certified backspace_home.html (v3, GM-verified).
+
+   Both pages mount this file — byte-identical shared chrome is the
+   acceptance metric. Page-specific furniture (home: film strip, airlock;
+   software: coming-soon copy) stays in the page files.
+
+   Away-iteration values are ported from the /software dev build Eric
+   supplied at phase initiation (the preferred witness per the addendum's
+   authority clause):
+   dev-bc957c3d0a667443e26913bd2b400be450273679.pressbackspace.com
+   assets/boot-Bk3-2sVb.css — exact stylesheet values, durations excepted:
+   per Eric's Aug 20 universal-tempo ruling, every pop-out/expansion runs
+   on --pop-motion and companion fades on --pop-fade; the witness's local
+   .19s/.18s/.16s expansion durations are superseded by the tokens.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Fonts — self-hosted, ported @font-face set (minus Octarine).
+      G-Octarine still gated: the witness embeds Octarine; production
+      excludes it until Eric clears the license. ───────────────────────── */
+@font-face{font-family:"Chill Duan Sans";font-style:normal;font-weight:300;font-display:swap;src:url(../assets/fonts/chillduan-light.woff2)format("woff2")}
+@font-face{font-family:"Chill Duan Sans";font-style:normal;font-weight:500;font-display:swap;src:url(../assets/fonts/chillduan-medium.woff2)format("woff2")}
+@font-face{font-family:"Chill Duan Sans";font-style:normal;font-weight:900;font-display:swap;src:url(../assets/fonts/chillduan-heavy.woff2)format("woff2")}
+@font-face{font-family:"Chill Duan Sans Wide";font-style:normal;font-weight:300;font-display:swap;src:url(../assets/fonts/chillduan-wide-light.woff2)format("woff2")}
+@font-face{font-family:"Chill Duan Sans Wide";font-style:normal;font-weight:600;font-display:swap;src:url(../assets/fonts/chillduan-wide-semibold.woff2)format("woff2")}
+@font-face{font-family:"Syncopate";font-style:normal;font-weight:400;font-display:swap;src:url(../assets/fonts/syncopate-400.woff2)format("woff2")}
+@font-face{font-family:"Syncopate";font-style:normal;font-weight:700;font-display:swap;src:url(../assets/fonts/syncopate-700.woff2)format("woff2")}
+
+/* ── Tokens — ported from the demo stylesheet ──────────────────────────── */
+:root {
+  --bg:               #040402;
+  --ink:              #fefefe;
+  --text-soft:        #fefefed1;   /* menu items at rest */
+  --mid:              #b8b8ba;     /* urban fog */
+  --color-signal-red: #9d1f00;
+  --panel-line:       #fefefe42;
+  --glow-text:        0 0 9.6px rgba(255,255,255,0.58);
+  /* ══════════════════ GLOW LAW — house rule ══════════════════════
+     Eric, Aug 20 (doubling) + Aug 23 (parity). Governs every glow in
+     the interface; new surfaces inherit it, they do not re-derive it.
+
+     1. PARITY. Glyph icons and text items shine at the SAME VISUAL
+        INTENSITY. One interface, one glow.
+     2. INTENSITY IS NOT REACH. How far a glow washes is not how bright
+        it reads. Two recipes may spread differently and still be at
+        parity — reach is not a mismatch to fix.
+     3. TO ADD INTENSITY, ADD LIGHT. Paste the layer over itself, raise
+        its alpha, or fatten the source with tight alpha-1 dilations.
+        NEVER widen a radius to get brighter: stretching spreads the
+        same light thinner and reads WEAKER. (Found the hard way on the
+        homepage — "doubling" a glow by widening it three times changed
+        nothing visible; duplicating the layer did.)
+     4. ONE TOKEN, SIZE-SCALED EMISSION (Eric, Aug 23 — supersedes the
+        earlier certified-pair calibration). --glow-text-icons IS the
+        icon-bar glow; the filter chain is its glyph-side derivation,
+        not an independent recipe. Emitted light varies with element
+        size BY DESIGN — a bigger lamp emits more — and SAME-SIZE
+        elements emit the SAME TOTAL LIGHT. Calibration anchor: the
+        upper-right cluster, ~5.7k total added light for lang texts and
+        glyph icons alike. Parity is MEASURED (total added light, with
+        the reach envelope held), never eyeballed. Two rejected targets
+        stay rejected: equal CORES (~3.7x too hot, glyphs go solid) and
+        matching small elements to BIG-ink lamps like the capsule links
+        (physically unreachable without burning). The pre-trial chain
+        remains verbatim in backspace_home.html as history.
+     5. PERF (FILTER CHAINS ONLY). No drop-shadow radius above 96px
+        inside a filter chain, and profile any chain addition on hover:
+        chained drop-shadows blur serially over a texture every pass
+        inflates. Text-shadow rings are exempt — they compose in
+        parallel and do not inflate anything, which is why the text
+        chain's 184px ring is free and a 184px FILTER ring was not.
+        Rule 3 is also the cheap direction and rule 2's stretch the
+        expensive one: the laws agree.
+     ═══════════════════════════════════════════════════════════════ */
+  /* The HOME MENU's interactive recipe (Aug 20): resting glow + two
+     wider, softer halos. The icon bars use the pair below instead. */
+  --glow-text-hover:  0 0 9.6px rgba(255,255,255,0.92), 0 0 24px rgba(255,255,255,0.5), 0 0 46px rgba(255,255,255,0.28);
+  /* The ICON BAR pair — ONE DESIGN TOKEN, TWO RENDERINGS (RULED, Eric,
+     Aug 23): glyphs "use" --glow-text-icons in the token sense — the
+     filter chain below is that token's glyph-side derivation, not an
+     independent recipe. The semantics: emitted light varies with
+     element size BY DESIGN (a bigger lamp emits more), and SAME-SIZE
+     elements emit the SAME LIGHT. Calibration anchor — the upper-right
+     cluster, where lang texts and glyph icons are the same size: both
+     emit ~5.7k total added light. Landed (one shared chain across two
+     glyph ink-areas, so a bracket): person 5308 / chevron 6106, mean
+     5707 — both within ±7.1% of the 5.7k anchor; the lang texts sit at
+     5652-5730. Reach stays on the texts' falloff envelope (nothing
+     past 32px) per the ratified reach-match. Tune ONLY the 7px pass
+     alpha to move total light; re-measure both glyphs against the
+     anchor; never touch reach without a reach ruling. */
+  --glow-icon-hover:  brightness(2) drop-shadow(0 0 3px rgba(255,255,255,1)) drop-shadow(0 0 4px rgba(255,255,255,0.9)) drop-shadow(0 0 7px rgba(255,255,255,0.82)) drop-shadow(0 0 12px rgba(255,255,255,0.18)) drop-shadow(0 0 20px rgba(255,255,255,0.03));
+  --glow-text-icons:  0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1), 0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95), 0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75), 0 0 96px rgba(255,255,255,0.5), 0 0 184px rgba(255,255,255,0.3);
+  /* WHOLE-WORD NORMALIZATION (Eric, Aug 23 — glow law rule 6, EQUATION
+     FORM; supersedes the same-day 1-char bucket, identical landing for
+     the live X). Letter halos sum by kernel coverage, so a word's glow
+     climbs with letter count toward a plateau — short words read
+     dimmer (X measured 0.60x the long platforms' contour on hover).
+     Eric's ruling: one intensity for every smaller text icon
+     regardless of length; homepage main menu excluded. The machine
+     solves, per element and state, with fitted constants per context
+     (row/capsule face vs tray face):
+         raw(n) = P  - D *e^(-k (n-1))   uncompensated contour light
+         fp(n)  = P' - D'*e^(-k'(n-1))   contour light at full paste
+         f(n)   = clamp((T - raw(n)) / (fp(n) - raw(n)), 0, 1)
+     and writes f into --wg-fr/--wg-fh (see normalizeWordGlow in the
+     js). The comp rings below scale by f — rule 3's paste-the-layer,
+     delivered fractionally; never a widened radius. f=0 renders these
+     tokens visually identical to the certified pair, so long words
+     change by nothing they can see (comp alphas 0-0.07). Constants,
+     the 2-4-words-per-length dataset, closed-loop flatness (rest
+     30.0-31.8 across n=1..6, hover 75.3-81.1, vs 25-31 / 49-78
+     uncompensated), and the recorded residuals (mid-band ~5% under
+     target, no live consumer; 1-char tray saturates -9%, none exists;
+     damping side unbuilt, no consumer; CJK re-measures when CN lands):
+     reports/glow_audit.md.
+     DECLARATION SITE: the two word tokens are declared on the SCOPE
+     ELEMENTS below, not here — var() inside a custom property
+     substitutes at the DECLARING element, so a :root declaration would
+     bake the root's --wg-f* (unset → 0) into the inherited value and
+     the per-element solve could never reach the formula. Do not move
+     them back to :root. */
+  /* The utility cluster runs 25% larger than the base UI scale (Eric). */
+  --icons-scale: calc(var(--ui-scale) * 1.25);
+  --font-display: "Syncopate", "Chill Duan Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-ui:      "Chill Duan Sans Wide", "Chill Duan Sans", ui-sans-serif, system-ui, sans-serif;
+  /* --font-sans omits Octarine until G-Octarine clears. */
+  --font-sans:    "Chill Duan Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* CURSOR CORRECTION (RULED — Eric, Aug 23; MASTER DELIVERED same
+     day): the demo-inherited SVG cursors were a wrong inheritance; the
+     house cursor is the design team's two-ring mark — the brand's
+     circle canon as pointer. The real master (光标.png, archived
+     ASCII-named at assets/src/bs_cursor_ring_master.png per the
+     no-CJK-paths precedent) superseded the GM's authored stand-in:
+     rings r≈184/512 at ~30px diagonal offset, HAIRLINE strokes
+     (~3.5px at master scale), faint interior wash (~11%) — kept: the
+     cuts are straight Lanczos downscales of the master's own pixels
+     (the earlier wash-drop proposal was authored for the 32px
+     stand-in era; faithful-to-master is the standing default, Eric's
+     feel rules). SIZE (RULED — Eric, Aug 23, on the master's
+     proportions): DOUBLED — 64px CSS with a 128px @2x, hotspot center
+     (32 32). Both tokens point at the one house cursor (the §2.6
+     collapse answer stands). Known limit, flagged not redesigned
+     (seed §2.3): at the 64px 1x cut the hairline lands ~67% peak
+     alpha — faint on non-retina 1x displays; the @2x is full-crisp.
+     A size-specific design cut from the team would close that. The
+     demo SVGs stay in assets/ui as the pre-correction record.
+     THREE ROLES (RULED — Eric, Aug 23, correcting the same-day
+     two-state split which had put the + on every interactive
+     surface): menu items and icons are MACHINE CONTROLS, not links —
+     they carry the plain rings like the ground. The + marks only
+     where the index-finger hand semantically lives: TRUE EXTERNAL
+     LINKS (today: the THIRD PARTY overlay's Continue — the social
+     slug anchors; any future outbound link consumes the same token).
+     The + is the demo cross's own grammar restored (gapped ticks,
+     hollow center, stroke 1.1/64, alpha .85, round caps) composed
+     into the rings' hollow. One family, three roles:
+       --cursor-cross  = ground        (plain rings, crosshair fallback)
+       --cursor-target = machine controls (plain rings, pointer fallback)
+       --cursor-link   = external links  (rings + plus, pointer fallback) */
+  --cursor-target: url(../assets/ui/bs_cursor_ring_64.png) 32 32, pointer;
+  --cursor-cross:  url(../assets/ui/bs_cursor_ring_64.png) 32 32, crosshair;
+  /* + variant parked (Eric, Aug 23) — link token renders the plain
+     rings until revived; the semantic slot stays. */
+  --cursor-link:   url(../assets/ui/bs_cursor_ring_64.png) 32 32, pointer;
+  --ui-scale: 1;                   /* set by JS: min(vw/1920, vh/1080), clamped */
+  /* UNIVERSAL INTERACTION TEMPO (Eric's ruling, Aug 20): every pop-out
+     and expansion in the interface runs 0.5s on this curve, with its
+     companion fades at 0.41s. One token pair — new surfaces inherit the
+     tempo by using these, never by writing their own durations.
+     v1 chrome note: the pair is now COMPOSED from split duration/curve
+     tokens so the view-transition pseudo-elements (which take duration
+     and timing-function as separate longhands) can drink from the same
+     source. Resolved values are unchanged. */
+  --pop-duration: .5s;
+  --pop-curve: cubic-bezier(.22, 1, .36, 1);
+  --pop-fade-duration: .41s;
+  --pop-motion: var(--pop-duration) var(--pop-curve);
+  --pop-fade: var(--pop-fade-duration) ease;
+  --side-menu-shift-x: calc(33px * var(--ui-scale));
+  --side-menu-motion: var(--pop-motion);
+  --side-menu-fade: var(--pop-fade);
+  /* Witness layout anchors (scene-layer vars, lvw/lvh → vw/vh per the
+     certified port convention): */
+  --edge-x: max(clamp(34px, 3.8vw, 68px), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  --top-y:  max(clamp(20px, 3.1vh, 40px), env(safe-area-inset-top, 0px));
+  /* ACCENT-COMMITTED SEAM — the one token the ladder-wide ruling lands in.
+     Value below is READ FROM THE WITNESS (away nav .is-active: full-white
+     ink, weight 600, dot explicitly struck). Eric's one-line ruling
+     re-skins the committed rung here and nowhere else. */
+  --committed-ink: #fefefe;
+}
+
+/* Rule-6 word tokens — declared on the scope so var(--wg-f*) resolves
+   per element (see the :root law block for the equation and why these
+   cannot live at :root). Values: certified base rings + comp rings
+   scaled by the element's solved deficit fraction; f=0 = certified. */
+.bs-social-link, .site-primary-nav__link, .bs-tray-item, .bs-head, .bs-round {
+  --glow-text-word: 0 0 9.6px rgba(255,255,255,0.58), 0 0 9.6px rgb(255 255 255 / calc(min(0.58, var(--wg-fr, 0) * 0.58)));
+  --glow-text-icons-word: 0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1), 0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95), 0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75), 0 0 96px rgba(255,255,255,0.5), 0 0 184px rgba(255,255,255,0.3), 0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))), 0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))), 0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95))), 0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95)));
+}
+
+/* Retina cut for the ring cursor where cursor+image-set parses (the
+   spec's own progressive pattern: unsupporting engines keep the plain
+   32px declaration above; hotspot units are CSS px in both). */
+@supports (cursor: image-set(url("about:blank") 1x) 32 32, pointer) {
+  :root {
+    --cursor-target: image-set(url(../assets/ui/bs_cursor_ring_64.png) 1x, url(../assets/ui/bs_cursor_ring_128.png) 2x) 32 32, pointer;
+    --cursor-cross:  image-set(url(../assets/ui/bs_cursor_ring_64.png) 1x, url(../assets/ui/bs_cursor_ring_128.png) 2x) 32 32, crosshair;
+    --cursor-link:   image-set(url(../assets/ui/bs_cursor_ring_64.png) 1x, url(../assets/ui/bs_cursor_ring_128.png) 2x) 32 32, pointer;
+  }
+}
+
+/* ── THE DOM CURSOR (Eric's defect report, Aug 23: OS hand on the
+   social row and the film strip). ROOT CAUSE, on record: browsers
+   suppress CSS cursor bitmaps larger than 32x32 whenever the cursor
+   rect would cross the viewport boundary (Chromium anti-spoofing
+   intervention) and paint the FALLBACK KEYWORD instead — our 64px
+   center-hotspot cursor overhangs 32px every direction, so every
+   edge-resident surface (strip 93.5vh, social row 94.7vh, the top
+   icon lines) showed `pointer`, the OS hand. No CSS cursor at Eric's
+   ruled 64px can escape the rule, so the cursor is RENDERED BY THE
+   PAGE: a fixed element tracking the pointer, OS cursor hidden. Full
+   size everywhere including edges; the hairlines and wash render
+   exactly (the 128 cut on retina); clips at the window edge like any
+   element instead of vanishing. The --cursor-* tokens above stay as
+   the NO-JS FALLBACK layer — `cursor: none` binds only under
+   .bs-cursor-live, which only the booted tracker adds, so a dead
+   script degrades to the OS/CSS cursors, never to an invisible one.
+   One state for now — the plain rings everywhere (the +/link variant
+   is parked on Eric's word; see the #bs-cursor block below). Touch
+   and hover-less devices never see it. */
+html.bs-cursor-live, html.bs-cursor-live * { cursor: none !important; }
+#bs-cursor {
+  position: fixed; left: 0; top: 0;
+  width: 64px; height: 64px;
+  margin: -32px 0 0 -32px;               /* hotspot = center, like the cuts */
+  pointer-events: none;
+  z-index: 99;                            /* above the overlay's 30 */
+  background: url(../assets/ui/bs_cursor_ring_64.png) center / 64px 64px no-repeat;
+  opacity: 0;                             /* revealed by the first mouse signal */
+  will-change: transform;
+}
+#bs-cursor.is-on { opacity: 1; }
+/* The +/link variant is PARKED (Eric, Aug 23: "the two circle cursor
+   without the + icon for now") — one cursor, no state swap. The plus
+   cuts (bs_cursor_ring_plus_{64,128}.png) stay in assets as the
+   design record; reviving the external-link state = an .is-link rule
+   here + the closest() toggle in bootDomCursor + re-pointing
+   --cursor-link below. */
+@media (min-resolution: 1.5dppx) {
+  #bs-cursor { background-image: url(../assets/ui/bs_cursor_ring_128.png); }
+}
+@media (hover: none) { #bs-cursor { display: none; } }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { background: var(--bg); color-scheme: dark; }
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body {
+  background: var(--bg); color: var(--mid);
+  font-family: var(--font-ui); font-weight: 300;
+  cursor: var(--cursor-cross);   /* the demo's page-ground crosshair */
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+
+/* ── Stage — blank black on every page; scenes mount here later.
+      The scene's eventual file format (video / bake / still) is OPEN —
+      nothing in this rule may preclude any of the three. ───────────────── */
+#bs-stage { position: fixed; inset: 0; background: var(--bg); touch-action: none; }
+
+/* ── Wordmark — .scene-logo port. Home: the certified 50px×scale drop.
+      Section pages: the witness's section-scene anchor (--top-y), and the
+      wordmark is a CONTROL (witness .is-clickable grammar): it returns
+      home. Both carry the bs-logo view-transition name so the browser
+      morphs the mark between its two positions across the page boundary. */
+#bs-wordmark {
+  position: fixed;
+  /* Vertically CENTERED ON THE ICON BAR's line on EVERY page (Eric,
+     Aug 22): top 41px×ui + half the 35px×icons circle. Supersedes both
+     the certified homepage 50px×ui top (measured ~1.7px low of the
+     line, and not tracking it across scales) and the witness's --top-y
+     section anchor. */
+  top: calc(41px * var(--ui-scale) + 17.5px * var(--icons-scale));
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(118px, 10.2vw, 177px); height: auto;
+  filter: drop-shadow(0 0 14px rgba(255,255,255,0.28));
+  z-index: 10; pointer-events: none;
+  view-transition-name: bs-logo;
+}
+a#bs-wordmark-link { display: contents; }
+/* Section pages share the wordmark-as-control grammar; the gate widens by
+   one page name as each section lands (community: Aug 23). */
+body:is([data-bs-page="software"], [data-bs-page="community"]) #bs-wordmark {
+  pointer-events: auto; cursor: var(--cursor-target);
+  transition: filter .2s;
+}
+body:is([data-bs-page="software"], [data-bs-page="community"]) a#bs-wordmark-link:hover #bs-wordmark,
+body:is([data-bs-page="software"], [data-bs-page="community"]) a#bs-wordmark-link:focus-visible #bs-wordmark {
+  filter: drop-shadow(0 0 18px rgba(255,255,255,0.55));
+}
+a#bs-wordmark-link:focus-visible { outline: none; }
+
+/* ── Utility nav — .site-utility-nav port ──────────────────────────────── */
+#bs-icons {
+  position: fixed;
+  /* Anchors compensated by the .bs-hit pad (8.8px×scale) so the visible
+     circles sit exactly where the demo puts them. */
+  top: calc(41px * var(--ui-scale) - 8.8px * var(--icons-scale));
+  right: calc(58px * var(--ui-scale) - 8.8px * var(--icons-scale));
+  z-index: 11; display: flex; align-items: flex-start;   /* pills hang down from a common top line */
+  gap: calc(6.4px * var(--icons-scale));   /* 6.4 gap + 2×8.8 pads = the original 24 between circles */
+}
+/* Mouse-vicinity pad (Eric: like the menu's) — each control's hover and
+   click target extends 8.8px×scale on every side (the ruled +10%, Eric
+   Aug 22, applied to BOTH clusters); the 6.4px gap between pads keeps
+   neighboring targets from ever overlapping while the visible 24-rhythm
+   holds — the growth comes out of the dead space, never the layout. */
+.bs-hit { padding: calc(8.8px * var(--icons-scale)); }
+/* Plain circle (the cart — no expansion; it will redirect to the cart
+   page in the commerce realm). */
+.bs-round {
+  width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
+  border-radius: 999px;
+  border: 0.3px solid var(--ink);
+  box-shadow: 0 0 calc(15px * var(--icons-scale)) calc(1px * var(--icons-scale)) rgba(255,255,255,0.14);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.94); background: rgba(0,0,0,0.04);   /* demo resolved rest values */
+  cursor: var(--cursor-target);
+  transition: color 0.16s;
+  position: relative;
+}
+/* ── Expanding pill (右上icon展开 mockup): the circle outline grows into
+   a capsule on hover/focus. Motion inherits the universal tempo. */
+.bs-pill {
+  position: relative;
+  width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
+  border-radius: 999px;
+  border: 0.3px solid var(--ink);
+  background: rgba(0,0,0,0.24);
+  box-shadow: 0 0 calc(15px * var(--icons-scale)) calc(1px * var(--icons-scale)) rgba(255,255,255,0.14);
+  overflow: hidden;
+  transition: height var(--pop-motion);   /* the universal tempo */
+}
+.bs-pill.is-open { height: var(--open-h); }
+.bs-head {
+  width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.94); background: transparent; border: 0; padding: 0;
+  /* Language text sits lighter than the icon glyphs: Chill Duan Sans
+     LIGHT (the non-wide cut), line-height 1 for true optical centering
+     in the circle. */
+  font-family: var(--font-sans); font-weight: 300;
+  font-size: calc(11px * var(--icons-scale));
+  line-height: 1;
+  cursor: var(--cursor-target);
+  transition: color 0.16s;
+  position: relative;
+}
+/* Icon sizes + glow per the demo: sound/account rasters 23px, cart 20px,
+   all with the icon-level drop-shadow. */
+.bs-round img, .bs-head img {
+  width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale));
+  display: block;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.35));
+}
+#bs-cart img { width: calc(20px * var(--icons-scale)); height: calc(20px * var(--icons-scale)); }
+@media (hover: hover) and (pointer: fine) {
+  .bs-round:hover, .bs-head:hover { color: #fff; }
+  /* Hover-glow rule (Eric): EXPANDABLE controls glow on their SUB items
+     only (the heads just lift color); a NON-expandable control — the
+     cart — glows itself. */
+  .bs-round:hover img { filter: var(--glow-icon-hover); }
+}
+/* Keyboard twins of the hover state: the native Tab cursor, and the
+   A/D icon-bar cursor (.kb-hover — same class the menu rail uses).
+   Under the bar cursor every head GLOWS (the cursor's affordance —
+   Enter is what expands); text heads bloom via text-shadow, glyph
+   heads via the filter chain. */
+.bs-round:focus-visible, .bs-head:focus-visible,
+.bs-round.kb-hover, .bs-head.kb-hover { color: #fff; outline: none; text-shadow: var(--glow-text-icons-word); }
+.bs-round:focus-visible img, .bs-round.kb-hover img,
+.bs-head.kb-hover img { filter: var(--glow-icon-hover); }
+.bs-round img, .bs-head img { transition: filter 0.2s ease; }
+/* STATE-LADDER DISCIPLINE (Eric): the outer glow is backspace's
+   translation of softfractal's ink-FOCUSED state — it lives in exactly
+   one place. When ANY pill is expanded, focus descends into its tray
+   (items, or the volume fill), so the head hands its glow off; only the
+   color lift remains on the "held" parent. */
+.bs-pill.is-open .bs-head { text-shadow: none; }
+.bs-pill.is-open .bs-head img { filter: drop-shadow(0 0 6px rgba(255,255,255,0.35)); }
+/* Sound mute slash — .site-utility-nav__sound-control::after port
+   (muted: slash at .9, icon dimmed to .45). */
+#bs-sound::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  width: calc(24px * var(--icons-scale)); height: 1px;
+  background: currentColor; box-shadow: 0 0 5px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  opacity: 0; transition: opacity 0.14s; pointer-events: none;
+}
+#bs-sound.is-off::after { opacity: 0.9; }
+#bs-sound img { transition: opacity 0.14s; }
+#bs-sound.is-off img { opacity: 0.45; }
+/* Tray — the expanded content. Items fade/slide in like the demo's
+   primary-nav links (opacity + a small offset resolving on open). */
+.bs-tray { pointer-events: none; }
+.bs-pill.is-open .bs-tray { pointer-events: auto; }
+.bs-tray > * {
+  opacity: 0; transform: translateY(calc(-7px * var(--icons-scale)));
+  transition: opacity var(--pop-fade), transform var(--pop-motion);
+}
+.bs-pill.is-open .bs-tray > * { opacity: 1; transform: none; }
+.bs-tray-item {
+  width: 100%; height: calc(38px * var(--icons-scale));
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-soft); background: transparent; border: 0; padding: 0;
+  font-family: var(--font-sans); font-weight: 300;   /* Chill Duan Sans light — matches the icons' weight feel */
+  font-size: calc(11px * var(--icons-scale)); letter-spacing: 0.06em;
+  line-height: 1;
+  cursor: var(--cursor-target);
+  /* The full list: this shorthand REPLACES the .bs-tray > * transition
+     on these items (tie broken by source order), so the entrance
+     opacity/transform must be carried here too or they snap. */
+  transition: color 0.16s, text-shadow 0.2s ease,
+              opacity var(--pop-fade), transform var(--pop-motion);
+}
+/* Sub icons match the head glyphs' size (Eric: they read undersized in
+   the grown pill at 17px). */
+.bs-tray-item img { width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale)); display: block; transition: filter 0.2s ease; }
+/* Breathing parity (Eric): the language rows hold ~11px text, the
+   account rows 23px glyphs — equal 38px rows leave the icons visually
+   tighter. Deeper rows for the icon tray give both pills the same
+   ~27px of air between elements. */
+#bs-pill-account .bs-tray-item { height: calc(45px * var(--icons-scale)); }
+@media (hover: hover) and (pointer: fine) {
+  /* Word token everywhere in scope — rule 6's normalization rides the
+     per-element --wg-f* vars (0 for every live tray string: 2-char is
+     the tray context's own norm). */
+  .bs-tray-item:hover { color: #fff; text-shadow: var(--glow-text-icons-word); }
+  .bs-tray-item:hover img { filter: var(--glow-icon-hover); }
+}
+.bs-tray-item:focus-visible, .bs-tray-item.kb-hover { color: #fff; outline: none; text-shadow: var(--glow-text-icons-word); }
+.bs-tray-item:focus-visible img, .bs-tray-item.kb-hover img { filter: var(--glow-icon-hover); }
+.bs-tray-item.is-current { color: #fff; }
+/* Volume bar (mockup 1:1): a track filling the pill below the speaker,
+   with a white capsule fill anchored at the bottom, glowing. */
+#bs-vol-track {
+  width: 100%;
+  /* The track is everything below the head — the fill runs to the very
+     brim of the pill. --open-h is inherited from the pill's inline style. */
+  height: calc(var(--open-h) - 35px * var(--icons-scale));
+  position: relative;
+  cursor: var(--cursor-target);
+  outline: none;
+}
+/* No armed outline on the track — the intended design has no ring
+   around the volume region (it read as a max-volume indicator); the
+   moving fill itself is the keyboard feedback. */
+#bs-vol-fill {
+  position: absolute;
+  /* Filled to the BRIM (Eric's reference): edge to edge and flush with
+     the pill's foot — the fill capsule's rounded end IS the pill's end
+     (same 999px radius; the pill's overflow clips them coincident). */
+  left: 0; right: 0; bottom: 0;
+  height: 70%;
+  background: #e8e8e8;
+  border-radius: 999px;
+  box-shadow: 0 0 calc(18px * var(--icons-scale)) rgba(255,255,255,0.35);
+}
+
+/* ── The menu, HOME iteration — .site-side-menu--home port, verbatim ───
+   All items the same size. Hover/keyboard-cursor pops the label right
+   with easing (both ways), lifts it to white (the glow-text is always
+   on, so the lift reads as the glow-up), and the signal-red dot fades
+   in at the left edge. .kb-hover is the keyboard twin of :hover —
+   pixel-identical, driven by THE focus variable. */
+#bs-menu {
+  position: fixed;
+  top: 42.17vh;
+  /* Demo anchor: max(edge-x, 3.76% of scene width); edge-x is a
+     clamp(34px, 3.8lvw, 68px) FLOOR — the 3.76vw term itself is uncapped. */
+  left: max(clamp(34px, 3.8vw, 68px), 3.76vw);
+  z-index: 16;
+  display: grid; gap: calc(40px * var(--ui-scale));
+  color: var(--text-soft);
+  /* The nav is ONE element in two iterations — this name is what the
+     browser morphs to the away corner across the page boundary. */
+  view-transition-name: bs-nav;
+}
+.bs-item {
+  /* HIT AREA: the visual row is 15px but each item's hover/click target
+     extends 14px into the 40px gap on both sides (12px of true dead
+     space remains — targets never overlap). The negative margin returns
+     the extension to the grid, so track pitch and label positions are
+     unchanged; flex re-centers the label in the taller box. */
+  height: calc(43px * var(--ui-scale));
+  margin: calc(-14px * var(--ui-scale)) 0;
+  color: var(--text-soft);
+  /* Home-menu iteration override (boot.css): 14px / weight 600 — the
+     generic side-menu base is 12px/300, but the home menu out-specifies it. */
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: calc(14px * var(--ui-scale));
+  line-height: calc(15px * var(--ui-scale));
+  letter-spacing: 0;
+  text-align: left; white-space: nowrap;
+  text-shadow: var(--glow-text);
+  background: none; border: 0; padding: 0;
+  display: flex; align-items: center;   /* re-centers the label in the taller hit box */
+  position: relative;
+  cursor: var(--cursor-target);
+  transition: color 0.16s, text-shadow 0.2s ease;
+}
+.bs-item > span {
+  display: inline-block;
+  transition: color .16s ease, opacity .16s ease, transform var(--side-menu-motion);
+}
+.bs-item::before {
+  content: ''; position: absolute; top: 50%; left: 0;
+  width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+  background: var(--color-signal-red); border-radius: 50%;
+  box-shadow: 0 0 12px 2px rgba(157, 31, 0, 0.45);
+  transform: translateY(-50%);
+  opacity: 0; transition: opacity var(--side-menu-fade);
+}
+/* ONE visual channel for the cursor: the pop-out renders ONLY through
+   .kb-hover, which mouseenter and the keyboard both drive via THE focus
+   variable. Raw :hover rules were deliberately removed — a second CSS-
+   only cursor drifts from the machine the moment focus is cleared
+   programmatically (idle reset under a parked pointer, Escape, sticky
+   touch suppression on hybrid laptops). One focus variable, ruthlessly. */
+.bs-item.kb-hover { color: #fff; text-shadow: var(--glow-text-hover); }
+.bs-item.kb-hover > span { transform: translateX(var(--side-menu-shift-x)); }
+.bs-item.kb-hover::before { opacity: 1; }
+.bs-item:focus-visible { color: #fff; outline: none; text-shadow: var(--glow-text-hover); }
+/* Committed lock — held out, dot on, glow held (weight already 600 at
+   rest, as in the demo's home menu). */
+.bs-item.active { color: #fff; text-shadow: var(--glow-text-hover); }
+.bs-item.active > span { transform: translateX(var(--side-menu-shift-x)); }
+.bs-item.active::before { opacity: 1; }
+
+/* ── The menu, AWAY iteration — the top-left corner element on section
+   pages. Ported from the witness build's .site-header__nav /
+   .site-primary-nav grammar, durations swapped to the tempo tokens per
+   the Aug 20 ruling. Class names kept witness-verbatim so the port stays
+   auditable against the source.
+   CLUSTER MATCH (Eric, Aug 22): the corner bar styles AS the utility
+   cluster — same top-line alignment (pad-compensated anchors), same
+   35px circles on --icons-scale, the cluster's 8+8+8 pad/gap rhythm
+   (24 visible between circles), and the same loosened .bs-hit mouse
+   vicinity. The capsule's internals (stops, type) scale with their head
+   so the witness's internal proportions hold at the cluster's size. */
+#bs-corner {
+  position: fixed;
+  /* Anchors compensated by the .bs-hit pad exactly like #bs-icons — the
+     visible rings sit on the utility line: top 41px×ui, inset 65px×ui. */
+  top: calc(41px * var(--ui-scale) - 8.8px * var(--icons-scale));
+  left: calc(65px * var(--ui-scale) - 8.8px * var(--icons-scale));
+  z-index: 24;
+  display: flex; align-items: flex-start;   /* the cluster's common top line */
+  gap: calc(6.4px * var(--icons-scale));   /* 6.4 gap + 2×8.8 pads = the cluster's 24 between circles */
+  color: rgba(255,255,255,0.94);
+  view-transition-name: bs-nav;   /* the same nav, away iteration */
+}
+/* The round control ring — the utility circle spec (35px × icons-scale,
+   0.3px ink border), witness grammar.
+   CORNER GLOW RULE (Eric, Aug 22): the corner controls carry NO outer
+   glow at rest. The utility cluster's hover-glow rule applies here too —
+   a NON-expandable control (the ‹ home ring) glows ITSELF on hover/
+   cursor (the witness halo, moved from rest to the hover state); the
+   EXPANDABLE pill never glows — its hover affordance IS the expansion,
+   and the glow belongs to its SUB texts. */
+.site-round-button {
+  width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
+  color: inherit;
+  cursor: var(--cursor-target);
+  background: rgba(0,0,0,0.04);
+  border: 0.3px solid var(--ink);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  padding: 0;
+  transition: color 0.16s;
+}
+/* Corner glyphs run on the utility cluster's GLOBAL icon grammar (Eric,
+   Aug 22): the head-glyph size (23px×icons — the witness's 46%/42%
+   fractions are superseded), the resting 6px drop-shadow, and the
+   interactive glow is the icon FILTER CHAIN (--glow-icon-hover — built
+   for hairline strokes like these chevrons), not the witness's soft
+   ring halo, whose intensity read far under the cluster's. */
+.site-round-button svg,
+.site-primary-nav__forward-button svg {
+  width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale));
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.35));
+  transition: filter 0.2s ease;
+}
+.site-round-button:hover, .site-round-button:focus-visible,
+.site-round-button.kb-hover { color: #fff; outline: none; }
+.site-round-button:hover svg, .site-round-button:focus-visible svg,
+.site-round-button.kb-hover svg { filter: var(--glow-icon-hover); }
+/* The primary pill — a cluster-size circle that grows into a capsule.
+   Witness transition .19s on the house curve → the tempo tokens. */
+.site-primary-nav {
+  /* Reserved width: left inset 65×ui + back circle 35×icons + the 24×icons
+     between-circles rhythm + a symmetric 65×ui right margin.
+     The 523 content target rides ui-scale — the capsule's TEXT keeps the
+     last iteration's size (Eric, Aug 22: the cluster match is for the
+     circles; the expanded texts reverted — they took too much space). */
+  --site-primary-nav-expanded-w: min(calc(523px * var(--ui-scale)), calc(100vw - 130px * var(--ui-scale) - 59px * var(--icons-scale)));
+  width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
+  text-shadow: var(--glow-text);
+  pointer-events: auto;
+  background: rgba(0,0,0,0.24);
+  border: 0.3px solid var(--ink);
+  border-radius: 50%;
+  transition: width var(--pop-motion), border-radius var(--pop-motion);
+  position: relative; overflow: hidden;
+  /* No glow at rest or under the MOUSE — the pill's hover affordance is
+     its expansion (Eric, Aug 22). The KEYBOARD cursor is the exception
+     below. */
+}
+.site-primary-nav.is-open { width: var(--site-primary-nav-expanded-w); border-radius: 999px; }
+/* KEYBOARD cursor (Eric, Aug 22): under the bar cursor BOTH corner
+   controls glow — on the GLOBAL icon chain, at the cluster's intensity;
+   Enter is what expands (the certified utility-cluster keyboard model).
+   The mouse path stays glowless automatically: hover OPENS the pill,
+   and an open pill hands its glow off to the tray (state-ladder
+   discipline — the glow lives in exactly one place). */
+.site-primary-nav.kb-hover .site-primary-nav__forward-button svg { filter: var(--glow-icon-hover); }
+.site-primary-nav.kb-hover.is-open .site-primary-nav__forward-button svg { filter: drop-shadow(0 0 6px rgba(255,255,255,0.35)); }
+.site-primary-nav__forward-button {
+  width: calc(35px * var(--icons-scale)); height: 100%;
+  color: inherit; cursor: var(--cursor-target); pointer-events: auto;
+  background: transparent; border: 0; padding: 0;
+  display: grid; place-items: center;
+  position: absolute; top: 0; left: 0;
+  transition: color 0.16s;
+}
+.site-primary-nav__forward-button:hover, .site-primary-nav__forward-button:focus-visible { color: #fff; outline: none; }
+/* Cursor twin on the pill head: the bar cursor GLOWS the head; Enter is
+   what expands (the certified expandable-control keyboard model). */
+.site-primary-nav.kb-hover .site-primary-nav__forward-button { color: #fff; }
+.site-primary-nav__link {
+  position: absolute;
+  /* FULL-HEIGHT hit target (Eric, Aug 22 — the expanded inner targets
+     match the utility trays' discipline: sub-items fill their
+     container's cross-axis, as .bs-tray-item fills the pill's width).
+     The label stays optically centered by flex; type keeps the last
+     iteration's ui-scale. */
+  top: 0;
+  height: 100%;
+  display: flex; align-items: center;
+  color: inherit;
+  font-family: var(--font-ui); font-weight: 300;
+  font-size: calc(14px * var(--ui-scale));
+  line-height: calc(15px * var(--ui-scale));
+  letter-spacing: 0; white-space: nowrap;
+  text-shadow: var(--glow-text-word);   /* rule 6: rest rides the word token (f=0 = certified) */
+  cursor: var(--cursor-target);
+  opacity: 0; pointer-events: none;
+  transform: translateX(calc(-7px * var(--ui-scale)));
+  background: transparent; border: 0; padding: 0;
+  /* Witness: opacity .16s + transform .18s house-curve → tempo tokens. */
+  transition: color .16s, text-shadow .2s ease,
+              opacity var(--pop-fade), transform var(--pop-motion);
+}
+/* Witness link stops — exact stylesheet values (ui-scale, the last
+   iteration; the cluster-size head column nicks stop 43 by under 1px,
+   invisible with no rendered column boundary). */
+.site-primary-nav__link--hardware  { left: calc(43px  * var(--ui-scale)); }
+.site-primary-nav__link--software  { left: calc(162px * var(--ui-scale)); }
+.site-primary-nav__link--community { left: calc(278px * var(--ui-scale)); }
+.site-primary-nav__link--support   { left: calc(405px * var(--ui-scale)); }
+.site-primary-nav.is-open .site-primary-nav__link { opacity: 1; pointer-events: auto; transform: none; }
+/* The pill's SUB texts carry the glow (Eric, Aug 22) — on the ICON
+   BAR's text chain (--glow-text-icons, the doubled recipe), not the
+   home menu's: the utility cluster's treatment is the global rule for
+   everything inside the icon bars, and its tray texts bloom on this
+   chain. */
+.site-primary-nav__link:hover, .site-primary-nav__link:focus-visible,
+.site-primary-nav__link.kb-hover { color: #fff; outline: none; text-shadow: var(--glow-text-icons-word); }
+/* "You are here" — the committed rung, rendered per the witness: full
+   ink at weight 600, aria-current, and the dot deliberately struck
+   (the witness carries content:none!important armor on this state —
+   kept verbatim). Ink routes through the accent-committed seam token. */
+.site-primary-nav__link.is-active-nav { font-weight: 600; color: var(--committed-ink); }
+.site-primary-nav__link.is-active-nav::after { content: none !important; display: none !important; }
+/* The already-selected item does NOT take the hover glow (Eric, Aug 22)
+   — it holds its committed rendering under the cursor; only its resting
+   glow remains. Applies to the keyboard twin too (pixel parity). */
+.site-primary-nav__link.is-active-nav:hover,
+.site-primary-nav__link.is-active-nav:focus-visible,
+.site-primary-nav__link.is-active-nav.kb-hover { text-shadow: var(--glow-text-word); }
+
+/* iOS-style "locked" shake — denied input shakes; nothing fails
+   silently. Under reduced motion the shake becomes a non-motion blink. */
+@keyframes bs-shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-5px); }
+  30% { transform: translateX(5px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+  90% { transform: translateX(2px); }
+}
+.bs-shake { animation: bs-shake 0.4s ease; }
+@keyframes bs-deny-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bs-shake { animation: bs-deny-blink 0.4s ease; }
+  .bs-item > span { transition: color .16s ease, opacity .16s ease; } /* pop-out lands instantly */
+  .bs-pill { transition: none; }
+  .site-primary-nav { transition: none; }
+  .site-primary-nav__link { transition: color .16s; }
+}
+
+/* ── Cross-page morph — the home↔away nav morph and the wordmark's
+   position shift ride the View Transitions API across REAL navigation
+   (the witness build's own mechanism: it tags bs-logo and runs root
+   fades at .42s ≈ the tempo's companion fade). Cross-document variant
+   here; browsers without it fall back to an instant swap — content
+   snaps, per the house motion discipline. Zero local durations: the
+   groups drink from the split tempo tokens. ─────────────────────────── */
+@view-transition { navigation: auto; }
+::view-transition { background: var(--bg); }
+::view-transition-old(root), ::view-transition-new(root) {
+  animation-duration: var(--pop-fade-duration);
+}
+::view-transition-group(bs-nav), ::view-transition-group(bs-logo) {
+  animation-duration: var(--pop-duration);
+  animation-timing-function: var(--pop-curve);
+}
+::view-transition-old(bs-nav), ::view-transition-new(bs-nav),
+::view-transition-old(bs-logo), ::view-transition-new(bs-logo) {
+  animation-duration: var(--pop-fade-duration);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Haptic source — must stay renderable (journal canon). */
+#bs-haptic { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+/* PROVISIONAL narrow-portrait chrome — mobile grammar is Eric's later
+   design; this only prevents collisions meanwhile. */
+@media (max-width: 560px) {
+  #bs-wordmark { left: 6vw; transform: translateY(-50%); width: 104px; }   /* left-anchored, still on the icon line */
+  #bs-menu { left: 6vw; }
+  #bs-corner { left: calc(6vw - 8.8px * var(--icons-scale)); }   /* pad-compensated like the anchors */
+  /* PROVISIONAL narrow collision rules for the open section drawer —
+     four labels cannot coexist with the utility row at phone width, and
+     the real answer is Eric's mobile grammar. Meanwhile: the capsule
+     stops at the 6vw margin, and the utility row yields (fades) while
+     the drawer is open so text never runs under the circles. */
+  .site-primary-nav { --site-primary-nav-expanded-w: calc(88vw - 50.2px * var(--icons-scale)); }
+  body:has(.site-primary-nav.is-open) #bs-icons { opacity: 0; pointer-events: none; transition: opacity var(--pop-fade); }
+  #bs-icons { transition: opacity var(--pop-fade); }
+  /* On section pages the corner owns the top-left — the wordmark drops
+     to a centered berth below the two top rails instead. */
+  body:is([data-bs-page="software"], [data-bs-page="community"]) #bs-wordmark {
+    left: 50%; transform: translateX(-50%);
+    top: calc(100px * var(--ui-scale));
+    width: 104px;
+  }
+}
