@@ -525,19 +525,29 @@
      rail cannot coexist with the menu at phone width, so the window
      takes the stage and the rail stacks beneath it. */
   @media (max-width: 900px) {
-    #bs-support-menu { left: 6vw; transition: opacity var(--pop-fade); }
-    /* PREVIEW: the window sits BELOW the menu, capped so it cannot reach
-       the fold. The rail does not exist yet at this rung, so nothing
-       else competes for the column. */
+    #bs-support-menu { left: 6vw; }
+    /* ONE narrow layout for BOTH levels: menu on top, the window capped
+       below it, the rail at the foot. They all fit at 375x812 (measured:
+       menu 177-345, panel 390-634, rail 669-780), and the window scrolls
+       internally for anything taller.
+
+       THE MENU STAYS LIVE UNDER THE LOCK, and that is load-bearing, not
+       cosmetic. An earlier version of this block faded it to
+       opacity:0 + pointer-events:none once locked, which made LOCKED on
+       any of the five lorem items a TERMINAL STATE on a device with no
+       Esc key: door #1 is the locked item itself (dead under
+       pointer-events:none), door #2 returns early while locked, and the
+       rail — whose door and request-type row are the only other unlock()
+       callers — is never rendered for a lorem item. Nothing on screen
+       could descend the ladder. The same rule also made denial INVISIBLE,
+       since denyLocked() shakes the locked item inside the faded menu —
+       audible but unseen, against the house law. Both faults were the
+       fade; keeping the menu live fixes them together and restores the
+       invariant this comment used to merely claim. Mobile grammar
+       remains Eric's later design; this is still collision-prevention
+       only. */
     #bs-panel { left: 6vw; width: 88vw; top: 48vh; max-height: 30vh; }
     #bs-rail  { left: 6vw; right: auto; width: 88vw; top: auto; bottom: 4vh; }
-    /* LOCKED: six labels, a panel AND the rail cannot coexist at phone
-       width, so the menu YIELDS once the user has committed — the same
-       provisional grammar the chrome already uses for the utility row
-       under an open drawer. Hover is not a thing here, and the ladder
-       still walks: Esc (or the locked item) returns the menu. */
-    body:has(#bs-panel.sup-locked) #bs-support-menu { opacity: 0; pointer-events: none; }
-    body:has(#bs-panel.sup-locked) #bs-panel { top: var(--sup-top); max-height: 52vh; }
   }
 </style>
 </head>
@@ -819,7 +829,13 @@ REQ_TYPES.forEach(function(k){
   b.setAttribute('data-str', k);
   b.setAttribute('data-req', k);
   b.addEventListener('mouseenter', function(){ if (!C.rail.isTouch()) setOptionFocus(optionEls.indexOf(b)); });
-  b.addEventListener('click', function(){ wake(); chooseType(k); });
+  // clickOk() is the journal's one-commit-per-400ms gate. chooseType was
+  // the ONLY commit door that skipped it, and the picker's option 0
+  // overlaps the form's request-type row, so a double-click committed on
+  // the first click and the second landed on that row — which DOES gate
+  // on clickOk(), passed because nothing had stamped the window — and
+  // retreated straight back out. One double-click round-tripped the lock.
+  b.addEventListener('click', function(){ wake(); if (clickOk()) chooseType(k); });
   optionsEl.appendChild(b);
   optionEls.push(b);
 });
@@ -971,7 +987,10 @@ function render(){
     menuItems[i].classList.toggle('kb-hover', i === focusIdx && !isLocked());
     menuItems[i].classList.toggle('active', lockIdx === i);
   }
-  panel.classList.toggle('sup-locked', isLocked());   // narrow-width layout gate
+  // State hook only — no CSS consumes it since the narrow-width lock
+  // override was removed (it made LOCKED a terminal state). Kept as the
+  // seam Eric's mobile grammar will want.
+  panel.classList.toggle('sup-locked', isLocked());
   // THE RAIL now rides the ACTIVE real item at BOTH levels. Eric's earlier
   // "the rail belongs to LOCK" was ruled against the EXCERPT state, which
   // no longer exists: the preview is the request type itself, and the
