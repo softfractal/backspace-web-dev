@@ -110,6 +110,39 @@
     display: grid; gap: calc(30px * var(--ui-scale));
     color: var(--text-soft);
   }
+  /* WEIGHT GRAMMAR (RULED — Eric, Aug 24, pointing at the EXPANDED
+     AWAY-NAV as the reference: "besides the hovered item, all other at
+     rest items should use this font styling").
+
+     The correction: .bs-item is the HOME menu's grammar and rests at
+     weight 600. This list rests at the CAPSULE's weight — 300 — and only
+     the hovered/previewed item rises to 600. (The locked item holds the
+     same rung: lock is preview committed, so it stays 600.) Porting
+     .bs-item verbatim carried the home menu's 600 into rest, which is
+     what Eric caught.
+
+     MEASURED against the design frames before changing anything — the
+     five untouched labels measure identically in A-4 and 1-1, which
+     validates the metric as a control:
+       AT REST  frame stroke-run 1.41-1.81  ->  light 300 off 4.1%,
+                                                semibold 600 off 98.6%
+       POPPED   frame stroke-run 4.05       ->  600 + --glow-text-hover
+                                                off 4.6%, while 300 +
+                                                the same glow is off
+                                                42.7% (so the pop is a
+                                                REAL weight step, not
+                                                the glow alone)
+     Label widths agree independently: frame 99 / 155 px vs light
+     101 / 156 and semibold 107 / 170.
+
+     Everything else in .bs-item is already identical to the capsule
+     link (var(--font-ui), 14px×ui, 15px line, letter-spacing 0), so
+     font-weight is the ENTIRE delta. The HOME menu is untouched —
+     its 14/600 rest is certified law. */
+  #bs-support-menu .bs-item { font-weight: 300; }
+  #bs-support-menu .bs-item.kb-hover,
+  #bs-support-menu .bs-item:focus-visible,
+  #bs-support-menu .bs-item.active { font-weight: 600; }
 
   /* ── The window — the MERGED bs-window subsystem, placed and sized ────
      Frame rect x[577,1137] top 243 -> left 33.39vw, width 32.47vw. The
