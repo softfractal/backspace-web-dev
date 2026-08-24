@@ -829,6 +829,17 @@ REQ_TYPES.forEach(function(k){
   b.setAttribute('data-str', k);
   b.setAttribute('data-req', k);
   b.addEventListener('mouseenter', function(){ if (!C.rail.isTouch()) setOptionFocus(optionEls.indexOf(b)); });
+  // The options are NOT sticky. Sticky hover is the MENU's grammar — it
+  // holds because leaving a menu item must not tear down the window the
+  // item opened. Inside the window there is nothing to protect, so the
+  // cursor follows the pointer and leaves with it (Eric, Aug 25: the last
+  // hovered option kept glowing after the mouse left). Moving between two
+  // options fires leave-then-enter in the same frame, so the light hands
+  // over without a flicker.
+  b.addEventListener('mouseleave', function(){
+    if (C.rail.isTouch()) return;
+    if (optionIdx === optionEls.indexOf(b)) setOptionFocus(-1);
+  });
   // clickOk() is the journal's one-commit-per-400ms gate. chooseType was
   // the ONLY commit door that skipped it, and the picker's option 0
   // overlaps the form's request-type row, so a double-click committed on
@@ -1123,6 +1134,16 @@ panel.addEventListener('keydown', function(e){
     }
   }
 });
+// Leaving the WINDOW clears the option cursor outright — the backstop for
+// a pointer that exits fast enough to skip an option's own mouseleave, or
+// one that leaves from the panel's padding rather than off an option.
+// pointerleave does not fire on child transitions, so moving among the
+// options never trips it.
+panel.addEventListener('pointerleave', function(e){
+  if (e.pointerType && e.pointerType !== 'mouse') return;
+  if (optionIdx >= 0) setOptionFocus(-1);
+});
+
 // TWO DOORS, ONE LOCK — door #2: clicking the window itself commits.
 panel.addEventListener('click', function(e){
   if (isLocked()) return;
