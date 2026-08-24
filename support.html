@@ -244,8 +244,14 @@
      frames put it (1-2: dot x657-661 against a content box starting at
      657). It previously hung at calc(--sup-pad-x * -1), i.e. out at the
      window's own edge — wrong by the full 80px pad. */
+  /* top is MEASURED into --sup-dot-y (see alignMarkers in the script):
+     the dot's centre lands on the text's CAP MIDPOINT. The fallback is
+     for a dead script only, and it is HALF THE LINE BOX — never 50%,
+     which resolves against a padding box that now carries the divider's
+     air and drops the dot ~6px (the measured bug this replaced). */
   .sup-mark::before {
-    content: ''; position: absolute; top: 50%;
+    content: ''; position: absolute;
+    top: var(--sup-dot-y, calc(6.5px * var(--ui-scale)));
     left: 0;
     width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
     background: var(--sup-marker); border-radius: 50%;
@@ -318,7 +324,7 @@
   }
   .sup-field::before {
     content: ''; position: absolute; left: 0;
-    top: calc(6.5px * var(--ui-scale));       /* on the label's line, above the rule */
+    top: var(--sup-dot-y, calc(6.5px * var(--ui-scale)));   /* cap midpoint — measured */
     width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
     background: var(--sup-marker); border-radius: 50%;
     box-shadow: var(--sup-marker-glow);
@@ -886,6 +892,44 @@ function renderChosen(){
   chosenEl.textContent = chosenType ? T(chosenType) : '—';
   chosenEl.setAttribute('aria-label', T('supReqType'));
 }
+/* MARKER ALIGNMENT — MEASURED, never assumed (Eric, Aug 24: "can we have
+   the glow dots align to the texts vertically"). A dot centred on its
+   line BOX is wrong twice over: the box carries leading, and once the
+   divider's padding joined the box, top:50% fell a further 5.9px
+   (measured) below the text — a regression the divider introduced. The
+   eye aligns a dot to the text's CAP MIDPOINT, so the machine solves
+   that offset per element from REAL font metrics and writes it into
+   --sup-dot-y. Re-runs when the webfont lands and at every scale change,
+   because both move the metrics; the frames put the marker in this same
+   band (1-3px above the x-height centre across every sampled label). */
+var _mctx = null;
+function capMidOf(el){
+  if (!_mctx) _mctx = document.createElement('canvas').getContext('2d');
+  var cs = getComputedStyle(el);
+  _mctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+  var cap = _mctx.measureText('H');
+  var lh = parseFloat(cs.lineHeight);
+  var fa = cap.fontBoundingBoxAscent, fd = cap.fontBoundingBoxDescent;
+  var ca = cap.actualBoundingBoxAscent;
+  // Old engines report none of these — leave the CSS fallback in charge.
+  if (!isFinite(lh) || !isFinite(fa) || !isFinite(fd) || !isFinite(ca)) return null;
+  return (lh - (fa + fd)) / 2 + fa - ca / 2;     // line-box top -> cap midpoint
+}
+function alignMarkers(){
+  var ks = document.querySelectorAll('.sup-kicker');
+  for (var i = 0; i < ks.length; i++){
+    var y = capMidOf(ks[i]);
+    if (y !== null) ks[i].style.setProperty('--sup-dot-y', y.toFixed(2) + 'px');
+  }
+  var fs = document.querySelectorAll('.sup-field');
+  for (var j = 0; j < fs.length; j++){
+    var lab = fs[j].querySelector('label');
+    if (!lab) continue;
+    var yy = capMidOf(lab);
+    if (yy !== null) fs[j].style.setProperty('--sup-dot-y', yy.toFixed(2) + 'px');
+  }
+}
+
 // ── Render from state ─────────────────────────────────────────────────────
 function render(){
   for (var i = 0; i < menuItems.length; i++){
@@ -1223,7 +1267,11 @@ C.init({
       else renderChosen();
       document.title = T2('supportTitle');
     },
-    onFontsReady:   function(){ measurePitch(); if (focusIdx >= 0 || isLocked()) sizePanel(); },
+    onFontsReady:   function(){
+      measurePitch();
+      alignMarkers();                       // the webfont's metrics are the real ones
+      if (focusIdx >= 0 || isLocked()) sizePanel();
+    },
     devState:       function(){
       return { focusIdx: focusIdx, lockIdx: lockIdx, view: view, rung: lastRung,
                chosenType: chosenType, menuPitch: menuPitch, arrival: arrival,
@@ -1237,9 +1285,13 @@ renderStrings();
 links.forEach(function(l){ l.textContent = T(l.getAttribute('data-section')); });
 renderChosen();
 measurePitch();
+alignMarkers();
 render();
 
-window.addEventListener('resize', function(){ if (focusIdx >= 0 || isLocked()) sizePanel(); });
+window.addEventListener('resize', function(){
+  alignMarkers();                           // --ui-scale moved: so did the metrics
+  if (focusIdx >= 0 || isLocked()) sizePanel();
+});
 window.addEventListener('pageshow', function(e){
   if (e.persisted){
     _leaving = false;
