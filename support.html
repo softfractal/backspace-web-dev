@@ -111,6 +111,25 @@
        house's own hairline token rather than measured off the frame.
        --panel-line is what the chrome already uses for exactly this. */
     --sup-rule: var(--panel-line);
+    /* THE RULE SITS IN THE MIDDLE (RULED — Eric, Aug 24, on the preview
+       close-up: "too close to CONTACT US and too far from the excerpt...
+       the divider should sit in middle between the upper and lower
+       elements, with equal paddings").
+       Equal INK-to-rule distance is NOT equal CSS padding: the two
+       neighbours carry different half-leading (the kicker is a 13px line
+       box on 11px caps; the prose is a 1.75 box on 12px WITH descenders;
+       the form's value is a 17px box on 13px caps). So the CSS values
+       differ on purpose, and they are MEASURED — verified in the browser
+       with canvas font metrics (actualBoundingBox*), not eyeballed.
+       Retune by re-running that measurement, never by nudging one side. */
+    --sup-rule-above: calc(14px * var(--ui-scale));
+    --sup-rule-below: calc(8px  * var(--ui-scale));
+    --sup-fld-above:  calc(7px  * var(--ui-scale));
+    --sup-fld-below:  calc(4px  * var(--ui-scale));
+    /* The picker needs its own value: its options ride a 27px line box
+       (the frame's option pitch), whose half-leading pushes the first
+       option's ink 3.7px further down than the prose's would go. */
+    --sup-opt-below:  calc(4px  * var(--ui-scale));
     /* The panel's own interior rhythm (component internals ride ui-scale,
        page placement rides frame fractions — the certified split). The
        frames draw 80px side pads in 1-2 and 52/86 in 1-3; harmonized to
@@ -218,7 +237,7 @@
        other faces share the grammar so the rule does not appear and
        vanish as the ladder walks. (Eric named the FORM specifically;
        carrying it to the kicker is mine, and one line strikes it.) */
-    padding-bottom: calc(5px * var(--ui-scale));
+    padding-bottom: var(--sup-rule-above);
     border-bottom: 1px solid var(--sup-rule);
   }
   /* The marker sits at the CONTENT box's left edge, which is where the
@@ -236,7 +255,7 @@
   /* Prose runs LEFT — the frames' own split: labels right, prose left
      (the 1-3 textarea does exactly this). Readability decides. */
   .sup-prose {
-    margin: calc(16px * var(--ui-scale)) 0 0;
+    margin: var(--sup-rule-below) 0 0;
     color: var(--text-soft);
     font-family: var(--font-sans); font-weight: 300;
     font-size: calc(12px * var(--ui-scale));
@@ -249,7 +268,7 @@
      (seed). Shipped as one list, right-aligned bold on the frame's 27px
      pitch. The set itself is a PLACEHOLDER pending Eric's manifest
      confirm — it lives in STR keys, so the real list is a copy edit. */
-  .sup-options { margin-top: calc(16px * var(--ui-scale)); display: grid; }
+  .sup-options { margin-top: var(--sup-opt-below); display: grid; }
   .sup-option {
     display: block; width: 100%;
     padding: 0; border: 0; background: none;
@@ -285,7 +304,7 @@
   }
   /* title -> divider -> value. The label is a stretched grid item, so its
      own border IS the full-column rule; no extra element needed. */
-  .sup-field { position: relative; display: grid; gap: calc(7px * var(--ui-scale)); }
+  .sup-field { position: relative; display: grid; gap: var(--sup-fld-below); }
   .sup-field--wide { grid-column: 1 / -1; }
   .sup-field > label {
     text-align: right;
@@ -294,7 +313,7 @@
     font-size: calc(11px * var(--ui-scale));
     line-height: calc(13px * var(--ui-scale));
     letter-spacing: .04em;
-    padding-bottom: calc(5px * var(--ui-scale));
+    padding-bottom: var(--sup-fld-above);
     border-bottom: 1px solid var(--sup-rule);
   }
   .sup-field::before {
@@ -670,6 +689,8 @@ var vForm    = document.getElementById('sup-view-form');
 var optionsEl= document.getElementById('sup-options');
 var railEl   = document.getElementById('bs-rail');
 var chosenEl = document.getElementById('sup-f-type');
+var excerptKicker = document.getElementById('sup-excerpt-kicker');
+var excerptCopy   = document.getElementById('sup-excerpt-copy');
 var noteEl   = document.getElementById('sup-note');
 var emailBtn = document.getElementById('sup-email');
 var doorBtn  = document.getElementById('sup-door');
@@ -775,7 +796,11 @@ function chooseType(k){
     o.setAttribute('aria-selected', String(o.getAttribute('data-req') === k));
   });
   SoundBus.play('commit'); hapticTick();
-  setView('form');
+  // CHOOSING THE TYPE **IS** THE COMMIT (Eric, Aug 24): the form is the
+  // level with something to lose, so it is the level that locks.
+  if (!isLocked() && focusIdx >= 0) lockIdx = focusIdx;
+  if (isLocked()) showFace(lockIdx, true);
+  render();
 }
 
 // ── The window ────────────────────────────────────────────────────────────
@@ -784,6 +809,20 @@ function chooseType(k){
 // The form is CAPPED at the frame's own 600/1117 so it scrolls internally
 // — which is exactly what frame 1-3's scrollbar shows.
 var FORM_CAP_VH = 53.71;
+
+// ── THE TWO LEVELS (RULED — Eric, Aug 24, relaying the design team) ──────
+// There is NO separate excerpt rung. The window carrying the request type
+// IS the preview; the level BELOW it is the one worth locking, because
+// that is where there is something to LOSE (for CONTACT US, a half-filled
+// form). The excerpt face I had invented is retired for the real item and
+// survives only as the lorem items' own two levels.
+//   PREVIEW   real -> the request-type face   ·  lorem -> its excerpt
+//   LOCKED    real -> the form                ·  lorem -> its deeper body
+function faceFor(i, locked){
+  if (i < 0) return 'excerpt';
+  if (ITEMS[i].real) return locked ? 'form' : 'request';
+  return 'excerpt';
+}
 function viewEl(){ return view === 'form' ? vForm : (view === 'request' ? vRequest : vExcerpt); }
 function measurePanel(){
   var el = viewEl();
@@ -800,56 +839,76 @@ function measurePanel(){
   return Math.ceil(h);
 }
 function sizePanel(){ panel.style.height = measurePanel() + 'px'; }
-function setView(v){
-  view = v;
-  vExcerpt.hidden = (v !== 'excerpt');
-  vRequest.hidden = (v !== 'request');
-  vForm.hidden    = (v !== 'form');
-  sizePanel();
-  if (v === 'request'){ setOptionFocus(-1); }
+
+// Fill and show item i's face at the given level.
+function setFace(i, locked){
+  view = faceFor(i, locked);
+  vExcerpt.hidden = (view !== 'excerpt');
+  vRequest.hidden = (view !== 'request');
+  vForm.hidden    = (view !== 'form');
+  if (i >= 0 && !ITEMS[i].real){
+    excerptKicker.textContent = T(ITEMS[i].key);
+    excerptCopy.textContent   = locked ? T('supLoremBody') : T('supLoremExcerpt');
+  }
+  if (view === 'request') setOptionFocus(-1);
   renderChosen();
+  sizePanel();
+}
+// A LEVEL change inside one item: the content snaps, the frame resizes on
+// the tempo. (House law — surfaces fade, content snaps.)
+function showFace(i, locked){ setFace(i, locked); }
+
+// AN ITEM change: REDRAW (Eric, Aug 24 — "make the pop up window redraw
+// itself every time I hover to another menu item"). The window is not a
+// container whose contents swap; it is DRAWN FRESH per item, so the
+// expansion mechanic runs every time. The collapse is INSTANTANEOUS —
+// the transition is suppressed for exactly that frame — so a redraw costs
+// ONE draw-out on the tempo instead of a retract plus a draw. The face is
+// swapped and re-measured while collapsed, so nothing of the outgoing
+// item is ever visible inside the incoming frame.
+function drawPanel(i, locked){
+  var prev = panel.style.transition;
+  panel.style.transition = 'none';
+  panel.classList.remove('is-open');
+  panel.classList.remove('is-hidden');
+  void panel.offsetWidth;                 // commit the collapsed seed square
+  setFace(i, locked);                     // swap + resize while invisible
+  void panel.offsetWidth;
+  panel.style.transition = prev || '';
+  void panel.offsetWidth;                 // commit the restored transition
+  panel.classList.add('is-open');         // …then draw out on the tempo
+}
+function hidePanel(){
+  panel.classList.remove('is-open');
+  panel.classList.add('is-hidden');
 }
 function renderChosen(){
   chosenEl.textContent = chosenType ? T(chosenType) : '—';
   chosenEl.setAttribute('aria-label', T('supReqType'));
 }
-function renderPanelContent(){
-  var i = (lockIdx !== null) ? lockIdx : focusIdx;
-  if (i < 0) return;
-  var it = ITEMS[i];
-  document.getElementById('sup-excerpt-kicker').textContent = T(it.key);
-  document.getElementById('sup-excerpt-copy').textContent =
-    it.real ? T('supRailIntro') : T('supLoremExcerpt');
-}
-// The five lorem items lock into a body view; CONTACT US locks into the
-// request-type flow. Same ladder, different content (Eric, Aug 24).
-function lockedViewFor(i){ return ITEMS[i].real ? 'request' : 'excerpt'; }
-function renderLockedContent(){
-  var it = ITEMS[lockIdx];
-  if (!it.real){
-    document.getElementById('sup-excerpt-kicker').textContent = T(it.key);
-    document.getElementById('sup-excerpt-copy').textContent = T('supLoremBody');
-  }
-}
-
 // ── Render from state ─────────────────────────────────────────────────────
 function render(){
   for (var i = 0; i < menuItems.length; i++){
     menuItems[i].classList.toggle('kb-hover', i === focusIdx && !isLocked());
     menuItems[i].classList.toggle('active', lockIdx === i);
   }
-  var open = (focusIdx >= 0 || isLocked());
-  panel.classList.toggle('is-hidden', !open);
-  panel.classList.toggle('is-open', open);
-  // The rail is LOCK-side, and only the real item owns it.
   panel.classList.toggle('sup-locked', isLocked());   // narrow-width layout gate
-  var railOn = isLocked() && ITEMS[lockIdx].real;
+  // THE RAIL now rides the ACTIVE real item at BOTH levels. Eric's earlier
+  // "the rail belongs to LOCK" was ruled against the EXCERPT state, which
+  // no longer exists: the preview is the request type itself, and the
+  // rail's own door is the way INTO the locked form — gating it behind the
+  // lock would leave both that door and the support address unreachable.
+  // Frames 1-2 and 1-3 draw the rail at both levels. LABELED: one line
+  // returns it to lock-only.
+  var act = isLocked() ? lockIdx : focusIdx;
+  var railOn = act >= 0 && ITEMS[act].real;
   railEl.classList.toggle('is-on', railOn);
   railEl.setAttribute('aria-hidden', String(!railOn));
-  // Tab enters the form only when locked (the machine law).
+  // Tab enters the FORM only when locked (the machine law). The options
+  // are the PREVIEW's own control, so they are reachable while it is up.
   var tabbable = isLocked();
   vForm.querySelectorAll('input, textarea, button').forEach(function(el){ el.tabIndex = tabbable ? 0 : -1; });
-  optionEls.forEach(function(el){ el.tabIndex = tabbable ? 0 : -1; });
+  optionEls.forEach(function(el){ el.tabIndex = (focusIdx >= 0 && !isLocked()) ? 0 : -1; });
   railEl.querySelectorAll('button').forEach(function(el){ el.tabIndex = railOn ? 0 : -1; });
 }
 
@@ -858,10 +917,10 @@ function setFocus(i){
   if (i >= 0 && C.rail.index() >= 0) C.rail.focus(-1);   // one cursor
   focusIdx = i;
   if (i >= 0){
-    view = 'excerpt';
-    renderPanelContent();
-    setView('excerpt');
+    drawPanel(i, false);                 // every item REDRAWS the window
     SoundBus.play('detent'); hapticTick();
+  } else {
+    hidePanel();
   }
   render();
 }
@@ -883,9 +942,7 @@ function lock(i){
   lockIdx = i;
   focusIdx = i;
   SoundBus.play('commit'); hapticTick();
-  renderPanelContent();
-  renderLockedContent();
-  setView(lockedViewFor(i));
+  showFace(i, true);        // a LEVEL change, not an item change — no redraw
   render();
 }
 // Lock retreats to PREVIEW — the ladder mirrors its own ascent (ratified).
@@ -894,8 +951,7 @@ function unlock(){
   var i = lockIdx;
   lockIdx = null;
   focusIdx = i;
-  renderPanelContent();
-  setView('excerpt');
+  showFace(i, false);
   render();
   SoundBus.play('detent'); hapticTick();
 }
@@ -905,9 +961,12 @@ function denyLocked(){
 }
 
 // ── THE ESC LADDER — one honest level per press, through ONE function ─────
-// field focus -> window level -> LOCKED -> PREVIEW -> menu rest -> boundary.
-// (Menu rest and idle coincide on this page: nothing else holds state at
-// rest — the /community precedent.) Instrumented under ?dev.
+// field focus -> LOCKED -> PREVIEW -> menu rest -> boundary.
+// One rung SHORTER than the first build: the form no longer retreats to a
+// request-type "window level" on its way out, because the request type IS
+// the preview now (Eric, Aug 24). Each press is still exactly one honest
+// level. (Menu rest and idle coincide here — nothing else holds state at
+// rest, the /community precedent.) Instrumented under ?dev.
 var lastRung = null;
 function goBack(){
   if (isLocked()){
@@ -919,16 +978,15 @@ function goBack(){
       try { panelBody.focus({ preventScroll: true }); } catch (e) {}
       return;
     }
-    // 2. the form retreats to the request-type face (the window level).
-    if (view === 'form'){ lastRung = 'window'; setView('request'); return; }
-    // 3. LOCKED retreats to PREVIEW.
+    // 2. LOCKED retreats to PREVIEW (which, for the real item, IS the
+    //    request-type face).
     lastRung = 'locked';
     unlock();
     return;
   }
-  // 4. PREVIEW retreats to rest.
+  // 3. PREVIEW retreats to rest.
   if (focusIdx >= 0){ lastRung = 'preview'; setFocus(-1); return; }
-  // 5. rest -> the page boundary (a TRUE history pop; cold boot is silent).
+  // 4. rest -> the page boundary (a TRUE history pop; cold boot is silent).
   lastRung = 'boundary';
   if (arrival) popBoundary();
 }
@@ -938,7 +996,7 @@ function goBack(){
 // the window, so W/S/A/D typed into a field are text, not menu input.
 // Esc still walks THE ladder — one function, both routes.
 panel.addEventListener('keydown', function(e){
-  if (!isLocked()) return;
+  if (focusIdx < 0 && !isLocked()) return;
   e.stopPropagation();
   if (e.key === 'Escape'){ e.preventDefault(); wake(); goBack(); return; }
   if (view === 'request'){
@@ -962,10 +1020,19 @@ panel.addEventListener('keydown', function(e){
 panel.addEventListener('click', function(e){
   if (isLocked()) return;
   if (focusIdx < 0) return;
+  // The preview's own controls own their clicks — choosing an option IS
+  // the commit, so it must not double-fire the ground's door.
+  if (e.target.closest('.sup-option')) return;
   wake();
   if (clickOk()) lock(focusIdx);
   e.stopPropagation();
 });
+
+// The form's request-type row is a CONTROL: it retreats to the picker —
+// which is the same rung the Esc ladder walks. (It was never wired in the
+// first build.) The form's field values survive in the DOM, so choosing
+// again returns to a form that kept everything.
+chosenEl.addEventListener('click', function(){ wake(); if (clickOk()) unlock(); });
 
 // ── The rail's two controls ───────────────────────────────────────────────
 // The email capsule COPIES (Eric, Aug 24). mailto: was the alternative and
@@ -996,11 +1063,19 @@ emailBtn.addEventListener('click', function(){
     ok ? said() : failed();
   } catch (err) { failed(); }
 });
-// The form door — the rail's jump straight to the form.
+// The form door — the rail's own way into the locked level, skipping the
+// request-type choice (the form's first row still carries it, and Submit
+// denies until it is set). From PREVIEW this is a COMMIT.
 doorBtn.addEventListener('click', function(){
   wake();
-  if (!isLocked()) return;
-  setView('form');
+  var i = isLocked() ? lockIdx : focusIdx;
+  if (i < 0 || !ITEMS[i].real) return;
+  if (!isLocked()){
+    if (!clickOk()) return;
+    lock(i);
+  } else {
+    showFace(i, true);
+  }
   var first = document.getElementById('sup-f-name');
   try { first.focus({ preventScroll: true }); } catch (e) {}
 });
@@ -1137,15 +1212,15 @@ C.init({
     },
     wheelStep:      focusStep,
     wheelPitch:     function(){ return menuPitch; },
-    clearPrimary:   function(){ if (focusIdx >= 0 && !isLocked()){ focusIdx = -1; render(); } },
+    clearPrimary:   function(){ if (focusIdx >= 0 && !isLocked()) setFocus(-1); },
     idleReset:      function(){ setFocus(-1); C.rail.focus(-1); },
     onLangChange:   function(T2){
       links.forEach(function(l){ l.textContent = T2(l.getAttribute('data-section')); });
       renderStrings();
-      renderPanelContent();
-      if (isLocked()) renderLockedContent();
-      renderChosen();
-      sizePanel();
+      // Re-render whichever face is live, at its current level.
+      var act = isLocked() ? lockIdx : focusIdx;
+      if (act >= 0) setFace(act, isLocked());
+      else renderChosen();
       document.title = T2('supportTitle');
     },
     onFontsReady:   function(){ measurePitch(); if (focusIdx >= 0 || isLocked()) sizePanel(); },
