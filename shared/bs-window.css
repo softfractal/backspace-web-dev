@@ -1,0 +1,143 @@
+/* SUPERSEDED Aug 24 2026 — MERGED into shared/bs-chrome.css under the
+   session lock (tokens in the :root tempo family, component rules below
+   the away-nav block). Values corrected at merge from the design frames:
+   --bsw-corner 22px -> 15px, --bsw-fill 8% -> 9% (measured), --bsw-glow
+   CALIBRATED by the rule-4 parity harness. This file is kept as the
+   frozen v2 review record ONLY — it is not mounted by any page and must
+   not be edited. The merged block in bs-chrome.css is the law. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   bs-window — the GLOBAL window-expansion subsystem  (v2 — Eric's Aug 24 eye)
+   Destined for shared/bs-chrome.css under the session lock; standalone here
+   for review. Canon §9 entry owed on merge.
+
+   THE MECHANIC
+   Rest: the window IS the seed square — the two corner triangles co-located
+   (::before upper-left half + ::after lower-right half). Eric's ruling: the
+   square is the resting state, visible.
+   Open (.is-open): the lower-right triangle travels to the far corner while
+   clip-path draws the translucent grey frame out behind it — both on ONE
+   duration + curve, so wide/tall/mixed expansion falls out of the target
+   ratio alone. Content fades in only once the frame lands. Removing
+   .is-open retracts to the seed square (Esc's close animation, free).
+   Absent (.is-hidden): for pages where the window shouldn't exist at rest —
+   fades out entirely. The page chooses its resting affordance.
+
+   GLOW (Eric, Aug 24: triangles and the square carry outer glow)
+   The triangles are rendered as HARD-STOP GRADIENTS, not clip-path polygons.
+   Reason: filters apply BEFORE clip-path in the paint pipeline, so a
+   drop-shadow on a clipped element is sheared off at the clip edge —
+   gradient alpha keeps the silhouette and lets the glow hug the hypotenuse.
+   The chain lives in one token (--bsw-glow). GLOW LAW compliance: radii
+   ≤18px (perf rule 5 ceiling is 96); the default below is a family-
+   consistent derivation of the glyph chain — IN-REPO MERGE MUST RUN THE
+   RULE-4 PARITY MEASUREMENT (total added light vs. same-size elements)
+   before this default is treated as calibrated. Note: the two half-glows
+   sum slightly along the shared hypotenuse in the seed state — negligible
+   at these radii; measured pass confirms.
+
+   TEMPO LAW — zero locally written durations. Consumes:
+     --pop-duration · --pop-fade · --pop-fade-duration (canon §6)
+     --expand-curve  NEW TOKEN (ease-in-out; the house --pop-curve does not
+                     ease in). Canon §6 entry owed on ratification.
+
+   VALUES PENDING FRAME CONFIG (placeholders labeled):
+     --bsw-corner  triangle leg / seed edge — default 22px×ui, CONFIRM.
+     --bsw-fill    the translucent grey — default 8% ink, CONFIRM.
+
+   USAGE
+     <div class="bs-window" style="width:…; height:…"> …content… </div>
+     Rest = seed square visible · .is-open = expanded · .is-hidden = absent.
+     JS toggles classes; the machine's preview/lock states drive them.
+     Pointer-inert until open (hover-lock previews are interactable).
+
+   MIN SIZE: keep both dimensions ≥ 3 × --bsw-corner.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --expand-curve: cubic-bezier(.65, 0, .35, 1); /* NEW TOKEN — Eric ratified the feel Aug 24 */
+  --bsw-corner: calc(22px * var(--ui-scale));   /* PLACEHOLDER — confirm from frame config */
+  --bsw-fill: #fefefe14;                        /* PLACEHOLDER — confirm from frame config */
+  --bsw-glow:                                   /* DEFAULT PENDING rule-4 measurement in-repo */
+    drop-shadow(0 0 3px rgba(255,255,255, 1))
+    drop-shadow(0 0 8px rgba(255,255,255, .55))
+    drop-shadow(0 0 18px rgba(255,255,255, .18));
+}
+
+/* ── Rest: the visible seed square ───────────────────────────────────────── */
+.bs-window {
+  position: absolute;              /* the page places and sizes it */
+  background: var(--bsw-fill);
+  /* Optional hairline, off pending the design call:
+     box-shadow: inset 0 0 0 1px var(--panel-line); */
+  pointer-events: none;
+  clip-path: inset(0 calc(100% - var(--bsw-corner)) calc(100% - var(--bsw-corner)) 0);
+  transition:
+    clip-path  var(--pop-duration) var(--expand-curve),
+    opacity    var(--pop-fade),
+    visibility 0s;
+}
+
+/* The two corner triangles — co-located at rest, they ARE the seed square.
+   Gradient-rendered so --bsw-glow follows the triangle silhouette. */
+.bs-window::before,
+.bs-window::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: var(--bsw-corner);
+  height: var(--bsw-corner);
+  z-index: 2;
+  pointer-events: none;
+  filter: var(--bsw-glow);
+}
+.bs-window::before {                              /* upper-left half — stays home */
+  background: linear-gradient(to bottom right,
+    var(--ink) calc(50% - .5px), transparent calc(50% + .5px));
+}
+.bs-window::after {                               /* lower-right half — the traveler */
+  background: linear-gradient(to bottom right,
+    transparent calc(50% - .5px), var(--ink) calc(50% + .5px));
+  transition:
+    top  var(--pop-duration) var(--expand-curve),
+    left var(--pop-duration) var(--expand-curve);
+}
+
+/* Content waits for the frame. */
+.bs-window > * {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity var(--pop-fade);
+}
+
+/* ── OPEN ─────────────────────────────────────────────────────────────────── */
+.bs-window.is-open {
+  pointer-events: auto;                           /* previews are interactable — hover-lock ruling */
+  clip-path: inset(0 0 0 0);
+}
+.bs-window.is-open::after {
+  top:  calc(100% - var(--bsw-corner));
+  left: calc(100% - var(--bsw-corner));
+}
+.bs-window.is-open > * {
+  opacity: 1;
+  transition-delay: var(--pop-duration);          /* land the frame, then the content */
+}
+.bs-window:not(.is-open) > * { transition-delay: 0s; }
+
+/* ── ABSENT — for pages where no seed square rests on stage ──────────────── */
+.bs-window.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    clip-path  var(--pop-duration) var(--expand-curve),
+    opacity    var(--pop-fade),
+    visibility 0s var(--pop-fade-duration);       /* hide only after the fade lands */
+}
+
+/* ── Reduced motion: instant states, nothing choreographs. ───────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .bs-window, .bs-window::after, .bs-window > * { transition: none; }
+}

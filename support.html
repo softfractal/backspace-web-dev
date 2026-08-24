@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#040402">
+<title>BACKSPACE — Support</title>
+<!--
+  backspace — /support (page four), phase one: the CONTACT US anchor.
+  Mounts the ratified shared pair; the window is the merged bs-window
+  subsystem (no bespoke panel exists on this page).
+
+  DESIGN AUTHORITY (RULED — Eric, Aug 24): this page was never built by
+  the previous engineer, so there is no dev-build witness. The design
+  team's frames (A-4 rest · 1-1 CONTACT US · 1-2 request type · 1-3 form,
+  all 1728x1117) are VISUAL REFERENCE, MIXED with the shipped pages' own
+  grammar — not an exact-value port. Where the frames and the house
+  diverge, the house wins and the deviation is labeled here. Measurements
+  behind every ported value: reports/support_phase1_initiation_audit.md
+  (Eric sanctioned the PNG convention, +-1px frame units).
+
+  THE HOVER-LOCK LADDER (RULED — Eric, Aug 24) — the page's whole point.
+  Each of the six items runs three states from ONE focus variable:
+    REST.
+    PREVIEW (STICKY). Hover pops the item out (home-menu grammar: the
+      pop, the signal-red dot, the glow) and opens the grey excerpt
+      window center-stage. THE POINTER LEAVING DOES NOT RETRACT IT — the
+      item stays popped, the window stays present AND interactable.
+      Exclusive: hovering another item cancels and replaces.
+    LOCKED. Clicking the previewed item again, OR clicking the window —
+      TWO DOORS, ONE LOCK — commits: the excerpt becomes the full
+      content, and ONLY NOW does the right rail appear.
+  RULING ON RECORD: frame 1-1 draws the right rail during hover. That is
+  TOO EARLY. On hover only the excerpt window exists; the rail belongs to
+  LOCK. Built to the ruling, not the frame.
+
+  Sticky hover is not a second model — it is hover ACQUIRING the focus
+  variable, which is the keyboard cursor's own behavior. Preview renders
+  from focus; lock is the commit. Derived defaults, ratified Aug 24:
+  W/S walks items and every step previews (parity) - Enter locks - Esc is
+  the only non-replacement cancel - touch taps once to preview, twice to
+  lock - lock retreats to PREVIEW (the ladder mirrors its own ascent).
+
+  CONTENT: CONTACT US is real. The other five ride the SAME ladder with
+  LOREM through the STR manifest (Eric, Aug 24) — real copy swaps in at
+  the keys, no code changes. FAQ's sub-list and answer states are OUT of
+  phase one; nothing here precludes them.
+
+  STAGE: blank black per the standing scene-format gate. SCENE SEAM is
+  #bs-stage; video / bake / still all remain possible.
+
+  MACHINE LAW on this page: three zones on one cursor — the top strip
+  (away nav, SUPPORT DENIES as current, plus utilities; A/D) - the menu
+  (W/S) - the locked window (keys remap inside; Tab enters the form only
+  when locked). Wheel ownership SWITCHES with the lock: at menu level the
+  wheel steps the menu on a MEASURED pitch (first away-page consumer of
+  the C14 bridge); inside the locked window the wheel belongs to the
+  panel's native scroll (the wheelNative seam in the shared chrome), and
+  unlock hands it back. The Esc ladder walks ONE honest level per press
+  through ONE function: field focus -> window level -> LOCKED -> PREVIEW
+  -> menu rest -> the page boundary. (Rest and idle coincide here —
+  nothing else holds state at rest, as on /community.) Denial is visible
+  and audible everywhere: the current away-nav section, foreign axes, a
+  frozen menu under the lock, invalid submits.
+
+  SUBMIT IS A LABELED STUB pending the wiring ruling (endpoint / mailto /
+  disabled-until-go-live): the full submit UX runs to a marked seam and
+  says honestly that nothing was sent. No path leaves the site, so the
+  THIRD PARTY overlay's second-consumer factoring trigger has NOT fired.
+-->
+<link rel="stylesheet" href="shared/bs-chrome.css">
+<style>
+  /* ── Page tokens ──────────────────────────────────────────────────────
+     THE SHARED TOP LINE: the frames start the menu, the window and the
+     rail on one line (window top 243, menu ink 247, rail ink 248 of
+     1117) — 243/1117 -> 21.76vh. One token so the three cannot drift. */
+  body[data-bs-page="support"] {
+    --sup-top: 21.76vh;
+    /* NEW MARKER VOCABULARY (canon §9 entry owed — noted at close per
+       the seed). The frames' field/kicker markers are NOT the signal-red
+       menu dot: measured warm white ~#f2e7d5 at 5x5. The menu's own dot
+       measured #9d1f00 EXACTLY — the house token, untouched. Two marker
+       vocabularies by design; do not harmonize them. */
+    --sup-marker: #f2e7d5;
+    --sup-marker-glow: 0 0 7px rgba(242, 231, 213, .55);
+    /* The panel's own interior rhythm (component internals ride ui-scale,
+       page placement rides frame fractions — the certified split). The
+       frames draw 80px side pads in 1-2 and 52/86 in 1-3; harmonized to
+       ONE symmetric 80px box, the internally consistent reading. */
+    --sup-pad-x: calc(80px * var(--ui-scale));
+    --sup-pad-t: calc(52px * var(--ui-scale));
+    --sup-pad-b: calc(30px * var(--ui-scale));
+    --sup-label: #ffffff94;
+  }
+
+  /* ── The menu — SIX items, the home menu's own grammar ────────────────
+     .bs-item is consumed VERBATIM from the shared chrome (pop-out, the
+     signal-red dot, the glow ladder, the hit-area rhythm): this list and
+     the title screen's menu are the same control in two placements. Only
+     placement is page-side. Frame: x65 -> 3.76vw, which is the EXACT
+     second term of the home menu's anchor — the away-page content column
+     and the title-screen menu ride one rail. Pitch measured 45px uniform
+     (gap 30 + the 15px line box); the superseded nine-layer table's
+     30/65 group-skip problem does not exist in these frames. */
+  #bs-support-menu {
+    position: fixed;
+    top: var(--sup-top);
+    left: max(clamp(34px, 3.8vw, 68px), 3.76vw);
+    z-index: 16;
+    display: grid; gap: calc(30px * var(--ui-scale));
+    color: var(--text-soft);
+  }
+
+  /* ── The window — the MERGED bs-window subsystem, placed and sized ────
+     Frame rect x[577,1137] top 243 -> left 33.39vw, width 32.47vw. The
+     component owns every transition; the page owns geometry only.
+     Height is set in PX BY THE MACHINE from measured content (the
+     measurePitch discipline: never hardcode what the content decides),
+     capped for the form so it scrolls internally like the frame's own
+     scrollbar shows. */
+  #bs-panel {
+    position: fixed;
+    left: 33.39vw;
+    top: var(--sup-top);
+    width: 32.47vw;
+    height: calc(139px * var(--ui-scale));   /* boot value; the machine measures */
+    z-index: 18;
+    color: var(--text-soft);
+  }
+  #bs-panel .sup-body {
+    position: absolute; inset: 0;
+    padding: var(--sup-pad-t) var(--sup-pad-x) var(--sup-pad-b);
+    overflow: hidden auto;
+    overscroll-behavior: contain;   /* the panel's scroll never leaks to the page */
+    scrollbar-width: thin;
+    scrollbar-color: #ffffff5c transparent;
+  }
+  #bs-panel .sup-body::-webkit-scrollbar { width: calc(5px * var(--ui-scale)); }
+  #bs-panel .sup-body::-webkit-scrollbar-thumb {
+    background: #ffffff5c;
+  }
+  #bs-panel .sup-body::-webkit-scrollbar-track { background: transparent; }
+  .sup-view[hidden] { display: none; }
+
+  /* Kicker + marker — the 1-2 grammar: dim right-aligned label, the warm
+     marker dot at the content box's left edge on the kicker's own line. */
+  .sup-kicker {
+    position: relative;
+    margin: 0;
+    text-align: right;
+    color: var(--sup-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    line-height: calc(13px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+  .sup-mark::before {
+    content: ''; position: absolute; top: 50%;
+    left: calc(var(--sup-pad-x) * -1);
+    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+    background: var(--sup-marker); border-radius: 50%;
+    box-shadow: var(--sup-marker-glow);
+    transform: translateY(-50%);
+  }
+  /* Prose runs LEFT — the frames' own split: labels right, prose left
+     (the 1-3 textarea does exactly this). Readability decides. */
+  .sup-prose {
+    margin: calc(16px * var(--ui-scale)) 0 0;
+    color: var(--text-soft);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    line-height: 1.75;
+    letter-spacing: .02em;
+  }
+
+  /* ── Request type — the option list ───────────────────────────────────
+     Frame 1-2 draws one option twice; that is an ARTIFACT, not a repeat
+     (seed). Shipped as one list, right-aligned bold on the frame's 27px
+     pitch. The set itself is a PLACEHOLDER pending Eric's manifest
+     confirm — it lives in STR keys, so the real list is a copy edit. */
+  .sup-options { margin-top: calc(16px * var(--ui-scale)); display: grid; }
+  .sup-option {
+    display: block; width: 100%;
+    padding: 0; border: 0; background: none;
+    text-align: right;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(13px * var(--ui-scale));
+    line-height: calc(27px * var(--ui-scale));   /* the frame's option pitch */
+    letter-spacing: 0;
+    text-shadow: var(--glow-text);
+    cursor: var(--cursor-target);
+    transition: color .16s, text-shadow .2s ease;
+  }
+  /* ONE visual channel for the cursor (house law): the bloom renders only
+     through .kb-hover, which mouseenter and the keyboard both drive. */
+  .sup-option.kb-hover, .sup-option:focus-visible {
+    color: #fff; outline: none;
+    text-shadow: var(--glow-text-hover);
+  }
+  .sup-option.is-chosen { color: #fff; }
+
+  /* ── The form ─────────────────────────────────────────────────────────
+     Frame 1-3: two columns, labels right-aligned above right-aligned
+     values, a marker dot per field at its column's left edge. The values
+     are real inputs with no chrome — the design draws typed text, not
+     boxes, so the field IS its value. Focus lights the marker and the
+     value's glow (the house's one focus channel). */
+  .sup-form { display: grid; gap: calc(30px * var(--ui-scale)); }
+  .sup-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    column-gap: calc(61px * var(--ui-scale));
+    row-gap: calc(30px * var(--ui-scale));
+  }
+  .sup-field { position: relative; display: grid; gap: calc(6px * var(--ui-scale)); }
+  .sup-field--wide { grid-column: 1 / -1; }
+  .sup-field > label {
+    text-align: right;
+    color: var(--sup-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    line-height: calc(13px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+  .sup-field::before {
+    content: ''; position: absolute; left: 0;
+    top: calc(6.5px * var(--ui-scale));       /* on the label's own line */
+    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+    background: var(--sup-marker); border-radius: 50%;
+    box-shadow: var(--sup-marker-glow);
+    transform: translateY(-50%);
+    opacity: .55;
+    transition: opacity .16s;
+  }
+  .sup-field:focus-within::before { opacity: 1; }
+  .sup-input, .sup-area {
+    width: 100%;
+    background: none; border: 0; padding: 0;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(13px * var(--ui-scale));
+    line-height: calc(17px * var(--ui-scale));
+    letter-spacing: 0;
+    text-align: right;
+    text-shadow: var(--glow-text);
+    caret-color: var(--ink);
+    cursor: var(--cursor-target);
+    transition: text-shadow .2s ease;
+  }
+  .sup-input:focus, .sup-area:focus { outline: none; text-shadow: var(--glow-text-hover); }
+  .sup-input::placeholder, .sup-area::placeholder { color: #ffffff42; }
+  /* The long field wraps, so it reads LEFT — the frame's own choice. */
+  .sup-area {
+    text-align: left; resize: none;
+    min-height: calc(96px * var(--ui-scale));
+    font-weight: 300; line-height: 1.7;
+    font-family: var(--font-sans);
+  }
+  /* The chosen request type is a CONTROL: it returns to the picker (and
+     it is the Esc ladder's own next rung down). */
+  .sup-chosen {
+    width: 100%; padding: 0; border: 0; background: none;
+    text-align: right;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(13px * var(--ui-scale));
+    line-height: calc(17px * var(--ui-scale));
+    text-shadow: var(--glow-text);
+    cursor: var(--cursor-target);
+    transition: color .16s, text-shadow .2s ease;
+  }
+  .sup-chosen.kb-hover, .sup-chosen:hover, .sup-chosen:focus-visible {
+    color: #fff; outline: none; text-shadow: var(--glow-text-hover);
+  }
+  .sup-foot {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: calc(24px * var(--ui-scale));
+    margin-top: calc(6px * var(--ui-scale));
+  }
+  .sup-note {
+    margin: 0; max-width: 62%;
+    color: var(--sup-label);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    line-height: 1.5;
+  }
+  .sup-note.is-said { color: var(--ink); text-shadow: var(--glow-text); }
+  /* Submit — the one INVERTED control in the interface, exactly as the
+     frame draws it: light plate, dark ink. */
+  .sup-submit {
+    flex: none;
+    padding: calc(7px * var(--ui-scale)) calc(22px * var(--ui-scale));
+    border: 0; border-radius: 0;
+    background: #ededed;
+    color: #0b0b0a;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .04em;
+    cursor: var(--cursor-target);
+    box-shadow: 0 0 calc(18px * var(--ui-scale)) rgba(255,255,255,.20);
+    transition: background .16s, box-shadow .2s ease;
+  }
+  .sup-submit:hover, .sup-submit:focus-visible, .sup-submit.kb-hover {
+    background: #fff; outline: none;
+    box-shadow: 0 0 calc(26px * var(--ui-scale)) rgba(255,255,255,.42);
+  }
+
+  /* ── The right rail — LOCK-SIDE FURNITURE ─────────────────────────────
+     Eric's ruling: it does NOT exist during hover. Frame x[1379,1669] —
+     its right edge lands on 59/1728 from the frame edge, which IS the
+     utility cluster's own 58px inset: the rail hangs on the house's
+     established right line rather than a bespoke fraction (the mix
+     ruling). Width keeps the frame fraction. */
+  #bs-rail {
+    position: fixed;
+    top: var(--sup-top);
+    right: calc(58px * var(--ui-scale));
+    width: 16.78vw; min-width: calc(230px * var(--ui-scale));
+    z-index: 14;
+    display: grid; gap: calc(18px * var(--ui-scale));
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  #bs-rail.is-on {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transition: opacity var(--pop-fade), visibility 0s;
+  }
+  .sup-rail-copy {
+    margin: 0;
+    color: var(--text-soft);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    line-height: 1.5;
+    letter-spacing: .01em;
+  }
+  /* The email capsule — a plate, not a pill: this page's geometry is
+     hard-edged (the window's own corners are square with triangle
+     marks), so the house 999px pill would read foreign here. */
+  .sup-plate {
+    width: 100%;
+    height: calc(25px * var(--ui-scale));
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 calc(10px * var(--ui-scale));
+    border: 0;
+    background: #ffffff1f;
+    color: var(--ink);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .01em;
+    white-space: nowrap;
+    cursor: var(--cursor-target);
+    text-shadow: var(--glow-text);
+    transition: background .16s, color .16s, text-shadow .2s ease;
+  }
+  .sup-plate:hover, .sup-plate:focus-visible, .sup-plate.kb-hover {
+    background: #ffffff2e; color: #fff; outline: none;
+    text-shadow: var(--glow-text-hover);
+  }
+  /* The form door — the frame's white + square joined to a grey label
+     plate. One control, two halves. */
+  .sup-door {
+    display: flex; align-items: stretch; gap: 0;
+    border: 0; padding: 0; background: none;
+    cursor: var(--cursor-target);
+    width: max-content;
+  }
+  .sup-door-plus {
+    width: calc(30px * var(--ui-scale)); height: calc(30px * var(--ui-scale));
+    display: grid; place-items: center;
+    background: #ededed; color: #0b0b0a;
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(15px * var(--ui-scale)); line-height: 1;
+    box-shadow: 0 0 calc(16px * var(--ui-scale)) rgba(255,255,255,.18);
+    transition: background .16s, box-shadow .2s ease;
+  }
+  .sup-door-label {
+    height: calc(30px * var(--ui-scale));
+    display: flex; align-items: center;
+    padding: 0 calc(16px * var(--ui-scale));
+    background: #ffffff1f;
+    color: var(--ink);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .01em; white-space: nowrap;
+    text-shadow: var(--glow-text);
+    transition: background .16s, color .16s, text-shadow .2s ease;
+  }
+  .sup-door:hover .sup-door-plus, .sup-door:focus-visible .sup-door-plus,
+  .sup-door.kb-hover .sup-door-plus {
+    background: #fff; box-shadow: 0 0 calc(24px * var(--ui-scale)) rgba(255,255,255,.40);
+  }
+  .sup-door:hover .sup-door-label, .sup-door:focus-visible .sup-door-label,
+  .sup-door.kb-hover .sup-door-label {
+    background: #ffffff2e; color: #fff; text-shadow: var(--glow-text-hover);
+  }
+  .sup-door:focus-visible { outline: none; }
+
+  /* Commit-arrival resolve for browsers WITHOUT view transitions (the
+     shared chrome carries the real cross-document morph): the two morph
+     participants fade in on the tempo's companion fade. Cold boot never
+     runs this — T0 discipline, nothing choreographs at a deep link. */
+  @keyframes bs-arrive { from { opacity: 0; } }
+  html.bs-arrive #bs-corner,
+  html.bs-arrive #bs-wordmark { animation: bs-arrive var(--pop-fade); }
+  @media (prefers-reduced-motion: reduce) {
+    html.bs-arrive #bs-corner,
+    html.bs-arrive #bs-wordmark { animation: none; }
+  }
+
+  /* PROVISIONAL narrow-portrait rules — mobile grammar is Eric's later
+     design; these only prevent collisions meanwhile. The window and the
+     rail cannot coexist with the menu at phone width, so the window
+     takes the stage and the rail stacks beneath it. */
+  @media (max-width: 900px) {
+    #bs-support-menu { left: 6vw; transition: opacity var(--pop-fade); }
+    /* PREVIEW: the window sits BELOW the menu, capped so it cannot reach
+       the fold. The rail does not exist yet at this rung, so nothing
+       else competes for the column. */
+    #bs-panel { left: 6vw; width: 88vw; top: 48vh; max-height: 30vh; }
+    #bs-rail  { left: 6vw; right: auto; width: 88vw; top: auto; bottom: 4vh; }
+    /* LOCKED: six labels, a panel AND the rail cannot coexist at phone
+       width, so the menu YIELDS once the user has committed — the same
+       provisional grammar the chrome already uses for the utility row
+       under an open drawer. Hover is not a thing here, and the ladder
+       still walks: Esc (or the locked item) returns the menu. */
+    body:has(#bs-panel.sup-locked) #bs-support-menu { opacity: 0; pointer-events: none; }
+    body:has(#bs-panel.sup-locked) #bs-panel { top: var(--sup-top); max-height: 52vh; }
+  }
+</style>
+</head>
+<body data-bs-page="support">
+
+<script>
+// Pre-paint arrival read (inline so the entrance class exists at first
+// paint; runs in microseconds — T0 interactivity is untouched). The flag
+// is consumed HERE, once; the machine reads window.__bsArrival. Arrivals
+// commit from home OR any sibling section now that ROUTES.support exists.
+(function(){
+  var from = null;
+  try {
+    from = sessionStorage.getItem('bs-nav-from');
+    sessionStorage.removeItem('bs-nav-from');
+  } catch (e) {}
+  window.__bsArrival = (from === 'home' || from === 'software' || from === 'community');
+  window.__bsArrivalFrom = window.__bsArrival ? from : null;
+  if (window.__bsArrival && !(window.CSS && CSS.supports && CSS.supports('view-transition-name: a'))){
+    document.documentElement.classList.add('bs-arrive');
+  }
+})();
+</script>
+
+<!-- Blank stage — SCENE SEAM. -->
+<div id="bs-stage"></div>
+
+<!-- Wordmark at the section-scene berth; a control here: it leads home. -->
+<a id="bs-wordmark-link" href="home.html" aria-label="backspace — home">
+  <img id="bs-wordmark" src="assets/bs_wordmark.svg" alt="backspace">
+</a>
+
+<!-- The away iteration — witness markup, classes verbatim. SUPPORT is
+     committed: full ink weight-600, no dot, aria-current; clicking it
+     DENIES with the shake (ruled Aug 23). -->
+<div id="bs-corner" class="site-header__nav site-header__nav--primary" aria-label="Section navigation">
+  <div class="bs-hit"><button id="bs-back" class="site-round-button site-header__back-button" type="button" aria-label="Home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button></div>
+  <div class="bs-hit"><nav id="bs-primary" class="site-primary-nav" aria-label="Primary" aria-expanded="false">
+    <button class="site-primary-nav__forward-button" type="button" aria-label="Open section navigation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <button class="site-primary-nav__link site-primary-nav__link--hardware" type="button" data-section="hardware">HARDWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--software" type="button" data-section="software">SOFTWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--community" type="button" data-section="community">COMMUNITY</button>
+    <button class="site-primary-nav__link site-primary-nav__link--support is-active is-active-nav" type="button" aria-current="page" data-section="support">SUPPORT</button>
+  </nav></div>
+</div>
+
+<!-- Utility cluster — injected by the shared chrome. -->
+<div id="bs-icons"></div>
+
+<!-- The six-item menu. Labels render through STR keys at boot. -->
+<nav id="bs-support-menu" aria-label="Support topics"></nav>
+
+<!-- THE WINDOW — the merged bs-window subsystem. Absent at rest (Eric,
+     Aug 24: no seed square rests on stage; preview invokes the window). -->
+<div id="bs-panel" class="bs-window is-hidden" role="region" aria-label="Support detail">
+  <div class="sup-body" id="bs-panel-body">
+
+    <!-- PREVIEW: the excerpt. -->
+    <div class="sup-view" id="sup-view-excerpt">
+      <p class="sup-kicker sup-mark" id="sup-excerpt-kicker"></p>
+      <p class="sup-prose" id="sup-excerpt-copy"></p>
+    </div>
+
+    <!-- LOCKED, entry view: request type (frame 1-2). -->
+    <div class="sup-view" id="sup-view-request" hidden>
+      <p class="sup-kicker sup-mark" data-str="supReqType"></p>
+      <div class="sup-options" id="sup-options" role="listbox" aria-label="Request type"></div>
+    </div>
+
+    <!-- LOCKED, form view (frame 1-3). -->
+    <form class="sup-view sup-form" id="sup-view-form" hidden novalidate>
+      <div class="sup-field sup-field--wide">
+        <label for="sup-f-type" data-str="supReqType"></label>
+        <button class="sup-chosen" id="sup-f-type" type="button"></button>
+      </div>
+      <div class="sup-grid">
+        <div class="sup-field">
+          <label for="sup-f-name" data-str="supFldName"></label>
+          <input class="sup-input" id="sup-f-name" name="name" type="text" autocomplete="name" required>
+        </div>
+        <div class="sup-field">
+          <!-- The frame reads "emile address" — a TYPO, never ported. -->
+          <label for="sup-f-email" data-str="supFldEmail"></label>
+          <input class="sup-input" id="sup-f-email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="sup-field">
+          <label for="sup-f-country" data-str="supFldCountry"></label>
+          <input class="sup-input" id="sup-f-country" name="country" type="text" inputmode="tel" value="+86">
+        </div>
+        <div class="sup-field">
+          <label for="sup-f-phone" data-str="supFldPhone"></label>
+          <input class="sup-input" id="sup-f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel">
+        </div>
+        <div class="sup-field">
+          <label for="sup-f-subject" data-str="supFldSubject"></label>
+          <input class="sup-input" id="sup-f-subject" name="subject" type="text" required>
+        </div>
+        <div class="sup-field">
+          <label for="sup-f-model" data-str="supFldModel"></label>
+          <input class="sup-input" id="sup-f-model" name="model" type="text">
+        </div>
+        <div class="sup-field sup-field--wide">
+          <label for="sup-f-requests" data-str="supFldRequests"></label>
+          <textarea class="sup-area" id="sup-f-requests" name="requests" rows="4" required></textarea>
+        </div>
+      </div>
+      <div class="sup-foot">
+        <p class="sup-note" id="sup-note" data-str="supFormNote" aria-live="polite"></p>
+        <button class="sup-submit" id="sup-submit" type="submit" data-str="supSubmit"></button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<!-- THE RIGHT RAIL — appears ONLY at LOCK (Eric's ruling supersedes
+     frame 1-1, which draws it during hover). -->
+<aside id="bs-rail" aria-label="Contact channels">
+  <p class="sup-rail-copy" data-str="supRailIntro"></p>
+  <button class="sup-plate" id="sup-email" type="button" data-str="supEmail"></button>
+  <p class="sup-rail-copy" data-str="supRailReturns"></p>
+  <button class="sup-door" id="sup-door" type="button">
+    <span class="sup-door-plus" aria-hidden="true">+</span>
+    <span class="sup-door-label" data-str="supFormCta"></span>
+  </button>
+</aside>
+
+<input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
+
+<script src="shared/bs-chrome.js"></script>
+<script>
+(function(){
+'use strict';
+var C = window.BSChrome;
+var T = C.T, SoundBus = C.SoundBus;
+var wake = C.wake, denyOn = C.denyOn, shakeEl = C.shakeEl, clickOk = C.clickOk, hapticTick = C.hapticTick;
+
+var arrival     = window.__bsArrival === true;
+var arrivalFrom = window.__bsArrivalFrom;
+
+// ── THE CONTENT MANIFEST ──────────────────────────────────────────────────
+// Six items, one ladder. CONTACT US is real; the other five carry LOREM
+// through STR keys (Eric, Aug 24) — real copy swaps in at `excerpt`/`body`
+// with no code change, and `real: true` is the only flag that turns the
+// rail on. FAQ's sub-list is out of phase one; nothing here precludes it.
+var ITEMS = [
+  { key: 'supContact',  real: true  },
+  { key: 'supFaq',      real: false },
+  { key: 'supWarranty', real: false },
+  { key: 'supReturn',   real: false },
+  { key: 'supGuides',   real: false },
+  { key: 'supBusiness', real: false }
+];
+// Request types — PLACEHOLDER SET pending Eric's manifest confirm.
+var REQ_TYPES = ['supReqConsulting', 'supReqOrder', 'supReqWarranty', 'supReqReturns', 'supReqBusiness'];
+
+// ── DOM ───────────────────────────────────────────────────────────────────
+var menuEl   = document.getElementById('bs-support-menu');
+var panel    = document.getElementById('bs-panel');
+var panelBody= document.getElementById('bs-panel-body');
+var vExcerpt = document.getElementById('sup-view-excerpt');
+var vRequest = document.getElementById('sup-view-request');
+var vForm    = document.getElementById('sup-view-form');
+var optionsEl= document.getElementById('sup-options');
+var railEl   = document.getElementById('bs-rail');
+var chosenEl = document.getElementById('sup-f-type');
+var noteEl   = document.getElementById('sup-note');
+var emailBtn = document.getElementById('sup-email');
+var doorBtn  = document.getElementById('sup-door');
+var cornerEl = document.getElementById('bs-corner');
+var backBtn  = document.getElementById('bs-back');
+var primary  = document.getElementById('bs-primary');
+var fwdBtn   = primary.querySelector('.site-primary-nav__forward-button');
+var links    = Array.prototype.slice.call(primary.querySelectorAll('.site-primary-nav__link'));
+
+// ── i18n render — every visible string flows from a key ───────────────────
+function renderStrings(root){
+  var els = (root || document).querySelectorAll('[data-str]');
+  for (var i = 0; i < els.length; i++){
+    els[i].textContent = T(els[i].getAttribute('data-str'));
+  }
+}
+
+// ── STATE — one focus variable, one lock ──────────────────────────────────
+// focusIdx: the PREVIEW cursor (STICKY — the pointer leaving does not
+//   clear it; only replacement, Esc, or idle does).
+// lockIdx : the LOCKED item, or null.
+// view    : which face the window is showing.
+var focusIdx = -1;
+var lockIdx  = null;
+var view     = 'excerpt';        // 'excerpt' | 'request' | 'form'
+var chosenType = null;           // STR key of the chosen request type
+var menuItems = [];
+
+function isLocked(){ return lockIdx !== null; }
+
+// ── Menu build — .bs-item consumed verbatim from the shared chrome ────────
+ITEMS.forEach(function(it, idx){
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'bs-item';
+  b.id = 'bs-sup-' + idx;
+  var span = document.createElement('span');
+  span.className = 'bs-nav-label';
+  span.setAttribute('data-str', it.key);
+  b.appendChild(span);
+
+  // STICKY HOVER = hover acquiring THE focus variable. There is
+  // deliberately NO mouseleave handler: the ruling is that leaving the
+  // item does not retract it. Replacement, Esc, or idle clear it.
+  b.addEventListener('mouseenter', function(){
+    if (C.rail.isTouch() || isLocked()) return;
+    wake();
+    if (focusIdx !== idx) setFocus(idx);
+  });
+  // TWO DOORS, ONE LOCK — door #1: clicking the previewed item again.
+  // Touch's first tap only previews (the certified two-step).
+  b.addEventListener('click', function(){
+    wake();
+    if (isLocked()){
+      // The menu is frozen under the lock (the home airlock precedent):
+      // the locked item is one step BACK, anything else denies.
+      if (idx === lockIdx){ if (clickOk()) goBack(); }
+      else denyLocked();
+      return;
+    }
+    if (focusIdx === idx){ if (clickOk()) lock(idx); }
+    else setFocus(idx);
+  });
+  menuEl.appendChild(b);
+  menuItems.push(b);
+});
+
+// Menu pitch — MEASURED (item top -> next item top), never hardcoded, so
+// the wheel trigger follows any spacing tune. The frames draw a UNIFORM
+// 45px pitch, so one measured pitch honestly describes the whole list.
+var menuPitch = 45;
+function measurePitch(){
+  if (menuItems.length > 1){
+    var a = menuItems[0].getBoundingClientRect(), b = menuItems[1].getBoundingClientRect();
+    var p = b.top - a.top;
+    if (p > 0) menuPitch = p;
+  }
+}
+
+// ── Request-type options ──────────────────────────────────────────────────
+var optionEls = [];
+REQ_TYPES.forEach(function(k){
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'sup-option';
+  b.setAttribute('role', 'option');
+  b.setAttribute('data-str', k);
+  b.setAttribute('data-req', k);
+  b.addEventListener('mouseenter', function(){ if (!C.rail.isTouch()) setOptionFocus(optionEls.indexOf(b)); });
+  b.addEventListener('click', function(){ wake(); chooseType(k); });
+  optionsEl.appendChild(b);
+  optionEls.push(b);
+});
+var optionIdx = -1;
+function setOptionFocus(i){
+  optionIdx = i;
+  optionEls.forEach(function(o, n){ o.classList.toggle('kb-hover', n === i); });
+}
+function chooseType(k){
+  chosenType = k;
+  optionEls.forEach(function(o){
+    o.classList.toggle('is-chosen', o.getAttribute('data-req') === k);
+    o.setAttribute('aria-selected', String(o.getAttribute('data-req') === k));
+  });
+  SoundBus.play('commit'); hapticTick();
+  setView('form');
+}
+
+// ── The window ────────────────────────────────────────────────────────────
+// HEIGHT IS MEASURED, never hardcoded (the measurePitch discipline): the
+// panel is sized from the live content so a manifest edit needs no CSS.
+// The form is CAPPED at the frame's own 600/1117 so it scrolls internally
+// — which is exactly what frame 1-3's scrollbar shows.
+var FORM_CAP_VH = 53.71;
+function viewEl(){ return view === 'form' ? vForm : (view === 'request' ? vRequest : vExcerpt); }
+function measurePanel(){
+  var el = viewEl();
+  var was = el.hidden;
+  if (was) el.hidden = false;
+  var cs = getComputedStyle(panelBody);
+  var pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+  var h = el.scrollHeight + pad;
+  if (was) el.hidden = true;
+  var cap = window.innerHeight * FORM_CAP_VH / 100;
+  if (view === 'form') h = Math.min(h, cap);
+  // CEIL, never round: a half-pixel short and the panel grows a scrollbar
+  // it does not need (the content would overflow its own measured box).
+  return Math.ceil(h);
+}
+function sizePanel(){ panel.style.height = measurePanel() + 'px'; }
+function setView(v){
+  view = v;
+  vExcerpt.hidden = (v !== 'excerpt');
+  vRequest.hidden = (v !== 'request');
+  vForm.hidden    = (v !== 'form');
+  sizePanel();
+  if (v === 'request'){ setOptionFocus(-1); }
+  renderChosen();
+}
+function renderChosen(){
+  chosenEl.textContent = chosenType ? T(chosenType) : '—';
+  chosenEl.setAttribute('aria-label', T('supReqType'));
+}
+function renderPanelContent(){
+  var i = (lockIdx !== null) ? lockIdx : focusIdx;
+  if (i < 0) return;
+  var it = ITEMS[i];
+  document.getElementById('sup-excerpt-kicker').textContent = T(it.key);
+  document.getElementById('sup-excerpt-copy').textContent =
+    it.real ? T('supRailIntro') : T('supLoremExcerpt');
+}
+// The five lorem items lock into a body view; CONTACT US locks into the
+// request-type flow. Same ladder, different content (Eric, Aug 24).
+function lockedViewFor(i){ return ITEMS[i].real ? 'request' : 'excerpt'; }
+function renderLockedContent(){
+  var it = ITEMS[lockIdx];
+  if (!it.real){
+    document.getElementById('sup-excerpt-kicker').textContent = T(it.key);
+    document.getElementById('sup-excerpt-copy').textContent = T('supLoremBody');
+  }
+}
+
+// ── Render from state ─────────────────────────────────────────────────────
+function render(){
+  for (var i = 0; i < menuItems.length; i++){
+    menuItems[i].classList.toggle('kb-hover', i === focusIdx && !isLocked());
+    menuItems[i].classList.toggle('active', lockIdx === i);
+  }
+  var open = (focusIdx >= 0 || isLocked());
+  panel.classList.toggle('is-hidden', !open);
+  panel.classList.toggle('is-open', open);
+  // The rail is LOCK-side, and only the real item owns it.
+  panel.classList.toggle('sup-locked', isLocked());   // narrow-width layout gate
+  var railOn = isLocked() && ITEMS[lockIdx].real;
+  railEl.classList.toggle('is-on', railOn);
+  railEl.setAttribute('aria-hidden', String(!railOn));
+  // Tab enters the form only when locked (the machine law).
+  var tabbable = isLocked();
+  vForm.querySelectorAll('input, textarea, button').forEach(function(el){ el.tabIndex = tabbable ? 0 : -1; });
+  optionEls.forEach(function(el){ el.tabIndex = tabbable ? 0 : -1; });
+  railEl.querySelectorAll('button').forEach(function(el){ el.tabIndex = railOn ? 0 : -1; });
+}
+
+function setFocus(i){
+  if (i === focusIdx) return;
+  if (i >= 0 && C.rail.index() >= 0) C.rail.focus(-1);   // one cursor
+  focusIdx = i;
+  if (i >= 0){
+    view = 'excerpt';
+    renderPanelContent();
+    setView('excerpt');
+    SoundBus.play('detent'); hapticTick();
+  }
+  render();
+}
+function focusStep(dir){
+  if (isLocked()){ denyLocked(); return false; }
+  var next;
+  if (focusIdx < 0) next = dir > 0 ? 0 : ITEMS.length - 1;
+  else {
+    next = focusIdx + dir;
+    if (next < 0 || next >= ITEMS.length) return false;   // wall — clamp, no wrap
+  }
+  setFocus(next);
+  return true;
+}
+
+// ── LOCK / UNLOCK ─────────────────────────────────────────────────────────
+function lock(i){
+  if (isLocked()) return;
+  lockIdx = i;
+  focusIdx = i;
+  SoundBus.play('commit'); hapticTick();
+  renderPanelContent();
+  renderLockedContent();
+  setView(lockedViewFor(i));
+  render();
+}
+// Lock retreats to PREVIEW — the ladder mirrors its own ascent (ratified).
+function unlock(){
+  if (!isLocked()) return;
+  var i = lockIdx;
+  lockIdx = null;
+  focusIdx = i;
+  renderPanelContent();
+  setView('excerpt');
+  render();
+  SoundBus.play('detent'); hapticTick();
+}
+function denyLocked(){
+  var el = menuItems[lockIdx];
+  if (el && !el.classList.contains('bs-shake')) denyOn(el);
+}
+
+// ── THE ESC LADDER — one honest level per press, through ONE function ─────
+// field focus -> window level -> LOCKED -> PREVIEW -> menu rest -> boundary.
+// (Menu rest and idle coincide on this page: nothing else holds state at
+// rest — the /community precedent.) Instrumented under ?dev.
+var lastRung = null;
+function goBack(){
+  if (isLocked()){
+    var a = document.activeElement;
+    // 1. a focused field hands back to the window level.
+    if (a && panel.contains(a) && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')){
+      lastRung = 'field';
+      a.blur();
+      try { panelBody.focus({ preventScroll: true }); } catch (e) {}
+      return;
+    }
+    // 2. the form retreats to the request-type face (the window level).
+    if (view === 'form'){ lastRung = 'window'; setView('request'); return; }
+    // 3. LOCKED retreats to PREVIEW.
+    lastRung = 'locked';
+    unlock();
+    return;
+  }
+  // 4. PREVIEW retreats to rest.
+  if (focusIdx >= 0){ lastRung = 'preview'; setFocus(-1); return; }
+  // 5. rest -> the page boundary (a TRUE history pop; cold boot is silent).
+  lastRung = 'boundary';
+  if (arrival) popBoundary();
+}
+
+// ── The panel owns its keys while locked ──────────────────────────────────
+// The #bs-icons exemption pattern: the machine stays blind to keys inside
+// the window, so W/S/A/D typed into a field are text, not menu input.
+// Esc still walks THE ladder — one function, both routes.
+panel.addEventListener('keydown', function(e){
+  if (!isLocked()) return;
+  e.stopPropagation();
+  if (e.key === 'Escape'){ e.preventDefault(); wake(); goBack(); return; }
+  if (view === 'request'){
+    var k = e.key;
+    if (k === 'w' || k === 'W' || k === 'ArrowUp' || k === 's' || k === 'S' || k === 'ArrowDown'){
+      e.preventDefault(); wake();
+      var down = (k === 's' || k === 'S' || k === 'ArrowDown');
+      var n = optionIdx < 0 ? (down ? 0 : optionEls.length - 1) : optionIdx + (down ? 1 : -1);
+      if (n < 0 || n >= optionEls.length) return;            // ends clamp silently
+      setOptionFocus(n);
+      SoundBus.play('detent'); hapticTick();
+      return;
+    }
+    if (k === 'Enter' && optionIdx >= 0){
+      e.preventDefault(); wake();
+      chooseType(optionEls[optionIdx].getAttribute('data-req'));
+    }
+  }
+});
+// TWO DOORS, ONE LOCK — door #2: clicking the window itself commits.
+panel.addEventListener('click', function(e){
+  if (isLocked()) return;
+  if (focusIdx < 0) return;
+  wake();
+  if (clickOk()) lock(focusIdx);
+  e.stopPropagation();
+});
+
+// ── The rail's two controls ───────────────────────────────────────────────
+// The email capsule COPIES (Eric, Aug 24). mailto: was the alternative and
+// is deliberately NOT used: it is an external hand-off, which would fire
+// the THIRD PARTY overlay's second-consumer factoring trigger.
+var _copyT = null;
+emailBtn.addEventListener('click', function(){
+  wake();
+  var addr = T('supEmail');
+  var said = function(){
+    emailBtn.textContent = T('supEmailCopied');
+    SoundBus.play('commit'); hapticTick();
+    clearTimeout(_copyT);
+    _copyT = setTimeout(function(){ emailBtn.textContent = T('supEmail'); }, 1400);
+  };
+  var failed = function(){ denyOn(emailBtn); };   // nothing fails silently
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(addr).then(said).catch(failed);
+    return;
+  }
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = addr; ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    var ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    ok ? said() : failed();
+  } catch (err) { failed(); }
+});
+// The form door — the rail's jump straight to the form.
+doorBtn.addEventListener('click', function(){
+  wake();
+  if (!isLocked()) return;
+  setView('form');
+  var first = document.getElementById('sup-f-name');
+  try { first.focus({ preventScroll: true }); } catch (e) {}
+});
+
+// ── Submit — a LABELED STUB to a marked seam ──────────────────────────────
+// Validation denies LOUDLY: the offending field shakes and takes focus;
+// nothing fails silently. On a valid submit the UX runs to completion and
+// then says honestly that nothing was sent — the wiring ruling (endpoint /
+// mailto fallback / disabled-until-go-live) drops in AT THE SEAM BELOW
+// with no rework. NOTE: if the ruling sends anything off-site, the THIRD
+// PARTY overlay gains its second consumer and must be factored into the
+// shared pair first (canon §7).
+vForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  wake();
+  var bad = null;
+  if (!chosenType) bad = chosenEl;
+  if (!bad){
+    var required = [
+      document.getElementById('sup-f-name'),
+      document.getElementById('sup-f-email'),
+      document.getElementById('sup-f-subject'),
+      document.getElementById('sup-f-requests')
+    ];
+    for (var i = 0; i < required.length; i++){
+      var f = required[i];
+      var v = (f.value || '').trim();
+      var okEmail = (f.type !== 'email') || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      if (!v || !okEmail){ bad = f; break; }
+    }
+  }
+  if (bad){
+    noteEl.textContent = T('supInvalid');
+    noteEl.classList.remove('is-said');
+    denyOn(bad.closest('.sup-field') || bad);
+    try { bad.focus({ preventScroll: true }); } catch (err) {}
+    return;
+  }
+  SoundBus.play('commit'); hapticTick();
+  // ══ SUBMIT SEAM — the wiring ruling lands HERE ══════════════════════
+  // if (ENDPOINT) fetch(ENDPOINT, {...}); else if (MAILTO) ...; else:
+  noteEl.textContent = T('supSubmitPending');
+  noteEl.classList.add('is-said');
+});
+
+// ── Corner nav ────────────────────────────────────────────────────────────
+var pillPrimary = C.bindPill(primary, fwdBtn);
+pillPrimary.onOpenChange = function(open){
+  links.forEach(function(l){ l.tabIndex = open ? 0 : -1; });
+  primary.setAttribute('aria-expanded', String(open));
+};
+pillPrimary.onOpenChange(false);
+
+var _leaving = false;
+function leaveHome(){
+  if (_leaving || !clickOk()) return;
+  _leaving = true;
+  if (arrival && arrivalFrom === 'home'){
+    setTimeout(function(){
+      if (_leaving && !document.hidden){ _leaving = false; location.assign(C.ROUTES.home); }
+    }, 350);
+    history.back();
+    return;
+  }
+  location.assign(C.ROUTES.home);
+}
+function popBoundary(){
+  if (_leaving) return;
+  _leaving = true;
+  setTimeout(function(){
+    if (_leaving && !document.hidden){ _leaving = false; location.assign(C.ROUTES.home); }
+  }, 350);
+  history.back();
+}
+(backBtn.closest('.bs-hit') || backBtn).addEventListener('click', function(){ wake(); leaveHome(); });
+
+// SUPPORT is the current section — it DENIES with the shake (ruled).
+links.forEach(function(link){
+  link.addEventListener('click', function(e){
+    e.stopPropagation();
+    wake();
+    var sec = link.getAttribute('data-section');
+    if (sec !== 'support' && C.ROUTES[sec]){
+      if (clickOk()) C.nav.commit(sec);
+      return;
+    }
+    denyOn(link);
+  });
+});
+primary.addEventListener('click', function(e){
+  if (e.target.closest('.site-primary-nav__link')) return;
+  wake();
+  if (pillPrimary.touchOpenConsumed()) return;
+  if (C.rail.lockIndex() === RAIL_PILL) C.rail.unlock();
+  else C.rail.lock(RAIL_PILL);
+});
+
+// ── Mount ─────────────────────────────────────────────────────────────────
+var RAIL_BACK = 0, RAIL_PILL = 1;
+C.init({
+  page: 'support',
+  leadingControls: [
+    { headEl: backBtn, pill: null, activate: leaveHome },
+    { headEl: primary, pill: pillPrimary, trayAxis: 'x',
+      trayItems: function(){ return links; } }
+  ],
+  touchSurfaces: [document.getElementById('bs-stage'), menuEl],
+  sweepRoots: [cornerEl, menuEl, panel, railEl],
+  hooks: {
+    isLocked:       isLocked,
+    denyLocked:     denyLocked,
+    goBack:         goBack,
+    escapeFromRail: function(){ setFocus(0); },      // rail -> the primary surface
+    enterAtPrimary: function(){
+      if (focusIdx < 0){ setFocus(0); return; }      // cold Enter claims the first item
+      lock(focusIdx);                                 // Enter = lock (ratified)
+    },
+    verticalStep:   function(down){
+      // At the FIRST item, W/^ hands the cursor to the icon bar (the home
+      // menu's own top-wall zone transition).
+      if (!down && focusIdx === 0){ setFocus(-1); C.rail.focus(0); return; }
+      focusStep(down ? 1 : -1);
+    },
+    railVertical:   function(down){
+      if (down){ C.rail.focus(-1); setFocus(0); }     // strip -> menu
+    },
+    horizontalCold: function(){ /* A/D drive the rail only — inert here */ },
+    // WHEEL OWNERSHIP SWITCHES WITH THE LOCK. At menu level the wheel
+    // steps the menu on the measured pitch; inside the locked window it
+    // belongs to the panel's native scroll and the bridge hands off
+    // entirely (ends clamp silently, as everywhere).
+    wheelNative:    function(e){
+      return isLocked() && panelBody.contains(e.target);
+    },
+    wheelStep:      focusStep,
+    wheelPitch:     function(){ return menuPitch; },
+    clearPrimary:   function(){ if (focusIdx >= 0 && !isLocked()){ focusIdx = -1; render(); } },
+    idleReset:      function(){ setFocus(-1); C.rail.focus(-1); },
+    onLangChange:   function(T2){
+      links.forEach(function(l){ l.textContent = T2(l.getAttribute('data-section')); });
+      renderStrings();
+      renderPanelContent();
+      if (isLocked()) renderLockedContent();
+      renderChosen();
+      sizePanel();
+      document.title = T2('supportTitle');
+    },
+    onFontsReady:   function(){ measurePitch(); if (focusIdx >= 0 || isLocked()) sizePanel(); },
+    devState:       function(){
+      return { focusIdx: focusIdx, lockIdx: lockIdx, view: view, rung: lastRung,
+               chosenType: chosenType, menuPitch: menuPitch, arrival: arrival,
+               railOn: railEl.classList.contains('is-on') };
+    }
+  }
+});
+
+// ── Boot — cold or arrived, interactive at first paint ────────────────────
+renderStrings();
+links.forEach(function(l){ l.textContent = T(l.getAttribute('data-section')); });
+renderChosen();
+measurePitch();
+render();
+
+window.addEventListener('resize', function(){ if (focusIdx >= 0 || isLocked()) sizePanel(); });
+window.addEventListener('pageshow', function(e){
+  if (e.persisted){
+    _leaving = false;
+    lockIdx = null;
+    setFocus(-1);
+    C.rail.focus(-1);
+  }
+});
+
+})();
+</script>
+</body>
+</html>

@@ -182,6 +182,63 @@
   --pop-fade-duration: .41s;
   --pop-motion: var(--pop-duration) var(--pop-curve);
   --pop-fade: var(--pop-fade-duration) ease;
+  /* THE SECOND TEMPO CURVE (Eric ratified the feel Aug 24 on the
+     bs-window demo): --pop-curve does not ease IN, and a frame drawing
+     out of a seed square must start from rest. One tempo family, two
+     curves — durations are unchanged and still come from the pair
+     above; no surface writes its own. Canon §6 entry owed. */
+  --expand-curve: cubic-bezier(.65, 0, .35, 1);
+  /* ══════════════ bs-window — THE window subsystem ═══════════════
+     Merged from shared/bs-window.css v2 (Eric feel-ratified Aug 24);
+     that file stays as the frozen review record. Component rules sit
+     below the away-nav block. Canon §9 entry owed for the subsystem
+     and these three tokens.
+
+     VALUES — measured from the design team's 1-2/1-3 frames under
+     Eric's Aug 24 sanction; the v2 placeholders are superseded:
+
+     --bsw-corner  triangle leg / seed edge. The frames draw 14-15px;
+                   ported 15px×ui. The v2 22px placeholder was HIGH,
+                   and measurably ran the glow ~20% hot per edge.
+     --bsw-fill    the translucent grey. Frame measures +16.5 luma
+                   over the stage at bg 72.5 → alpha .091, NEUTRAL
+                   (ΔRGB 16.5/16.6/16.5 — no tint). The v2 8% default
+                   was within ~1%; corrected to the measurement.
+     --bsw-glow    RULE-4 PARITY MEASURED (seed §4). The v2 default is
+                   hereby CALIBRATED, not corrected. Method: the
+                   audit's canvas-proxy harness re-instrumented — each
+                   element rasterized at real UI size, its real recipe
+                   applied with CSS semantics (text-shadow rings
+                   PARALLEL, filter drop-shadows SERIAL), total added
+                   light measured against the stage. Glow is an EDGE
+                   phenomenon, so the honest comparator between a
+                   SOLID shape and stroke-drawn text is light per
+                   ink-EDGE pixel, not per ink area:
+                     bs-window triangle 15px   1336 per-edge
+                     capsule HARDWARE 14px     1362   (−1.9%)
+                     glyph chevron 28.75px     1439   (−7.2%)
+                   Near-halo 81.6 lands inside the house bracket
+                   (chevron 95.5 · capsule 65.4); peak 149 vs the
+                   chevron's 143. Radii ≤18px — far inside rule 5's
+                   96px filter ceiling.
+                   TUNING HANDLE (rule 3, if Eric's eye ever wants it):
+                   the 8px pass alpha ONLY — ±0.05 moves ±2% total
+                   light and ±3 near-halo. Re-measure both against the
+                   bracket; never eyeball, never widen a radius.
+                   The two half-glows summing along the shared
+                   hypotenuse in the seed state measured +3.5% total /
+                   +6.9% near-halo — negligible, as the v2 comment
+                   predicted. (On /support the seed square is
+                   transient anyway: Eric ruled Aug 24 that no square
+                   rests on stage — the window is absent until preview
+                   invokes it.)
+     ═══════════════════════════════════════════════════════════════ */
+  --bsw-corner: calc(15px * var(--ui-scale));
+  --bsw-fill:   #fefefe17;
+  --bsw-glow:
+    drop-shadow(0 0 3px  rgba(255,255,255, 1))
+    drop-shadow(0 0 8px  rgba(255,255,255, .55))
+    drop-shadow(0 0 18px rgba(255,255,255, .18));
   --side-menu-shift-x: calc(33px * var(--ui-scale));
   --side-menu-motion: var(--pop-motion);
   --side-menu-fade: var(--pop-fade);
@@ -296,12 +353,12 @@ body {
 a#bs-wordmark-link { display: contents; }
 /* Section pages share the wordmark-as-control grammar; the gate widens by
    one page name as each section lands (community: Aug 23). */
-body:is([data-bs-page="software"], [data-bs-page="community"]) #bs-wordmark {
+body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"]) #bs-wordmark {
   pointer-events: auto; cursor: var(--cursor-target);
   transition: filter .2s;
 }
-body:is([data-bs-page="software"], [data-bs-page="community"]) a#bs-wordmark-link:hover #bs-wordmark,
-body:is([data-bs-page="software"], [data-bs-page="community"]) a#bs-wordmark-link:focus-visible #bs-wordmark {
+body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"]) a#bs-wordmark-link:hover #bs-wordmark,
+body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"]) a#bs-wordmark-link:focus-visible #bs-wordmark {
   filter: drop-shadow(0 0 18px rgba(255,255,255,0.55));
 }
 a#bs-wordmark-link:focus-visible { outline: none; }
@@ -695,6 +752,100 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .site-primary-nav__link.is-active-nav:focus-visible,
 .site-primary-nav__link.is-active-nav.kb-hover { text-shadow: var(--glow-text-word); }
 
+/* ══════════════════════════════════════════════════════════════════════
+   bs-window — THE panel. No page writes a bespoke one.
+
+   THE MECHANIC (Eric, Aug 24)
+   Rest: the window IS the seed square — the two corner triangles
+   co-located (::before upper-left half + ::after lower-right half).
+   Open (.is-open): the lower-right triangle travels to the far corner
+   while clip-path draws the translucent frame out behind it, both on ONE
+   duration + curve — so wide/tall/mixed expansion falls out of the
+   target ratio ALONE. Content fades in only once the frame lands.
+   Removing .is-open retracts to the square: Esc's close animation, free.
+   Absent (.is-hidden): the window does not exist at rest. RULED (Eric,
+   Aug 24) — /support opens from .is-hidden; preview invokes the window,
+   no square rests on stage. The page chooses its resting affordance.
+
+   The triangles are HARD-STOP GRADIENTS, not clip-path polygons:
+   filters apply BEFORE clip-path in the paint pipeline, so a drop-shadow
+   on a clipped element is sheared off at the clip edge — gradient alpha
+   keeps the silhouette and lets the glow hug the hypotenuse.
+
+   TEMPO LAW: zero locally written durations. Consumes --pop-duration ·
+   --pop-fade · --pop-fade-duration · --expand-curve.
+   MIN SIZE: keep both dimensions ≥ 3 × --bsw-corner.
+   ══════════════════════════════════════════════════════════════════════ */
+.bs-window {
+  position: absolute;                /* the page places and sizes it */
+  background: var(--bsw-fill);
+  pointer-events: none;              /* inert until open */
+  clip-path: inset(0 calc(100% - var(--bsw-corner)) calc(100% - var(--bsw-corner)) 0);
+  /* height rides the SAME clock+curve as the traveling corner: a window
+     that changes size mid-open (excerpt → form) is still the expansion
+     mechanic, and the frame must not drift from its own corner mark. */
+  transition:
+    clip-path  var(--pop-duration) var(--expand-curve),
+    height     var(--pop-duration) var(--expand-curve),
+    opacity    var(--pop-fade),
+    visibility 0s;
+}
+.bs-window::before,
+.bs-window::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: var(--bsw-corner);
+  height: var(--bsw-corner);
+  z-index: 2;
+  pointer-events: none;
+  filter: var(--bsw-glow);
+}
+.bs-window::before {                 /* upper-left half — stays home */
+  background: linear-gradient(to bottom right,
+    var(--ink) calc(50% - .5px), transparent calc(50% + .5px));
+}
+.bs-window::after {                  /* lower-right half — the traveler */
+  background: linear-gradient(to bottom right,
+    transparent calc(50% - .5px), var(--ink) calc(50% + .5px));
+  transition:
+    top  var(--pop-duration) var(--expand-curve),
+    left var(--pop-duration) var(--expand-curve);
+}
+/* Content waits for the frame. */
+.bs-window > * {
+  position: relative; z-index: 1;
+  opacity: 0;
+  transition: opacity var(--pop-fade);
+}
+.bs-window.is-open {
+  pointer-events: auto;              /* previews are interactable — the hover-lock ruling */
+  clip-path: inset(0 0 0 0);
+}
+.bs-window.is-open::after {
+  top:  calc(100% - var(--bsw-corner));
+  left: calc(100% - var(--bsw-corner));
+}
+.bs-window.is-open > * {
+  opacity: 1;
+  transition-delay: var(--pop-duration);   /* land the frame, then the content */
+}
+.bs-window:not(.is-open) > * { transition-delay: 0s; }
+/* ABSENT — no seed square on stage. */
+.bs-window.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    clip-path  var(--pop-duration) var(--expand-curve),
+    height     var(--pop-duration) var(--expand-curve),
+    opacity    var(--pop-fade),
+    visibility 0s var(--pop-fade-duration);   /* hide only after the fade lands */
+}
+@media (prefers-reduced-motion: reduce) {
+  .bs-window, .bs-window::after, .bs-window > * { transition: none; }
+}
+
 /* iOS-style "locked" shake — denied input shakes; nothing fails
    silently. Under reduced motion the shake becomes a non-motion blink. */
 @keyframes bs-shake {
@@ -764,7 +915,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   #bs-icons { transition: opacity var(--pop-fade); }
   /* On section pages the corner owns the top-left — the wordmark drops
      to a centered berth below the two top rails instead. */
-  body:is([data-bs-page="software"], [data-bs-page="community"]) #bs-wordmark {
+  body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"]) #bs-wordmark {
     left: 50%; transform: translateX(-50%);
     top: calc(100px * var(--ui-scale));
     width: 104px;

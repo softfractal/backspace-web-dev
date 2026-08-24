@@ -55,7 +55,58 @@ var STR = {
     extTitle:    'CONTINUE TO {p}',
     extPending:  'External destination pending.',
     extContinue: 'Continue',
-    extCancel:   'Cancel'
+    extCancel:   'Cancel',
+    // ── /support (page four) — labels from the design team's A-4 / 1-1 /
+    // 1-2 / 1-3 frames. This page was never built in the demo site, so the
+    // frames are VISUAL REFERENCE mixed with the shipped pages' own
+    // grammar (RULED — Eric, Aug 24), not an exact-value port.
+    // ERRATA LAW: the 1-3 frame reads "emile address" — a typo. The key
+    // below ships the CORRECT string; the typo is filed to the design
+    // team and never appears in the markup.
+    supportTitle:    'BACKSPACE — Support',
+    supContact:      'CONTACT US',
+    supFaq:          'FAQ',
+    supWarranty:     'WARRANTY',
+    supReturn:       'RETURN & REFUND POLICY',
+    supGuides:       'PRODUCT GUIDES',
+    supBusiness:     'BUSINESS REQUEST',
+    // The right rail — LOCK-side furniture (Eric, Aug 24: frame 1-1 shows
+    // it too early; on hover only the excerpt window exists).
+    supRailIntro:    'For product support, order questions, warranty help, or general customer service, please contact us at:',
+    supEmail:        'support@pressbackspace.com',
+    supEmailCopy:    'Copy the support address',
+    supEmailCopied:  'copied',
+    supRailReturns:  'For any questions about returns, refunds, or exchanges, please contact our support team.',
+    supFormCta:      'fill out form',
+    // The window.
+    supReqType:      'request type',
+    supFldName:      'user name',
+    supFldEmail:     'email address',
+    supFldCountry:   'country code',
+    supFldPhone:     'contact number',
+    supFldSubject:   'subject',
+    supFldModel:     'product model',
+    supFldRequests:  'my requests',
+    supFormNote:     'You can also submit a support request and our team will get back to you as soon as possible',
+    supSubmit:       'Submit',
+    // Submit is a LABELED STUB pending the wiring ruling (endpoint /
+    // mailto / disabled-until-go-live). The copy is honest about it —
+    // nothing pretends to have sent.
+    supSubmitPending:'Submissions open at launch — nothing was sent.',
+    supInvalid:      'Complete the marked fields.',
+    // Request-type options — PLACEHOLDER SET. Only "product consulting"
+    // is evidenced in the frames (drawn twice — an artifact, one option);
+    // the real list is a manifest confirm and swaps in here.
+    supReqConsulting:'product consulting',
+    supReqOrder:     'order & delivery',
+    supReqWarranty:  'warranty & repair',
+    supReqReturns:   'returns & refunds',
+    supReqBusiness:  'business & wholesale',
+    // The five non-anchor items ride the SAME ladder with placeholder
+    // content (Eric, Aug 24). Real copy swaps in at these keys — no code
+    // changes.
+    supLoremExcerpt: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    supLoremBody:    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
   },
   zh: { /* populated when CN content lands; lookups fall back to en */ },
   ja: {},
@@ -75,8 +126,8 @@ var SECTIONS = ['hardware','software','community','support'];
 // file:// serve sibling .html files. Resolved once at boot.
 var HTMLISH = /\.html$/i.test(location.pathname) || location.protocol === 'file:';
 var ROUTES = HTMLISH
-  ? { home: 'home.html', software: 'software.html', community: 'community.html' }
-  : { home: '/', software: '/software', community: '/community' };
+  ? { home: 'home.html', software: 'software.html', community: 'community.html', support: 'support.html' }
+  : { home: '/', software: '/software', community: '/community', support: '/support' };
 
 // Commit-arrival vs cold boot (Part B deliverable 3): the committing page
 // stamps a same-tab flag before real navigation; the arriving page
@@ -113,6 +164,12 @@ var PAGE = {
   railVertical:  function(down){},              // W/S while the rail cursor is set
   horizontalCold:function(dir){},               // A/D with no cursor anywhere
   wheelStep:     function(dir){ return false; },// the wheel bridge's stepper
+  // WHEEL OWNERSHIP SEAM (support, Aug 24): a page surface with its OWN
+  // native scroll — the locked support panel — must keep the wheel. The
+  // bridge asks BEFORE it preventDefaults; true = hands off entirely (no
+  // step, no deny, no swallowed gesture). Default inert, so the certified
+  // path for every existing page is unchanged.
+  wheelNative:   function(e){ return false; },
   wheelPitch:    function(){ return 55; },      // measured trigger pitch
   clearPrimary:  function(){},                  // one cursor: rail claims → primary clears
   idleReset:     function(){},                  // attract: everything pops back in
@@ -528,6 +585,9 @@ function bindWheel(){
     // ctrl+wheel / pinch is the browser's ZOOM, not menu input — pass
     // through before the bridge can misread it.
     if (e.ctrlKey) return;
+    // The page may own this wheel outright (a locked panel's native
+    // scroll) — asked BEFORE preventDefault, or the scroll is already dead.
+    if (PAGE.wheelNative(e)) return;
     e.preventDefault();
     wake();
     if (PAGE.isLocked()){ PAGE.denyLocked(); return; }
