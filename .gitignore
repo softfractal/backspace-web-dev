@@ -2,3 +2,6 @@
 
 # not part of the backspace web build
 Reveal_v1.html
+
+# local packaging scratch — never part of the build
+*.zip

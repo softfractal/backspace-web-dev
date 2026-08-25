@@ -35,6 +35,22 @@ current browsers — the server is just the cleaner path.
   only populated locale; the picker is live and other locales fall
   back by design.
 
+## Sending this to someone who just wants to look
+
+Do **not** send the loose files — the pages resolve `shared/` and
+`assets/` by relative path, so anything that flattens or splits the
+folder produces an unstyled page. Instead build the self-contained
+preview:
+
+```
+python3 tools/build-preview.py
+```
+
+That writes three single-file pages (~590 KB each) to
+`../../build/backspace-preview/` with every font, graphic and script
+inlined as data URIs. Zip that folder and send it; the recipient
+double-clicks any page — no server, no folder structure, no internet.
+
 ## Layout
 
 | path | role |
@@ -44,3 +60,4 @@ current browsers — the server is just the cleaner path.
 | `assets/` | fonts (self-hosted), cursors, icons, imagery |
 | `backspace_home.html` | frozen pre-factoring build, kept as the certified reference — not linked |
 | `index.html` | redirect stub to `home.html` for server roots |
+| `tools/build-preview.py` | builds the self-contained preview copies (see above) |
