@@ -10,7 +10,15 @@ import base64, os, re, sys
 
 SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.abspath(os.path.join(SRC, os.pardir, os.pardir, "build", "backspace-preview"))
-PAGES = ["home.html", "software.html", "community.html"]
+# Pages are DISCOVERED from the chrome's own ROUTES table, so a page
+# added by a later phase is packaged automatically instead of being
+# silently left out (and its nav links left dead).
+_routes_src = open(os.path.join(SRC, "shared/bs-chrome.js")).read()
+_m = re.search(r"ROUTES\s*=.*?\?\s*\{(.*?)\}", _routes_src, re.S)
+PAGES = [f for f in re.findall(r"'([A-Za-z0-9_-]+\.html)'", _m.group(1) if _m else "")
+         if os.path.isfile(os.path.join(SRC, f))]
+if not PAGES:
+    sys.exit("could not resolve page list from ROUTES")
 
 MIME = {".woff2": "font/woff2", ".png": "image/png", ".svg": "image/svg+xml",
         ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp"}
