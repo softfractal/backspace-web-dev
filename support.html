@@ -599,6 +599,8 @@
      DENIES with the shake (ruled Aug 23). -->
 <div id="bs-corner" class="site-header__nav site-header__nav--primary" aria-label="Section navigation">
   <div class="bs-hit"><button id="bs-back" class="site-round-button site-header__back-button" type="button" aria-label="Home">
+    <!-- aria-label is re-set from STR on every render (navHome / navBack);
+         the literal here is only the pre-boot value. -->
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
   </button></div>
   <div class="bs-hit"><nav id="bs-primary" class="site-primary-nav" aria-label="Primary" aria-expanded="false">
@@ -1036,6 +1038,8 @@ function render(){
   // lock would leave both that door and the support address unreachable.
   // Frames 1-2 and 1-3 draw the rail at both levels. LABELED: one line
   // returns it to lock-only.
+  // The corner control names its current job (see cornerBack).
+  backBtn.setAttribute('aria-label', openIdx >= 0 ? T('navBack') : T('navHome'));
   var railOn = openIdx >= 0 && ITEMS[openIdx].real;
   railEl.classList.toggle('is-on', railOn);
   railEl.setAttribute('aria-hidden', String(!railOn));
@@ -1326,7 +1330,23 @@ function popBoundary(){
   }, 350);
   history.back();
 }
-(backBtn.closest('.bs-hit') || backBtn).addEventListener('click', function(){ wake(); leaveHome(); });
+// THE CORNER ‹ IS LEVEL-AWARE (RULED — Eric, Aug 25): once a second
+// level or higher is open, it descends ONE level instead of leading
+// home — the pointer's equivalent of Esc, through the very same ladder
+// function, so the two can never disagree. Below that it keeps its
+// labeled HOME semantic (the witness grammar, and the divergence from
+// Esc's strict-LIFO boundary pop that is already on record).
+// The WORDMARK deliberately does NOT change: it stays the unconditional
+// route home, so there is always one press that leaves the page no
+// matter how deep the ladder goes.
+function cornerBack(){
+  // clickOk gates the descent for the same reason it gates every other
+  // commit/back door (journal canon): without it a double-click drops
+  // TWO levels. leaveHome() carries its own gate already.
+  if (openIdx >= 0){ if (clickOk()) goBack(); return; }   // level 2+ -> one down
+  leaveHome();                                            // level 0-1 -> home, as labeled
+}
+(backBtn.closest('.bs-hit') || backBtn).addEventListener('click', function(){ wake(); cornerBack(); });
 
 // SUPPORT is the current section — it DENIES with the shake (ruled).
 links.forEach(function(link){
@@ -1354,7 +1374,7 @@ var RAIL_BACK = 0, RAIL_PILL = 1;
 C.init({
   page: 'support',
   leadingControls: [
-    { headEl: backBtn, pill: null, activate: leaveHome },
+    { headEl: backBtn, pill: null, activate: cornerBack },   // keyboard twin
     { headEl: primary, pill: pillPrimary, trayAxis: 'x',
       trayItems: function(){ return links; } }
   ],

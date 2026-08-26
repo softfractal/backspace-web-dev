@@ -31,6 +31,11 @@ var STR = {
     community: 'COMMUNITY',
     support:   'SUPPORT',
     homeTitle: 'backspace',
+    // The corner ‹ control names what it will DO, and on pages with their
+    // own depth that changes with the level (see navBack). Keyed because
+    // an aria-label is user-facing text and nothing may preclude CN.
+    navHome:   'Home',
+    navBack:   'Back',
     softwareTitle: 'BACKSPACE — Software',
     // /software coming-soon copy — text verbatim from the witness build's
     // A-2 SOFTWARE-01 layer config (figmaNodeId 1:183 / 1:184).
