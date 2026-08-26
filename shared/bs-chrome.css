@@ -234,6 +234,13 @@
                    invokes it.)
      ═══════════════════════════════════════════════════════════════ */
   --bsw-corner: calc(15px * var(--ui-scale));
+  /* The drawn line's thickness. It carries the WINDOW'S OWN FILL (the
+     company, Aug 25: "the same color and transparency as the pop up
+     window itself"), so it is literally a thin strip of the window
+     revealed early — no separate colour exists to drift. A 1px floor
+     keeps it from vanishing at small --ui-scale; this is the tunable if
+     it reads too faint against the stage. */
+  --bsw-line: max(1px, calc(2px * var(--ui-scale)));
   --bsw-fill:   #fefefe17;
   --bsw-glow:
     drop-shadow(0 0 3px  rgba(255,255,255, 1))
@@ -755,43 +762,76 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 /* ══════════════════════════════════════════════════════════════════════
    bs-window — THE panel. No page writes a bespoke one.
 
-   THE MECHANIC (Eric, Aug 24)
-   Rest: the window IS the seed square — the two corner triangles
-   co-located (::before upper-left half + ::after lower-right half).
-   Open (.is-open): the lower-right triangle travels to the far corner
-   while clip-path draws the translucent frame out behind it, both on ONE
-   duration + curve — so wide/tall/mixed expansion falls out of the
-   target ratio ALONE. Content fades in only once the frame lands.
-   Removing .is-open retracts to the square: Esc's close animation, free.
-   Absent (.is-hidden): the window does not exist at rest. RULED (Eric,
-   Aug 24) — /support opens from .is-hidden; preview invokes the window,
-   no square rests on stage. The page chooses its resting affordance.
+   THE MECHANIC (the company, Aug 25 — SUPERSEDES the Aug 24 diagonal
+   draw and its second triangle)
+   ONE TRIANGLE, at the upper left, and it never travels. It marks the
+   origin the window is drawn FROM.
+   Open (.is-open) runs TWO phases on one clock:
+     1. a THIN LINE draws left-to-right along the top edge, and
+     2. the window FALLS from that line like a waterfall.
+   Both are the same clip-path on the fill layer — the line phase moves
+   the RIGHT inset, the fall moves the BOTTOM inset — so the "line" is
+   just the window's own fill revealed early, which is exactly the
+   ruling's "same colour and transparency as the pop up window itself".
+   Content fades in only once the frame lands.
+   Absent (.is-hidden): the window does not exist at rest. /support opens
+   from .is-hidden. The page chooses its resting affordance.
 
-   The triangles are HARD-STOP GRADIENTS, not clip-path polygons:
-   filters apply BEFORE clip-path in the paint pipeline, so a drop-shadow
-   on a clipped element is sheared off at the clip edge — gradient alpha
-   keeps the silhouette and lets the glow hug the hypotenuse.
+   WHY THE FILL LIVES ON ::after AND THE TRIANGLE ON ::before: clip-path
+   clips an element's pseudo-elements too, so a triangle on the clipped
+   box would be sliced to a 1px sliver through the whole line phase. With
+   the fill on its own layer the triangle sits UNCLIPPED above it and
+   reads as the mark the line is drawn from. Only one triangle is
+   rendered either way — the second pseudo is now the fill, not a corner.
+
+   The triangle is a HARD-STOP GRADIENT, not a clip-path polygon: filters
+   apply BEFORE clip-path in the paint pipeline, so a drop-shadow on a
+   clipped element is sheared off at the clip edge — gradient alpha keeps
+   the silhouette and lets the glow hug the hypotenuse.
 
    TEMPO LAW: zero locally written durations. Consumes --pop-duration ·
    --pop-fade · --pop-fade-duration · --expand-curve.
    MIN SIZE: keep both dimensions ≥ 3 × --bsw-corner.
    ══════════════════════════════════════════════════════════════════════ */
+/* THE LINE, THEN THE FALL. One clock (--pop-duration), two phases: the
+   first 40% draws the line across, the rest lets the window down. Each
+   phase carries the tempo family's ease-in-out, so both read as
+   deliberate moves rather than one smeared gesture. Zero locally written
+   durations — the split is keyframe percentages of the house token. */
+@keyframes bsw-fall {
+  0% {
+    clip-path: inset(0 100% calc(100% - var(--bsw-line)) 0);
+    animation-timing-function: var(--expand-curve);
+  }
+  40% {
+    clip-path: inset(0 0 calc(100% - var(--bsw-line)) 0);
+    animation-timing-function: var(--expand-curve);
+  }
+  100% { clip-path: inset(0 0 0 0); }
+}
 .bs-window {
   position: absolute;                /* the page places and sizes it */
-  background: var(--bsw-fill);
   pointer-events: none;              /* inert until open */
-  clip-path: inset(0 calc(100% - var(--bsw-corner)) calc(100% - var(--bsw-corner)) 0);
-  /* height rides the SAME clock+curve as the traveling corner: a window
-     that changes size mid-open (excerpt → form) is still the expansion
-     mechanic, and the frame must not drift from its own corner mark. */
+  /* height still rides the tempo: a window that changes size mid-open
+     (request type → form) is still the expansion mechanic. */
   transition:
-    clip-path  var(--pop-duration) var(--expand-curve),
     height     var(--pop-duration) var(--expand-curve),
     opacity    var(--pop-fade),
     visibility 0s;
 }
-.bs-window::before,
+/* THE FILL LAYER — the thing that draws. Kept off the host element so the
+   triangle above it is never clipped. */
 .bs-window::after {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--bsw-fill);
+  clip-path: inset(0 100% calc(100% - var(--bsw-line)) 0);   /* collapsed: nothing drawn yet */
+}
+/* THE ONE TRIANGLE — the origin mark. It does not travel and it is not
+   clipped. */
+.bs-window::before {
   content: "";
   position: absolute;
   top: 0; left: 0;
@@ -800,17 +840,8 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   z-index: 2;
   pointer-events: none;
   filter: var(--bsw-glow);
-}
-.bs-window::before {                 /* upper-left half — stays home */
   background: linear-gradient(to bottom right,
     var(--ink) calc(50% - .5px), transparent calc(50% + .5px));
-}
-.bs-window::after {                  /* lower-right half — the traveler */
-  background: linear-gradient(to bottom right,
-    transparent calc(50% - .5px), var(--ink) calc(50% + .5px));
-  transition:
-    top  var(--pop-duration) var(--expand-curve),
-    left var(--pop-duration) var(--expand-curve);
 }
 /* Content waits for the frame. */
 .bs-window > * {
@@ -819,12 +850,10 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   transition: opacity var(--pop-fade);
 }
 .bs-window.is-open {
-  pointer-events: auto;              /* previews are interactable — the hover-lock ruling */
-  clip-path: inset(0 0 0 0);
+  pointer-events: auto;              /* an open window is interactable */
 }
 .bs-window.is-open::after {
-  top:  calc(100% - var(--bsw-corner));
-  left: calc(100% - var(--bsw-corner));
+  animation: bsw-fall var(--pop-duration) both;
 }
 .bs-window.is-open > * {
   opacity: 1;
@@ -837,13 +866,24 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   opacity: 0;
   pointer-events: none;
   transition:
-    clip-path  var(--pop-duration) var(--expand-curve),
     height     var(--pop-duration) var(--expand-curve),
     opacity    var(--pop-fade),
     visibility 0s var(--pop-fade-duration);   /* hide only after the fade lands */
 }
+/* Closing FADES from the full frame — it does not run the fall backwards.
+   Without this the fill would snap to its collapsed line the instant
+   .is-open left, and the snap would be visible underneath the fade. */
+.bs-window.is-hidden::after {
+  animation: none;
+  clip-path: inset(0 0 0 0);
+}
 @media (prefers-reduced-motion: reduce) {
-  .bs-window, .bs-window::after, .bs-window > * { transition: none; }
+  .bs-window, .bs-window::before, .bs-window::after, .bs-window > * {
+    transition: none;
+    animation: none;
+  }
+  /* Nothing choreographs, but the window must still BE there. */
+  .bs-window.is-open::after { clip-path: inset(0 0 0 0); }
 }
 
 /* iOS-style "locked" shake — denied input shakes; nothing fails
