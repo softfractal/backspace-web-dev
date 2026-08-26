@@ -152,6 +152,11 @@
     --sup-pad-t: calc(52px * var(--ui-scale));
     --sup-pad-b: calc(30px * var(--ui-scale));
     --sup-label: #ffffff94;
+    /* Where a field's marker sits when the pointer is elsewhere. The
+       hovered field's dot takes the fitted halo at full; this is the
+       rank the others fall to, and it is the tunable if the resting
+       dots read too faint. */
+    --sup-dot-rest: .45;
   }
 
   /* ── The menu — SIX items, the home menu's own grammar ────────────────
@@ -343,6 +348,30 @@
     background: var(--sup-marker); border-radius: 50%;
     box-shadow: var(--sup-marker-glow);
     transform: translateY(-50%);
+    /* THE MARKER ANSWERS THE POINTER (RULED — Eric, Aug 25): the dot on
+       the field under the mouse glows, every other dot sits dim.
+       The frames could not draw this — a static mock holds one level for
+       every dot — so the HOVER state takes the measured halo and rest
+       ranks BELOW it. That asymmetry is the only arrangement in which
+       the dots can indicate anything: the alternative (rest at full,
+       hover brighter) would push past the fitted calibration and still
+       leave the other dots undimmed.
+       0.2s ease is the house's own glow-transition timing (icon bar,
+       menu) — this is a hover answer, not a pop-out, so it does not
+       ride --pop-motion. */
+    opacity: var(--sup-dot-rest);
+    transition: opacity .2s ease;
+  }
+  /* :focus-within is the KEYBOARD TWIN — tabbing the form lights the
+     same dot the mouse would (house law: every hover state has one).
+     Native :hover is right HERE, unlike the menu and the option list:
+     form fields are not on the machine's focus variable, they are native
+     controls, and every other control inside this panel (.sup-chosen,
+     .sup-plate, .sup-door, .sup-submit) already answers natively. */
+  .sup-field:hover::before,
+  .sup-field:focus-within::before { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .sup-field::before { transition: none; }
   }
   .sup-input, .sup-area {
     width: 100%;
