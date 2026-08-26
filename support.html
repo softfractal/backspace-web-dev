@@ -412,6 +412,10 @@
   }
   /* The chosen request type is a CONTROL: it returns to the picker (and
      it is the Esc ladder's own next rung down). */
+  /* The chosen type READS OUT; it does not act. No pointer cursor and no
+     hover bloom, because nothing happens when you press it — the way
+     back to the picker is Esc, or the corner control, which is now
+     level-aware and does the same thing. */
   .sup-chosen {
     width: 100%; padding: 0; border: 0; background: none;
     text-align: right;
@@ -420,12 +424,8 @@
     font-size: calc(13px * var(--ui-scale));
     line-height: calc(17px * var(--ui-scale));
     text-shadow: var(--glow-text);
-    cursor: var(--cursor-target);
-    transition: color .16s, text-shadow .2s ease;
   }
-  .sup-chosen.kb-hover, .sup-chosen:hover, .sup-chosen:focus-visible {
-    color: #fff; outline: none; text-shadow: var(--glow-text-hover);
-  }
+  .sup-chosen:focus { outline: none; }
   .sup-foot {
     display: flex; align-items: flex-end; justify-content: space-between;
     gap: calc(24px * var(--ui-scale));
@@ -542,6 +542,26 @@
   .sup-door:hover .sup-door-plus, .sup-door:focus-visible .sup-door-plus,
   .sup-door.kb-hover .sup-door-plus {
     background: #fff; box-shadow: 0 0 calc(24px * var(--ui-scale)) rgba(255,255,255,.40);
+  }
+  /* THE DOOR REPORTS ITS OWN STATE (Eric, Aug 25, with the reference
+     shot): filled plate = "open the form", hollow outline = "the form is
+     open". Pressing it is what empties it. Every hover/cursor rule above
+     is re-stated here at higher specificity so the fill cannot creep
+     back under the pointer while the form stands. */
+  .sup-door.is-active .sup-door-plus,
+  .sup-door.is-active:hover .sup-door-plus,
+  .sup-door.is-active:focus-visible .sup-door-plus,
+  .sup-door.is-active.kb-hover .sup-door-plus {
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    box-shadow: none;
+  }
+  /* It still answers the pointer — as light, not as fill. */
+  .sup-door.is-active:hover .sup-door-plus,
+  .sup-door.is-active:focus-visible .sup-door-plus,
+  .sup-door.is-active.kb-hover .sup-door-plus {
+    box-shadow: 0 0 calc(18px * var(--ui-scale)) rgba(255,255,255,.30);
   }
   .sup-door:hover .sup-door-label, .sup-door:focus-visible .sup-door-label,
   .sup-door.kb-hover .sup-door-label {
@@ -680,8 +700,15 @@
     <!-- LOCKED, form view (frame 1-3). -->
     <form class="sup-view sup-form" id="sup-view-form" hidden novalidate>
       <div class="sup-field sup-field--wide">
-        <label for="sup-f-type" data-str="supReqType"></label>
-        <button class="sup-chosen" id="sup-f-type" type="button"></button>
+        <!-- A READOUT, not a control (Eric, Aug 25: clicking it must not
+             take you back to the secondary). Not a <button> any more —
+             a button that does nothing is worse than no button. It keeps
+             tabindex="-1" so the invalid-submit path can still focus it
+             to announce the fault, while Tab never lands on it, and
+             aria-labelledby carries the label the `for` used to. -->
+        <label id="sup-f-type-label" data-str="supReqType"></label>
+        <div class="sup-chosen" id="sup-f-type" tabindex="-1"
+             aria-labelledby="sup-f-type-label"></div>
       </div>
       <div class="sup-grid">
         <div class="sup-field">
@@ -1089,6 +1116,8 @@ function render(){
   // returns it to lock-only.
   // The corner control names its current job (see cornerBack).
   backBtn.setAttribute('aria-label', openIdx >= 0 ? T('navBack') : T('navHome'));
+  // The form door empties while the form is up (see .sup-door.is-active).
+  doorBtn.classList.toggle('is-active', isLocked());
   var railOn = openIdx >= 0 && ITEMS[openIdx].real;
   railEl.classList.toggle('is-on', railOn);
   railEl.setAttribute('aria-hidden', String(!railOn));
@@ -1264,7 +1293,9 @@ panel.addEventListener('pointerleave', function(e){
 // which is the same rung the Esc ladder walks. (It was never wired in the
 // first build.) The form's field values survive in the DOM, so choosing
 // again returns to a form that kept everything.
-chosenEl.addEventListener('click', function(){ wake(); if (clickOk()) unlock(); });
+// The request-type readout has NO click handler: retreating to the picker
+// from here was Eric's Aug 25 strike. Esc and the level-aware corner
+// control are the ways back, and both walk the one ladder function.
 
 // ── The rail's two controls ───────────────────────────────────────────────
 // The email capsule COPIES (Eric, Aug 24). mailto: was the alternative and
