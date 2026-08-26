@@ -1014,7 +1014,16 @@ function drawPanel(i, locked){
   panel.classList.add('is-open');         // …then draw out on the tempo
 }
 function hidePanel(){
-  panel.classList.remove('is-open');
+  // .is-open STAYS. Removing it would cancel bsw-fall, and a cancelled
+  // animation drops the fill back to whatever the normal cascade says —
+  // which snapped a half-drawn window to its FULL frame at full opacity
+  // and only then faded it. Leaving the class on keeps the animation
+  // declared, so the fill holds exactly where the draw had reached and
+  // the whole window fades from there. .is-hidden still wins every
+  // conflict it cares about (pointer-events, visibility, opacity): it is
+  // the same specificity and later in the sheet.
+  // drawPanel() removes BOTH classes before re-opening, so the next draw
+  // still restarts the animation from its first frame.
   panel.classList.add('is-hidden');
 }
 function renderChosen(){

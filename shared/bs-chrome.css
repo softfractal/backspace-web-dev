@@ -870,11 +870,20 @@ a#bs-wordmark-link:focus-visible { outline: none; }
     opacity    var(--pop-fade),
     visibility 0s var(--pop-fade-duration);   /* hide only after the fade lands */
 }
-/* Closing FADES from the full frame — it does not run the fall backwards.
-   Without this the fill would snap to its collapsed line the instant
-   .is-open left, and the snap would be visible underneath the fade. */
+/* Closing FADES FROM WHEREVER THE DRAW REACHED. It does not run the fall
+   backwards, and it must not jump either way first.
+   PAUSED, not `animation: none`: this selector is (0,2,1), the same as
+   .bs-window.is-open::after and later in the sheet, so `none` here would
+   CANCEL the fall — and a cancelled animation drops the fill to the
+   normal cascade, i.e. straight to the full frame below. Closing a
+   half-drawn window therefore snapped it to full size at full opacity
+   and only then faded. Pausing holds the exact frame it had reached.
+   The page keeps .is-open on while hiding so the animation still exists
+   to be paused (see hidePanel).
+   The clip-path below is the fallback for the case with no animation at
+   all — a window that has never been opened. */
 .bs-window.is-hidden::after {
-  animation: none;
+  animation-play-state: paused;
   clip-path: inset(0 0 0 0);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -882,8 +891,34 @@ a#bs-wordmark-link:focus-visible { outline: none; }
     transition: none;
     animation: none;
   }
-  /* Nothing choreographs, but the window must still BE there. */
-  .bs-window.is-open::after { clip-path: inset(0 0 0 0); }
+  /* THESE TWO MUST REPEAT AT THE STATE SELECTORS' OWN SPECIFICITY, and
+     the blanket rule above is NOT enough — that is a cascade trap this
+     component walked straight into.
+
+     `animation: none` above matches .bs-window::after at (0,1,1) and
+     LOSES to .bs-window.is-open::after at (0,2,1): a media query adds no
+     specificity, and specificity is compared BEFORE source order. So the
+     fall still ran under reduced motion. Worse, a running animation
+     lives in the ANIMATIONS cascade origin — above every normal author
+     declaration — so it also overrode the clip-path escape hatch that
+     used to sit here alone. The measured result: the host's transitions
+     WERE killed (content snapped to full opacity at once) while the fill
+     still wiped in over 500ms underneath it, so the window painted its
+     contents half a second before its own background. Reduced motion was
+     the ONLY mode that inverted content and frame. */
+  .bs-window.is-open::after {
+    animation: none;
+    clip-path: inset(0 0 0 0);
+  }
+  /* The same trap on the way out: .bs-window.is-hidden re-declares
+     `transition` at (0,2,0) and outranks the blanket rule, so HEIGHT went
+     on travelling while the window hid. The FADE stays — the house keeps
+     opacity transitions under reduce and kills only motion (see
+     .bs-item > span and .site-primary-nav__link below) — and visibility
+     must keep its delay or the window vanishes before it has faded. */
+  .bs-window.is-hidden {
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
 }
 
 /* iOS-style "locked" shake — denied input shakes; nothing fails
