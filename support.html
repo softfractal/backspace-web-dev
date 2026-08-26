@@ -19,27 +19,39 @@
   behind every ported value: reports/support_phase1_initiation_audit.md
   (Eric sanctioned the PNG convention, +-1px frame units).
 
-  THE HOVER-LOCK LADDER (RULED — Eric, Aug 24) — the page's whole point.
-  Each of the six items runs three states from ONE focus variable:
-    REST.
-    PREVIEW (STICKY). Hover pops the item out (home-menu grammar: the
-      pop, the signal-red dot, the glow) and opens the grey excerpt
-      window center-stage. THE POINTER LEAVING DOES NOT RETRACT IT — the
-      item stays popped, the window stays present AND interactable.
-      Exclusive: hovering another item cancels and replaces.
-    LOCKED. Clicking the previewed item again, OR clicking the window —
-      TWO DOORS, ONE LOCK — commits: the excerpt becomes the full
-      content, and ONLY NOW does the right rail appear.
-  RULING ON RECORD: frame 1-1 draws the right rail during hover. That is
-  TOO EARLY. On hover only the excerpt window exists; the rail belongs to
-  LOCK. Built to the ruling, not the frame.
+  THE CLICK-TO-OPEN LADDER (RULED — the company, Aug 25; this SUPERSEDES
+  the Aug 24 hover-lock grammar). HOUSE-WIDE RULE: only the two icon bars
+  — the top-right utility cluster and the top-left away nav — keep
+  hover-expansion. EVERY other menu requires a CLICK to trigger its
+  secondary expansion or window pop-up. Recorded here because it governs
+  every page still to come (FAQ's sub-list, hardware), not just this one.
 
-  Sticky hover is not a second model — it is hover ACQUIRING the focus
-  variable, which is the keyboard cursor's own behavior. Preview renders
-  from focus; lock is the commit. Derived defaults, ratified Aug 24:
-  W/S walks items and every step previews (parity) - Enter locks - Esc is
-  the only non-replacement cancel - touch taps once to preview, twice to
-  lock - lock retreats to PREVIEW (the ladder mirrors its own ascent).
+  Each of the six items now runs four states:
+    REST.
+    FOCUSED. Hover — or the W/S cursor — pops the item out with the
+      signal-red dot and the glow (home-menu grammar, verbatim). It
+      opens NOTHING. Leaving retracts it.
+    OPEN. A CLICK on the item draws its window out center-stage: the
+      request type for CONTACT US, its own content for the other five.
+      The window is the committed surface; the cursor is free to keep
+      walking the menu while it stands.
+    LOCKED. Choosing a request type, clicking the OPEN item again, or
+      clicking the window's ground commits to the level below — the
+      form — which is the level with something to lose.
+
+  WHAT THIS RETIRED, and why: STICKY HOVER is gone. Sticky existed for
+  exactly one reason — leaving a menu item must not tear down the window
+  that item had opened. Hover opens nothing now, so there is nothing to
+  protect and the item retracts on leave, which is the certified
+  home-menu grammar restored. KEYBOARD PREVIEW PARITY is gone with it:
+  W/S walks the cursor and opens nothing, because Enter is the click's
+  twin. Both were ratified Aug 24 against the hover model and fall with
+  it; the parity that MATTERS is preserved — click <-> Enter, and every
+  hover state still has a keyboard twin.
+
+  Touch and mouse now converge exactly: the old "first tap previews,
+  second locks" two-step IS the click grammar, with no hover branch to
+  special-case.
 
   CONTENT: CONTACT US is real. The other five ride the SAME ladder with
   LOREM through the STR manifest (Eric, Aug 24) — real copy swaps in at
@@ -57,11 +69,13 @@
   the C14 bridge); inside the locked window the wheel belongs to the
   panel's native scroll (the wheelNative seam in the shared chrome), and
   unlock hands it back. The Esc ladder walks ONE honest level per press
-  through ONE function: field focus -> window level -> LOCKED -> PREVIEW
-  -> menu rest -> the page boundary. (Rest and idle coincide here —
-  nothing else holds state at rest, as on /community.) Denial is visible
-  and audible everywhere: the current away-nav section, foreign axes, a
-  frozen menu under the lock, invalid submits.
+  through ONE function, and the click grammar gives it a real fifth rung:
+  field focus -> LOCKED -> OPEN -> the cursor -> the page boundary. The
+  window now closes on its own press, because the cursor can outlive it.
+  (Rest and idle coincide here — nothing else holds state at rest, as on
+  /community.) Denial is visible and audible everywhere: the current
+  away-nav section, foreign axes, a frozen menu under the lock, invalid
+  submits.
 
   SUBMIT IS A LABELED STUB pending the wiring ruling (endpoint / mailto /
   disabled-until-go-live): the full submit UX runs to a marked seam and
@@ -757,18 +771,22 @@ function renderStrings(root){
   }
 }
 
-// ── STATE — one focus variable, one lock ──────────────────────────────────
-// focusIdx: the PREVIEW cursor (STICKY — the pointer leaving does not
-//   clear it; only replacement, Esc, or idle does).
-// lockIdx : the LOCKED item, or null.
-// view    : which face the window is showing.
+// ── STATE — one focus variable, two commit levels ─────────────────────────
+// focusIdx: THE cursor. Hover and the keyboard drive the same variable
+//   (house law). It opens nothing and it is free to keep walking while a
+//   window stands, so it can outlive openIdx.
+// openIdx : the item whose window is OPEN, or -1. Set only by a click or
+//   its keyboard twin.
+// locked  : the deeper level (the form) is showing.
+// view    : which face the window is rendering.
 var focusIdx = -1;
-var lockIdx  = null;
+var openIdx  = -1;
+var locked   = false;
 var view     = 'excerpt';        // 'excerpt' | 'request' | 'form'
 var chosenType = null;           // STR key of the chosen request type
 var menuItems = [];
 
-function isLocked(){ return lockIdx !== null; }
+function isLocked(){ return locked; }
 
 // ── Menu build — .bs-item consumed verbatim from the shared chrome ────────
 ITEMS.forEach(function(it, idx){
@@ -781,27 +799,34 @@ ITEMS.forEach(function(it, idx){
   span.setAttribute('data-str', it.key);
   b.appendChild(span);
 
-  // STICKY HOVER = hover acquiring THE focus variable. There is
-  // deliberately NO mouseleave handler: the ruling is that leaving the
-  // item does not retract it. Replacement, Esc, or idle clear it.
+  // HOVER CARRIES THE CURSOR AND NOTHING ELSE (RULED — the company,
+  // Aug 25). It pops the item out, lights the dot and the glow, and
+  // opens no window. Leaving retracts it: sticky hover existed only to
+  // protect a window that hover had opened, and hover opens none now.
   b.addEventListener('mouseenter', function(){
     if (C.rail.isTouch() || isLocked()) return;
     wake();
     if (focusIdx !== idx) setFocus(idx);
   });
-  // TWO DOORS, ONE LOCK — door #1: clicking the previewed item again.
-  // Touch's first tap only previews (the certified two-step).
+  b.addEventListener('mouseleave', function(){
+    if (C.rail.isTouch() || isLocked()) return;
+    if (focusIdx === idx) setFocus(-1);
+  });
+  // THE CLICK IS THE TRIGGER (RULED — the company, Aug 25). One click
+  // opens this item's window; a second click on the SAME item commits to
+  // the level below (door #1). Touch and mouse are now one grammar.
   b.addEventListener('click', function(){
     wake();
     if (isLocked()){
       // The menu is frozen under the lock (the home airlock precedent):
-      // the locked item is one step BACK, anything else denies.
-      if (idx === lockIdx){ if (clickOk()) goBack(); }
+      // the open item is one step BACK, anything else denies.
+      if (idx === openIdx){ if (clickOk()) goBack(); }
       else denyLocked();
       return;
     }
-    if (focusIdx === idx){ if (clickOk()) lock(idx); }
-    else setFocus(idx);
+    setFocus(idx);                                   // the click also carries the cursor
+    if (openIdx === idx){ if (clickOk()) lock(); return; }   // door #1 — commit
+    if (clickOk()) openFor(idx);                     // …otherwise OPEN this item
   });
   menuEl.appendChild(b);
   menuItems.push(b);
@@ -864,8 +889,8 @@ function chooseType(k){
   SoundBus.play('commit'); hapticTick();
   // CHOOSING THE TYPE **IS** THE COMMIT (Eric, Aug 24): the form is the
   // level with something to lose, so it is the level that locks.
-  if (!isLocked() && focusIdx >= 0) lockIdx = focusIdx;
-  if (isLocked()) showFace(lockIdx, true);
+  if (openIdx >= 0) locked = true;      // choosing the type IS the commit
+  if (locked) showFace(openIdx, true);
   render();
 }
 
@@ -996,7 +1021,9 @@ function alignMarkers(){
 function render(){
   for (var i = 0; i < menuItems.length; i++){
     menuItems[i].classList.toggle('kb-hover', i === focusIdx && !isLocked());
-    menuItems[i].classList.toggle('active', lockIdx === i);
+    // .active marks the OPEN item — it holds its popped rendering while
+    // the cursor is free to walk elsewhere.
+    menuItems[i].classList.toggle('active', i === openIdx);
   }
   // State hook only — no CSS consumes it since the narrow-width lock
   // override was removed (it made LOCKED a terminal state). Kept as the
@@ -1009,28 +1036,25 @@ function render(){
   // lock would leave both that door and the support address unreachable.
   // Frames 1-2 and 1-3 draw the rail at both levels. LABELED: one line
   // returns it to lock-only.
-  var act = isLocked() ? lockIdx : focusIdx;
-  var railOn = act >= 0 && ITEMS[act].real;
+  var railOn = openIdx >= 0 && ITEMS[openIdx].real;
   railEl.classList.toggle('is-on', railOn);
   railEl.setAttribute('aria-hidden', String(!railOn));
   // Tab enters the FORM only when locked (the machine law). The options
   // are the PREVIEW's own control, so they are reachable while it is up.
   var tabbable = isLocked();
   vForm.querySelectorAll('input, textarea, button').forEach(function(el){ el.tabIndex = tabbable ? 0 : -1; });
-  optionEls.forEach(function(el){ el.tabIndex = (focusIdx >= 0 && !isLocked()) ? 0 : -1; });
+  optionEls.forEach(function(el){ el.tabIndex = (openIdx >= 0 && !isLocked()) ? 0 : -1; });
   railEl.querySelectorAll('button').forEach(function(el){ el.tabIndex = railOn ? 0 : -1; });
 }
 
+// THE CURSOR ONLY. It no longer touches the window — that is openFor's
+// job now, and the two are deliberately independent so the cursor can
+// keep walking while a window stands.
 function setFocus(i){
   if (i === focusIdx) return;
   if (i >= 0 && C.rail.index() >= 0) C.rail.focus(-1);   // one cursor
   focusIdx = i;
-  if (i >= 0){
-    drawPanel(i, false);                 // every item REDRAWS the window
-    SoundBus.play('detent'); hapticTick();
-  } else {
-    hidePanel();
-  }
+  if (i >= 0){ SoundBus.play('detent'); hapticTick(); }
   render();
 }
 function focusStep(dir){
@@ -1045,42 +1069,62 @@ function focusStep(dir){
   return true;
 }
 
-// ── LOCK / UNLOCK ─────────────────────────────────────────────────────────
-function lock(i){
-  if (isLocked()) return;
-  lockIdx = i;
-  focusIdx = i;
+// ── OPEN / CLOSE — the click's own level ──────────────────────────────────
+// Opening is where the REDRAW lives now (Eric, Aug 24: every new item
+// re-runs the expansion from the seed square). Clicking a different item
+// while one stands redraws for the new one.
+function openFor(i){
+  openIdx = i;
+  locked = false;
   SoundBus.play('commit'); hapticTick();
-  showFace(i, true);        // a LEVEL change, not an item change — no redraw
+  drawPanel(i, false);
+  render();
+}
+function closeWindow(){
+  if (openIdx < 0) return;
+  openIdx = -1;
+  locked = false;
+  // Never leave the keyboard inside a window that is going away.
+  var a = document.activeElement;
+  if (a && panel.contains(a) && a.blur) a.blur();
+  hidePanel();
+  render();
+}
+
+// ── LOCK / UNLOCK — the level below ───────────────────────────────────────
+function lock(){
+  if (openIdx < 0 || locked) return;
+  locked = true;
+  SoundBus.play('commit'); hapticTick();
+  showFace(openIdx, true);  // a LEVEL change, not an item change — no redraw
   render();
 }
 // Lock retreats to PREVIEW — the ladder mirrors its own ascent (ratified).
 function unlock(){
   if (!isLocked()) return;
-  var i = lockIdx;
-  lockIdx = null;
-  focusIdx = i;
+  locked = false;
   // Retreating a level must not leave the keyboard inside the panel: the
   // form's controls are about to be untabbable, and a stranded focus
   // silently eats the menu's own keys.
   var _a = document.activeElement;
   if (_a && panel.contains(_a) && _a.blur) _a.blur();
-  showFace(i, false);
+  showFace(openIdx, false);
   render();
   SoundBus.play('detent'); hapticTick();
 }
 function denyLocked(){
-  var el = menuItems[lockIdx];
+  var el = menuItems[openIdx];
   if (el && !el.classList.contains('bs-shake')) denyOn(el);
 }
 
 // ── THE ESC LADDER — one honest level per press, through ONE function ─────
-// field focus -> LOCKED -> PREVIEW -> menu rest -> boundary.
-// One rung SHORTER than the first build: the form no longer retreats to a
-// request-type "window level" on its way out, because the request type IS
-// the preview now (Eric, Aug 24). Each press is still exactly one honest
-// level. (Menu rest and idle coincide here — nothing else holds state at
-// rest, the /community precedent.) Instrumented under ?dev.
+// field focus -> LOCKED -> OPEN -> the cursor -> boundary.
+// The click grammar (the company, Aug 25) gives the ladder a real fifth
+// rung: the window has its own press now, because the cursor no longer
+// dies with it — hover opens nothing, so the cursor can outlive the
+// window and must be cleared on its own step. (The cursor's rung and
+// idle coincide — nothing else holds state at rest, the /community
+// precedent.) Instrumented under ?dev.
 var lastRung = null;
 function goBack(){
   if (isLocked()){
@@ -1096,15 +1140,18 @@ function goBack(){
       // ratified parity rule. Blurring hands the keys back to the machine.
       return;
     }
-    // 2. LOCKED retreats to PREVIEW (which, for the real item, IS the
+    // 2. LOCKED retreats to OPEN (which, for the real item, IS the
     //    request-type face).
     lastRung = 'locked';
     unlock();
     return;
   }
-  // 3. PREVIEW retreats to rest.
-  if (focusIdx >= 0){ lastRung = 'preview'; setFocus(-1); return; }
-  // 4. rest -> the page boundary (a TRUE history pop; cold boot is silent).
+  // 3. OPEN retracts the window. The cursor SURVIVES it — it was never
+  //    the thing that opened it.
+  if (openIdx >= 0){ lastRung = 'window'; closeWindow(); return; }
+  // 4. the cursor clears.
+  if (focusIdx >= 0){ lastRung = 'cursor'; setFocus(-1); return; }
+  // 5. rest -> the page boundary (a TRUE history pop; cold boot is silent).
   lastRung = 'boundary';
   if (arrival) popBoundary();
 }
@@ -1114,7 +1161,7 @@ function goBack(){
 // the window, so W/S/A/D typed into a field are text, not menu input.
 // Esc still walks THE ladder — one function, both routes.
 panel.addEventListener('keydown', function(e){
-  if (focusIdx < 0 && !isLocked()) return;
+  if (openIdx < 0) return;
   e.stopPropagation();
   if (e.key === 'Escape'){ e.preventDefault(); wake(); goBack(); return; }
   if (view === 'request'){
@@ -1147,12 +1194,12 @@ panel.addEventListener('pointerleave', function(e){
 // TWO DOORS, ONE LOCK — door #2: clicking the window itself commits.
 panel.addEventListener('click', function(e){
   if (isLocked()) return;
-  if (focusIdx < 0) return;
+  if (openIdx < 0) return;
   // The preview's own controls own their clicks — choosing an option IS
   // the commit, so it must not double-fire the ground's door.
   if (e.target.closest('.sup-option')) return;
   wake();
-  if (clickOk()) lock(focusIdx);
+  if (clickOk()) lock();
   e.stopPropagation();
 });
 
@@ -1200,13 +1247,12 @@ emailBtn.addEventListener('click', function(){
 // denies until it is set). From PREVIEW this is a COMMIT.
 doorBtn.addEventListener('click', function(){
   wake();
-  var i = isLocked() ? lockIdx : focusIdx;
-  if (i < 0 || !ITEMS[i].real) return;
+  if (openIdx < 0 || !ITEMS[openIdx].real) return;
   if (!isLocked()){
     if (!clickOk()) return;
-    lock(i);
+    lock();
   } else {
-    showFace(i, true);
+    showFace(openIdx, true);
   }
   var first = document.getElementById('sup-f-name');
   try { first.focus({ preventScroll: true }); } catch (e) {}
@@ -1320,8 +1366,11 @@ C.init({
     goBack:         goBack,
     escapeFromRail: function(){ setFocus(0); },      // rail -> the primary surface
     enterAtPrimary: function(){
-      if (focusIdx < 0){ setFocus(0); return; }      // cold Enter claims the first item
-      lock(focusIdx);                                 // Enter = lock (ratified)
+      // Enter is the CLICK's twin, rung for rung: it claims the cursor
+      // cold, then opens, then commits.
+      if (focusIdx < 0){ setFocus(0); return; }
+      if (openIdx !== focusIdx){ openFor(focusIdx); return; }
+      lock();
     },
     verticalStep:   function(down){
       // At the FIRST item, W/^ hands the cursor to the icon bar (the home
@@ -1340,31 +1389,34 @@ C.init({
     wheelNative:    function(e){
       if (!panelBody.contains(e.target)) return false;
       if (isLocked()) return true;          // the locked panel owns its wheel outright
-      // At PREVIEW the wheel belongs to the MENU (the parity rule) —
-      // UNLESS the panel is genuinely clipped, which the provisional
-      // narrow-width cap can do; its own content must stay reachable.
+      // While merely OPEN the wheel still belongs to the MENU, so the
+      // cursor can walk past a standing window — UNLESS the panel is
+      // genuinely clipped, which the provisional narrow-width cap can
+      // do; its own content must stay reachable.
       return panelBody.scrollHeight > panelBody.clientHeight + 1;
     },
     wheelStep:      focusStep,
     wheelPitch:     function(){ return menuPitch; },
     clearPrimary:   function(){ if (focusIdx >= 0 && !isLocked()) setFocus(-1); },
-    idleReset:      function(){ setFocus(-1); C.rail.focus(-1); },
+    // Attract: everything pops back in — the window included. A LOCKED
+    // window is exempt upstream (armIdle re-arms without resetting), so
+    // a half-filled form is never swept away.
+    idleReset:      function(){ setFocus(-1); closeWindow(); C.rail.focus(-1); },
     onLangChange:   function(T2){
       links.forEach(function(l){ l.textContent = T2(l.getAttribute('data-section')); });
       renderStrings();
       // Re-render whichever face is live, at its current level.
-      var act = isLocked() ? lockIdx : focusIdx;
-      if (act >= 0) setFace(act, isLocked());
+      if (openIdx >= 0) setFace(openIdx, isLocked());
       else renderChosen();
       document.title = T2('supportTitle');
     },
     onFontsReady:   function(){
       measurePitch();
       alignMarkers();                       // the webfont's metrics are the real ones
-      if (focusIdx >= 0 || isLocked()) sizePanel();
+      if (openIdx >= 0) sizePanel();
     },
     devState:       function(){
-      return { focusIdx: focusIdx, lockIdx: lockIdx, view: view, rung: lastRung,
+      return { focusIdx: focusIdx, openIdx: openIdx, locked: locked, view: view, rung: lastRung,
                chosenType: chosenType, menuPitch: menuPitch, arrival: arrival,
                railOn: railEl.classList.contains('is-on') };
     }
@@ -1381,12 +1433,12 @@ render();
 
 window.addEventListener('resize', function(){
   alignMarkers();                           // --ui-scale moved: so did the metrics
-  if (focusIdx >= 0 || isLocked()) sizePanel();
+  if (openIdx >= 0) sizePanel();
 });
 window.addEventListener('pageshow', function(e){
   if (e.persisted){
     _leaving = false;
-    lockIdx = null;
+    closeWindow();
     setFocus(-1);
     C.rail.focus(-1);
   }
