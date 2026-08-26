@@ -294,9 +294,20 @@
      pitch. The set itself is a PLACEHOLDER pending Eric's manifest
      confirm — it lives in STR keys, so the real list is a copy edit. */
   .sup-options { margin-top: var(--sup-opt-below); display: grid; }
+  /* THE TARGET HUGS THE LABEL. These were width:100% blocks, so although
+     the text is right-aligned every option's hit box spanned the whole
+     content width — a click 400px to the LEFT of "warranty & repair", on
+     what plainly looks like empty window, selected it. That is the other
+     half of Eric's Aug 25 report, and it would have kept firing after
+     door #2 was retired. The box now sizes to its label and is pushed
+     right by the auto margin; the left padding keeps a generous vicinity
+     (the house's .bs-hit philosophy: bounded, not unbounded). */
   .sup-option {
-    display: block; width: 100%;
-    padding: 0; border: 0; background: none;
+    display: block;
+    width: max-content; max-width: 100%;
+    margin-left: auto;
+    padding: 0 0 0 calc(24px * var(--ui-scale));
+    border: 0; background: none;
     text-align: right;
     color: var(--ink);
     font-family: var(--font-ui); font-weight: 600;
@@ -1224,17 +1235,21 @@ panel.addEventListener('pointerleave', function(e){
   if (optionIdx >= 0) setOptionFocus(-1);
 });
 
-// TWO DOORS, ONE LOCK — door #2: clicking the window itself commits.
-panel.addEventListener('click', function(e){
-  if (isLocked()) return;
-  if (openIdx < 0) return;
-  // The preview's own controls own their clicks — choosing an option IS
-  // the commit, so it must not double-fire the ground's door.
-  if (e.target.closest('.sup-option')) return;
-  wake();
-  if (clickOk()) lock();
-  e.stopPropagation();
-});
+// DOOR #2 IS RETIRED (Eric, Aug 25: clicking empty window space "will
+// also send me to a form field… seems to be a bug"). The window's GROUND
+// is now inert.
+//
+// It was ratified as half of "TWO DOORS, ONE LOCK" on Aug 24 — but that
+// was ruled when the window held a passive EXCERPT, where its ground was
+// the only thing there to click. The window now holds the request-type
+// picker: its own controls are the way forward, so a click on bare fill
+// commits nothing. Door #1 (clicking the open menu item again) is
+// unaffected and remains the commit for the five lorem items, whose
+// windows carry no controls of their own.
+//
+// Nothing replaces the handler: the document-level sweep in the shared
+// chrome already calls wake() on every pointerdown, and its stopPropagation
+// guarded nothing (bindSweep listens on pointerdown, not click).
 
 // The form's request-type row is a CONTROL: it retreats to the picker —
 // which is the same rung the Esc ladder walks. (It was never wired in the
