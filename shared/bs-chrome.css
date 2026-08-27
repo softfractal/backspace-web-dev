@@ -264,7 +264,7 @@
    per element (see the :root law block for the equation and why these
    cannot live at :root). Values: certified base rings + comp rings
    scaled by the element's solved deficit fraction; f=0 = certified. */
-.bs-social-link, .site-primary-nav__link, .bs-tray-item, .bs-head, .bs-round {
+.bs-social-link, .site-primary-nav__link, .bs-tray-item, .bs-head, .bs-round, .bs-subitem {
   --glow-text-word: 0 0 9.6px rgba(255,255,255,0.58), 0 0 9.6px rgb(255 255 255 / calc(min(0.58, var(--wg-fr, 0) * 0.58)));
   --glow-text-icons-word: 0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1), 0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95), 0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75), 0 0 96px rgba(255,255,255,0.5), 0 0 184px rgba(255,255,255,0.3), 0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))), 0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))), 0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95))), 0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95)));
 }

@@ -756,7 +756,14 @@ function glowF(eq, n){
   return Math.max(0, Math.min(1, (eq.T - raw) / (fp - raw)));
 }
 function normalizeWordGlow(){
-  var els = document.querySelectorAll('.bs-social-link, .site-primary-nav__link, .bs-tray-item, #bs-lang');
+  // .bs-subitem (support's in-menu sub-lists, Aug 25): 12px interactive
+  // row-face text — in scope BY THE RULING's own class (smaller text
+  // icons; only the home menu is excluded). Solved on the ROW curves;
+  // the constants were FIT AT 14px, and at 12px they transfer safely
+  // only because every current label is long (n>=15 -> f~0, the token
+  // renders certified-identical). A SHORT sub label (real copy, or CN)
+  // needs the 12px re-fit before its f is honest — flagged in the audit.
+  var els = document.querySelectorAll('.bs-social-link, .site-primary-nav__link, .bs-tray-item, .bs-subitem, #bs-lang');
   for (var i = 0; i < els.length; i++) {
     var el = els[i];
     if (el.querySelector('img')) continue;
@@ -967,6 +974,11 @@ window.BSChrome = {
   SoundBus: SoundBus,
   wake: wake, hapticTick: hapticTick,
   shakeEl: shakeEl, denyOn: denyOn, clickOk: clickOk,
+  // Pages that BUILD rule-6 scope elements and fill them after init
+  // (support's sub-lists render their STR labels at boot, after the
+  // init-time pass saw them empty) re-solve here. setLang already
+  // re-runs it for locale swaps.
+  normalizeWordGlow: normalizeWordGlow,
   bindPill: bindPill,
   rail: {
     focus: setIconFocus,

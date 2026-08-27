@@ -248,12 +248,21 @@
     font-size: calc(12px * var(--ui-scale));
     line-height: calc(14px * var(--ui-scale));
     letter-spacing: 0; white-space: nowrap; text-align: left;
-    text-shadow: var(--glow-text);
+    /* Rule-6 word tokens, BOTH states (Eric, Aug 25: the sub-items shone
+       far too dim — they had shipped on the HOME MENU's private 3-ring
+       hover recipe, which is the one surface the ruling excludes, and
+       sat outside normalizeWordGlow's scope so no compensation ever ran.
+       MEASURED at 34% of the community row's near-halo intensity; on the
+       icon-bar chain they land at 86%, the residual being the thinner
+       12px strokes shedding less light per pixel — rule 4's size-scaled
+       emission, same bracket the glyphs sit in. HOT is unified; reach
+       and total scale with the lamp. */
+    text-shadow: var(--glow-text-word);
     cursor: var(--cursor-target);
     transition: color .16s, text-shadow .2s ease;
   }
   .bs-subitem.kb-hover, .bs-subitem:focus-visible {
-    color: #fff; outline: none; text-shadow: var(--glow-text-hover);
+    color: #fff; outline: none; text-shadow: var(--glow-text-icons-word);
   }
   .bs-subitem.is-chosen { color: #fff; font-weight: 600; }
   /* THE HOLLOW RING — the sub level's own marker, and a THIRD marker
@@ -1901,6 +1910,9 @@ C.init({
 // ── Boot — cold or arrived, interactive at first paint ────────────────────
 renderStrings();
 links.forEach(function(l){ l.textContent = T(l.getAttribute('data-section')); });
+// The init-time rule-6 pass saw the sub-items EMPTY (their STR labels
+// render just above, after C.init) — re-solve now that n is real.
+C.normalizeWordGlow();
 renderChosen();
 measurePitch();
 alignMarkers();
