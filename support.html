@@ -233,8 +233,14 @@
   .bs-subitem {
     position: relative;
     /* Indented to sit under the POPPED parent's label — the parent is
-       always popped while its list is open, so the two align. */
+       always popped while its list is open, so the two align. The box
+       HUGS that label rather than stretching across the menu column: a
+       stretched item made the whole empty gutter to its right a hover and
+       click target, which is the same fault the request-type options had.
+       The padding keeps the marker's gutter inside the target. */
     padding-left: var(--side-menu-shift-x);
+    width: max-content; max-width: 100%;
+    justify-self: start;
     display: flex; align-items: center;
     background: none; border: 0;
     color: var(--text-soft);
@@ -272,7 +278,16 @@
      window's FILL token and nothing else of it. */
   #bs-stack {
     position: fixed;
-    left: 42vw; right: 0;
+    /* A BOUNDED COLUMN. It ran to the viewport's right edge (right: 0),
+       which no frame does — every one of them ends the plates with a
+       clear right margin, and the RETURN & REFUND frames put a third
+       column of copy beyond them. Read from the PNGs: the plates occupy
+       roughly 34%-74% of the frame width.
+       PROVISIONAL, and read BY EYE rather than measured: the source SVGs
+       are no longer on disk and the renders I still hold are aspect-
+       distorted, so these two numbers are the one thing here I could not
+       verify numerically. 1728x1117 PNG exports would settle them. */
+    left: 34vw; right: 26vw;
     top: var(--sup-top);
     max-height: calc(94vh - var(--sup-top));
     z-index: 12;
@@ -291,6 +306,7 @@
     transition: opacity var(--pop-fade), visibility 0s;
   }
   .sup-row {
+    position: relative;
     display: block; width: 100%;
     border: 0; margin: 0;
     background: var(--bsw-fill);
@@ -308,6 +324,28 @@
     letter-spacing: .01em;
     transition: color .16s, text-shadow .2s ease;
   }
+  /* THE PLATE'S MARKER — on the RIGHT (the company, Aug 25: "for them the
+     dots are on the right, reference the pngs"). Same warm-white marker
+     and the same fitted halo as the form's field dots, and the same
+     ranking grammar Eric already ratified there: dim at rest, full on the
+     plate under the pointer, full on the plate that is open. The vertical
+     offset is solved into --sup-dot-y from the TITLE's own font metrics,
+     exactly as the form's markers are. */
+  .sup-row::after {
+    content: ''; position: absolute;
+    right: calc(34px * var(--ui-scale));
+    top: var(--sup-dot-y, calc(29px * var(--ui-scale)));
+    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+    background: var(--sup-marker); border-radius: 50%;
+    box-shadow: var(--sup-marker-glow);
+    transform: translateY(-50%);
+    opacity: var(--sup-dot-rest);
+    transition: opacity .2s ease;
+  }
+  .sup-row.kb-hover::after,
+  .sup-row:focus-visible::after,
+  .sup-row.is-open::after { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .sup-row::after { transition: none; } }
   .sup-row.kb-hover, .sup-row:focus-visible { outline: none; background: #fefefe24; }
   .sup-row.kb-hover .sup-row-title, .sup-row:focus-visible .sup-row-title {
     color: #fff; text-shadow: var(--glow-text);
@@ -1305,6 +1343,18 @@ function alignMarkers(){
     var yy = capMidOf(lab);
     if (yy !== null) fs[j].style.setProperty('--sup-dot-y', yy.toFixed(2) + 'px');
   }
+  // The plates' right-hand markers ride the same solve, offset by the
+  // plate's own top padding since the marker is placed against the ROW
+  // while the metrics come from the TITLE inside it.
+  var rs = document.querySelectorAll('.sup-row');
+  for (var k = 0; k < rs.length; k++){
+    var ttl = rs[k].querySelector('.sup-row-title');
+    if (!ttl) continue;
+    var mid = capMidOf(ttl);
+    if (mid === null) continue;
+    var padTop = parseFloat(getComputedStyle(rs[k]).paddingTop) || 0;
+    rs[k].style.setProperty('--sup-dot-y', (padTop + mid).toFixed(2) + 'px');
+  }
 }
 
 // ── THE PLATE STACK — the panel items' whole detail level ────────────────
@@ -1351,6 +1401,7 @@ function buildStack(){
     rowEls.push(btn);
   });
   renderStrings(stackEl);
+  alignMarkers();      // the plates are new DOM — solve their markers too
 }
 // Picking a sub-item is what FILLS the stack (frames 1/2).
 function chooseSub(i, sIdx){
