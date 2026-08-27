@@ -69,12 +69,14 @@
   the C14 bridge); inside the locked window the wheel belongs to the
   panel's native scroll (the wheelNative seam in the shared chrome), and
   unlock hands it back. The Esc ladder walks ONE honest level per press
-  through ONE function, and the click grammar gives it a real fifth rung:
-  field focus -> LOCKED -> OPEN -> the cursor -> the page boundary. The
-  window now closes on its own press, because the cursor can outlive it.
-  (Rest and idle coincide here — nothing else holds state at rest, as on
-  /community.) Denial is visible and audible everywhere: the current
-  away-nav section, foreign axes, a frozen menu under the lock, invalid
+  through ONE function: field focus -> LOCKED -> plate -> sub -> item ->
+  the cursor -> the page boundary. (Rest and idle coincide here — nothing
+  else holds state at rest, as on /community.)
+  THE PAGE LOCK IS CANCELLED (Eric, Aug 25): the menu never freezes — at
+  any depth, hover carries the cursor, W/S and the wheel walk the menu,
+  and clicking another item switches to it. `locked` survives only as
+  LEVEL state (which face, the ladder, Tab gating). The remaining deny
+  shakes are not locks: the away-nav's current section and invalid
   submits.
 
   SUBMIT IS A LABELED STUB pending the wiring ruling (endpoint / mailto /
@@ -1102,29 +1104,37 @@ ITEMS.forEach(function(it, idx){
   // opens no window. Leaving retracts it: sticky hover existed only to
   // protect a window that hover had opened, and hover opens none now.
   b.addEventListener('mouseenter', function(){
-    if (C.rail.isTouch() || isLocked()) return;
+    if (C.rail.isTouch()) return;
     wake();
     if (focusIdx !== idx) setFocus(idx);
   });
   b.addEventListener('mouseleave', function(){
-    if (C.rail.isTouch() || isLocked()) return;
+    if (C.rail.isTouch()) return;
     if (focusIdx === idx) setFocus(-1);
   });
   // THE CLICK IS THE TRIGGER (RULED — the company, Aug 25). One click
-  // opens this item's window; a second click on the SAME item commits to
-  // the level below (door #1). Touch and mouse are now one grammar.
+  // opens this item; clicking the OPEN item again moves it one level —
+  // down into the form for CONTACT US, back up otherwise.
+  // THE PAGE LOCK IS CANCELLED (Eric, Aug 25: "we don't need to lock any
+  // page anymore"): the menu never freezes and nothing here denies.
+  // Clicking ANY other item — at any depth, a half-open form included —
+  // simply switches to it. The form's own half-filled values survive the
+  // switch in the DOM, so coming back finds them.
   b.addEventListener('click', function(){
     wake();
-    if (isLocked()){
-      // The menu is frozen under the lock (the home airlock precedent):
-      // the open item is one step BACK, anything else denies.
-      if (idx === openIdx){ if (clickOk()) goBack(); }
-      else denyLocked();
+    setFocus(idx);                                   // the click also carries the cursor
+    if (openIdx === idx){
+      if (!clickOk()) return;
+      // Door #1, level-aware: the form item commits down then retreats
+      // back; a panel item only ever retreats (its deeper levels — sub,
+      // plate — are chosen by their own controls, so there is nothing
+      // for the item itself to commit; goBack unwinds them one rung per
+      // press, exactly as Esc and the corner ‹ do).
+      if (isForm(idx) && !locked){ lock(); return; }
+      goBack();
       return;
     }
-    setFocus(idx);                                   // the click also carries the cursor
-    if (openIdx === idx){ if (clickOk()) lock(); return; }   // door #1 — commit
-    if (clickOk()) openFor(idx);                     // …otherwise OPEN this item
+    if (clickOk()) openFor(idx);                     // switching is never denied
   });
   slot.appendChild(b);
 
@@ -1495,7 +1505,6 @@ function setFocus(i){
   render();
 }
 function focusStep(dir){
-  if (isLocked()){ denyLocked(); return false; }
   var next;
   if (focusIdx < 0) next = dir > 0 ? 0 : ITEMS.length - 1;
   else {
@@ -1559,10 +1568,10 @@ function unlock(){
   render();
   SoundBus.play('detent'); hapticTick();
 }
-function denyLocked(){
-  var el = menuItems[openIdx];
-  if (el && !el.classList.contains('bs-shake')) denyOn(el);
-}
+// denyLocked is GONE with the page lock (Eric, Aug 25). The deny shakes
+// that REMAIN are not locks and are untouched: the away-nav's current
+// section (ruled cross-page grammar), invalid submits (validation law),
+// and the email capsule's copy failure (nothing fails silently).
 
 // ── THE ESC LADDER — one honest level per press, through ONE function ─────
 // field focus -> LOCKED -> OPEN -> the cursor -> boundary.
@@ -1840,16 +1849,28 @@ C.init({
   touchSurfaces: [document.getElementById('bs-stage'), menuEl],
   sweepRoots: [cornerEl, menuEl, panel, railEl, stackEl],
   hooks: {
-    isLocked:       isLocked,
-    denyLocked:     denyLocked,
+    // THE PAGE LOCK IS CANCELLED (Eric, Aug 25). The machine's lock
+    // gates — frozen menu, denied W/S and wheel, hover suppression,
+    // Enter suppression — all key off this hook, so reporting false
+    // retires the whole freeze in one place. The page KEEPS its internal
+    // `locked` level state: the Esc ladder, the window faces, the form
+    // door and Tab gating all still need to know WHICH level is showing;
+    // they just no longer freeze anything around it.
+    // The idle sweep is the one thing the machine's lock check was
+    // protecting (a half-filled form must never be swept by attract) —
+    // that guard moved into idleReset below, where it belongs.
+    isLocked:       function(){ return false; },
     goBack:         goBack,
     escapeFromRail: function(){ setFocus(0); },      // rail -> the primary surface
     enterAtPrimary: function(){
       // Enter is the CLICK's twin, rung for rung: it claims the cursor
-      // cold, then opens, then commits.
+      // cold, opens, and then walks the same level-aware door #1 —
+      // the form item commits down then retreats back; a panel item
+      // retreats (its deeper levels are chosen by their own controls).
       if (focusIdx < 0){ setFocus(0); return; }
       if (openIdx !== focusIdx){ openFor(focusIdx); return; }
-      lock();
+      if (isForm(focusIdx) && !locked){ lock(); return; }
+      goBack();
     },
     verticalStep:   function(down){
       // At the FIRST item, W/^ hands the cursor to the icon bar (the home
@@ -1884,7 +1905,14 @@ C.init({
     // Attract: everything pops back in — the window included. A LOCKED
     // window is exempt upstream (armIdle re-arms without resetting), so
     // a half-filled form is never swept away.
-    idleReset:      function(){ setFocus(-1); closeItem(); C.rail.focus(-1); },
+    idleReset:      function(){
+      setFocus(-1); C.rail.focus(-1);
+      // The machine used to skip idleReset entirely while the page was
+      // locked; with the lock cancelled the page guards itself: attract
+      // clears the cursor everywhere but never sweeps the FORM level —
+      // a half-filled form is the one state with something to lose.
+      if (!locked) closeItem();
+    },
     onLangChange:   function(T2){
       links.forEach(function(l){ l.textContent = T2(l.getAttribute('data-section')); });
       renderStrings();
