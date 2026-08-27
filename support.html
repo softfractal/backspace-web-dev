@@ -205,6 +205,140 @@
      link (var(--font-ui), 14px×ui, 15px line, letter-spacing 0), so
      font-weight is the ENTIRE delta. The HOME menu is untouched —
      its 14/600 rest is certified law. */
+  /* ── THE SUB-LIST — a second level INSIDE the menu ──────────────────
+     Frames 1/2: clicking FAQ opens a list beneath it and pushes every
+     item below it DOWN. Each main item therefore owns a SLOT, and the
+     sub-list lives inside its parent's slot rather than as a sibling in
+     the menu grid — a collapsed sibling would still take the grid's
+     30px gap on both sides and leave a hole in the menu. Inside the
+     slot, a collapsed list contributes exactly nothing.
+     The slot is itself a grid so the item's negative hit-area margins
+     cannot collapse against it.
+     GEOMETRY IS PROVISIONAL. These frames arrived as 7.5MB SVGs whose
+     text is outlined, and the mechanism was the brief — the exact-value
+     pass against them is owed before this ships. */
+  .bs-menu-slot { display: grid; }
+  .bs-sublist-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--pop-motion);
+  }
+  .bs-sublist-wrap.is-on { grid-template-rows: 1fr; }
+  .bs-sublist {
+    overflow: hidden;
+    display: grid;
+    gap: calc(16px * var(--ui-scale));
+  }
+  .bs-sublist > :first-child { margin-top: calc(18px * var(--ui-scale)); }
+  .bs-subitem {
+    position: relative;
+    /* Indented to sit under the POPPED parent's label — the parent is
+       always popped while its list is open, so the two align. */
+    padding-left: var(--side-menu-shift-x);
+    display: flex; align-items: center;
+    background: none; border: 0;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    line-height: calc(14px * var(--ui-scale));
+    letter-spacing: 0; white-space: nowrap; text-align: left;
+    text-shadow: var(--glow-text);
+    cursor: var(--cursor-target);
+    transition: color .16s, text-shadow .2s ease;
+  }
+  .bs-subitem.kb-hover, .bs-subitem:focus-visible {
+    color: #fff; outline: none; text-shadow: var(--glow-text-hover);
+  }
+  .bs-subitem.is-chosen { color: #fff; font-weight: 600; }
+  /* THE HOLLOW RING — the sub level's own marker, and a THIRD marker
+     vocabulary on this page: the main item's dot is SOLID signal red,
+     the form's field dot is warm white, and a chosen sub-item is an
+     OUTLINE ring in the same signal red. It sits in the same left
+     gutter as the parent's dot. Canon §9 entry owed. */
+  .bs-subitem.is-chosen::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+    border: 1px solid var(--color-signal-red);
+    border-radius: 50%;
+    box-shadow: 0 0 calc(9px * var(--ui-scale)) rgba(157, 31, 0, .45);
+    transform: translateY(-50%);
+  }
+
+  /* ── THE PLATE STACK — the right side for every panel item ───────────
+     Frames 1-4: a column of translucent plates that runs off the frame's
+     right edge, each expanding DOWNWARD in place and pushing the plates
+     below it down. This is NOT bs-window — there is no corner triangle
+     anywhere in these frames and no bounded frame; the plates carry the
+     window's FILL token and nothing else of it. */
+  #bs-stack {
+    position: fixed;
+    left: 42vw; right: 0;
+    top: var(--sup-top);
+    max-height: calc(94vh - var(--sup-top));
+    z-index: 12;
+    display: grid;
+    grid-auto-rows: max-content;
+    gap: calc(10px * var(--ui-scale));
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #ffffff5c transparent;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  #bs-stack.is-on {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transition: opacity var(--pop-fade), visibility 0s;
+  }
+  .sup-row {
+    display: block; width: 100%;
+    border: 0; margin: 0;
+    background: var(--bsw-fill);
+    padding: calc(20px * var(--ui-scale)) calc(34px * var(--ui-scale));
+    text-align: left;
+    cursor: var(--cursor-target);
+    transition: background .16s;
+  }
+  .sup-row-title {
+    display: block;
+    color: var(--text-soft);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(13px * var(--ui-scale));
+    line-height: calc(18px * var(--ui-scale));
+    letter-spacing: .01em;
+    transition: color .16s, text-shadow .2s ease;
+  }
+  .sup-row.kb-hover, .sup-row:focus-visible { outline: none; background: #fefefe24; }
+  .sup-row.kb-hover .sup-row-title, .sup-row:focus-visible .sup-row-title {
+    color: #fff; text-shadow: var(--glow-text);
+  }
+  .sup-row.is-open .sup-row-title {
+    color: var(--ink); font-weight: 600; text-shadow: var(--glow-text);
+  }
+  /* The downward expansion: 0fr -> 1fr animates to the content's OWN
+     height, which is the one way to travel to `auto` honestly. Rides the
+     house tempo — no local duration. */
+  .sup-row-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--pop-motion);
+  }
+  .sup-row.is-open .sup-row-body { grid-template-rows: 1fr; }
+  /* Spans, not divs: the plate is a <button>, which may only carry
+     phrasing content. The CSS gives them their boxes instead. */
+  .sup-row-body > span { display: block; overflow: hidden; }
+  .sup-row-copy {
+    display: block;
+    margin: calc(14px * var(--ui-scale)) 0 0;
+    color: var(--text-soft);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    line-height: 1.75;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bs-sublist-wrap, .sup-row-body { transition: none; }
+  }
+
   #bs-support-menu .bs-item { font-weight: 300; }
   #bs-support-menu .bs-item.kb-hover,
   #bs-support-menu .bs-item:focus-visible,
@@ -682,14 +816,12 @@
 
 <!-- THE WINDOW — the merged bs-window subsystem. Absent at rest (Eric,
      Aug 24: no seed square rests on stage; preview invokes the window). -->
+<!-- THE PLATE STACK — every panel item's detail. Built from the manifest;
+     no window, no triangle (the company, Aug 25, frames 1-4). -->
+<div id="bs-stack" role="region" aria-label="Details" aria-hidden="true"></div>
+
 <div id="bs-panel" class="bs-window is-hidden" role="region" aria-label="Support detail">
   <div class="sup-body" id="bs-panel-body">
-
-    <!-- PREVIEW: the excerpt. -->
-    <div class="sup-view" id="sup-view-excerpt">
-      <p class="sup-kicker sup-mark" id="sup-excerpt-kicker"></p>
-      <p class="sup-prose" id="sup-excerpt-copy"></p>
-    </div>
 
     <!-- LOCKED, entry view: request type (frame 1-2). -->
     <div class="sup-view" id="sup-view-request" hidden>
@@ -780,14 +912,54 @@ var arrivalFrom = window.__bsArrivalFrom;
 // through STR keys (Eric, Aug 24) — real copy swaps in at `excerpt`/`body`
 // with no code change, and `real: true` is the only flag that turns the
 // rail on. FAQ's sub-list is out of phase one; nothing here precludes it.
+// TWO KINDS OF ITEM (the company, Aug 25, frames 1-4):
+//   'form'  — CONTACT US alone. Opens the bs-window: request type, then
+//             the form. The only tertiary WINDOW on the page.
+//   'panel' — everything else. NO window. A click opens the item, and the
+//             detail lives in a STACK OF PLATES on the right that each
+//             EXPAND DOWNWARD in place. An item may also carry a SUB-LIST
+//             that opens inside the MENU itself, pushing the items below
+//             it down; picking a sub-item is what fills the stack.
+//             Frame 1/2 show FAQ with a sub-list; frame 3/4 show RETURN &
+//             REFUND POLICY going straight to its plates.
+//
+// STRUCTURE IS DATA, every string is an STR KEY: real copy replaces the
+// key lists (or the strings behind them) with NO code change. The lorem
+// shape below is chosen to exercise both item shapes, not to predict the
+// real one — how many subs and rows each item really has is a manifest
+// edit. Row bodies all point at supLoremBody for now; the real manifest
+// gives each row its own key.
+var LOREM_ROWS = ['supLoremRow1','supLoremRow2','supLoremRow3',
+                  'supLoremRow4','supLoremRow5','supLoremRow6'];
+function loremRows(n){
+  return LOREM_ROWS.slice(0, n).map(function(k){ return { key: k, body: 'supLoremBody' }; });
+}
 var ITEMS = [
-  { key: 'supContact',  real: true  },
-  { key: 'supFaq',      real: false },
-  { key: 'supWarranty', real: false },
-  { key: 'supReturn',   real: false },
-  { key: 'supGuides',   real: false },
-  { key: 'supBusiness', real: false }
+  { key: 'supContact',  kind: 'form' },
+  { key: 'supFaq',      kind: 'panel', subs: [
+      { key: 'supLoremSub1', rows: loremRows(6) },
+      { key: 'supLoremSub2', rows: loremRows(3) },
+      { key: 'supLoremSub3', rows: loremRows(5) },
+      { key: 'supLoremSub4', rows: loremRows(2) },
+      { key: 'supLoremSub5', rows: loremRows(4) }
+  ]},
+  { key: 'supWarranty', kind: 'panel', rows: loremRows(4) },
+  { key: 'supReturn',   kind: 'panel', rows: loremRows(5) },
+  { key: 'supGuides',   kind: 'panel', subs: [
+      { key: 'supLoremSub1', rows: loremRows(3) },
+      { key: 'supLoremSub2', rows: loremRows(6) }
+  ]},
+  { key: 'supBusiness', kind: 'panel', rows: loremRows(3) }
 ];
+function isForm(i){ return i >= 0 && ITEMS[i].kind === 'form'; }
+function subsOf(i){ return (i >= 0 && ITEMS[i].subs) || null; }
+// The rows a given (item, sub) shows — an item with subs has none of its own.
+function rowsFor(i, sub){
+  if (i < 0) return null;
+  var ss = subsOf(i);
+  if (ss) return (sub >= 0 && ss[sub]) ? ss[sub].rows : null;
+  return ITEMS[i].rows || null;
+}
 // Request types — PLACEHOLDER SET pending Eric's manifest confirm.
 var REQ_TYPES = ['supReqConsulting', 'supReqOrder', 'supReqWarranty', 'supReqReturns', 'supReqBusiness'];
 
@@ -803,14 +975,11 @@ document.getElementById('bs-wordmark-link').setAttribute('href', C.ROUTES.home);
 var menuEl   = document.getElementById('bs-support-menu');
 var panel    = document.getElementById('bs-panel');
 var panelBody= document.getElementById('bs-panel-body');
-var vExcerpt = document.getElementById('sup-view-excerpt');
 var vRequest = document.getElementById('sup-view-request');
 var vForm    = document.getElementById('sup-view-form');
 var optionsEl= document.getElementById('sup-options');
 var railEl   = document.getElementById('bs-rail');
 var chosenEl = document.getElementById('sup-f-type');
-var excerptKicker = document.getElementById('sup-excerpt-kicker');
-var excerptCopy   = document.getElementById('sup-excerpt-copy');
 var noteEl   = document.getElementById('sup-note');
 // The note is dual-purpose: static copy from a STR key, AND a transient
 // submit/validation message. Writing textContent alone meant a locale swap
@@ -850,7 +1019,11 @@ function renderStrings(root){
 // view    : which face the window is rendering.
 var focusIdx = -1;
 var openIdx  = -1;
-var locked   = false;
+// PANEL items only: which sub-item is chosen inside the open item, and
+// which plate in the stack is expanded. Both -1 when they do not apply.
+var subIdx   = -1;
+var rowIdx   = -1;
+var locked   = false;   // FORM item only — the form is showing
 var view     = 'excerpt';        // 'excerpt' | 'request' | 'form'
 var chosenType = null;           // STR key of the chosen request type
 var menuItems = [];
@@ -858,7 +1031,16 @@ var menuItems = [];
 function isLocked(){ return locked; }
 
 // ── Menu build — .bs-item consumed verbatim from the shared chrome ────────
+var subWraps = [];   // per item: the sub-list's animating wrapper, or null
+var subEls   = [];   // per item: its sub-item buttons, or null
+
 ITEMS.forEach(function(it, idx){
+  // Each item owns a SLOT. Its sub-list lives inside that slot, so a
+  // collapsed list adds nothing to the menu's rhythm (a sibling would
+  // still collect the grid's gap on both sides).
+  var slot = document.createElement('div');
+  slot.className = 'bs-menu-slot';
+
   var b = document.createElement('button');
   b.type = 'button';
   b.className = 'bs-item';
@@ -897,7 +1079,44 @@ ITEMS.forEach(function(it, idx){
     if (openIdx === idx){ if (clickOk()) lock(); return; }   // door #1 — commit
     if (clickOk()) openFor(idx);                     // …otherwise OPEN this item
   });
-  menuEl.appendChild(b);
+  slot.appendChild(b);
+
+  // The sub-list, if this item has one.
+  var ss = subsOf(idx);
+  if (ss){
+    var wrap = document.createElement('div');
+    wrap.className = 'bs-sublist-wrap';
+    var list = document.createElement('div');
+    list.className = 'bs-sublist';
+    var mine = [];
+    ss.forEach(function(sub, sIdx){
+      var sb = document.createElement('button');
+      sb.type = 'button';
+      sb.className = 'bs-subitem';
+      sb.setAttribute('data-str', sub.key);
+      sb.tabIndex = -1;
+      sb.addEventListener('mouseenter', function(){
+        if (!C.rail.isTouch()) sb.classList.add('kb-hover');
+      });
+      sb.addEventListener('mouseleave', function(){ sb.classList.remove('kb-hover'); });
+      sb.addEventListener('click', function(e){
+        e.stopPropagation();
+        wake();
+        if (clickOk()) chooseSub(idx, sIdx);
+      });
+      list.appendChild(sb);
+      mine.push(sb);
+    });
+    wrap.appendChild(list);
+    slot.appendChild(wrap);
+    subWraps.push(wrap);
+    subEls.push(mine);
+  } else {
+    subWraps.push(null);
+    subEls.push(null);
+  }
+
+  menuEl.appendChild(slot);
   menuItems.push(b);
 });
 
@@ -978,12 +1197,10 @@ var FORM_CAP_VH = 53.71;
 // survives only as the lorem items' own two levels.
 //   PREVIEW   real -> the request-type face   ·  lorem -> its excerpt
 //   LOCKED    real -> the form                ·  lorem -> its deeper body
-function faceFor(i, locked){
-  if (i < 0) return 'excerpt';
-  if (ITEMS[i].real) return locked ? 'form' : 'request';
-  return 'excerpt';
-}
-function viewEl(){ return view === 'form' ? vForm : (view === 'request' ? vRequest : vExcerpt); }
+// Only the FORM item ever opens the window, so its two faces are the
+// only faces. Panel items live entirely in the menu and the stack.
+function faceFor(i, locked){ return locked ? 'form' : 'request'; }
+function viewEl(){ return view === 'form' ? vForm : vRequest; }
 function measurePanel(){
   var el = viewEl();
   var was = el.hidden;
@@ -1003,13 +1220,8 @@ function sizePanel(){ panel.style.height = measurePanel() + 'px'; }
 // Fill and show item i's face at the given level.
 function setFace(i, locked){
   view = faceFor(i, locked);
-  vExcerpt.hidden = (view !== 'excerpt');
   vRequest.hidden = (view !== 'request');
   vForm.hidden    = (view !== 'form');
-  if (i >= 0 && !ITEMS[i].real){
-    excerptKicker.textContent = T(ITEMS[i].key);
-    excerptCopy.textContent   = locked ? T('supLoremBody') : T('supLoremExcerpt');
-  }
   if (view === 'request') setOptionFocus(-1);
   renderChosen();
   sizePanel();
@@ -1095,6 +1307,67 @@ function alignMarkers(){
   }
 }
 
+// ── THE PLATE STACK — the panel items' whole detail level ────────────────
+// Built from the manifest every time (openIdx, subIdx) changes. Each plate
+// expands DOWNWARD in place; one at a time, which is what the frames draw.
+var stackEl = document.getElementById('bs-stack');
+var rowEls  = [];
+function buildStack(){
+  var rows = rowsFor(openIdx, subIdx);
+  stackEl.innerHTML = '';
+  rowEls = [];
+  rowIdx = -1;
+  if (!rows) return;
+  rows.forEach(function(r, i){
+    // Phrasing content only — a <button> may not carry <div>/<p>, so the
+    // plate is spans throughout and the CSS gives them their boxes.
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sup-row';
+    btn.setAttribute('aria-expanded', 'false');
+    var title = document.createElement('span');
+    title.className = 'sup-row-title';
+    title.setAttribute('data-str', r.key);
+    var body = document.createElement('span');
+    body.className = 'sup-row-body';
+    var clip = document.createElement('span');       // the overflow clip
+    var copy = document.createElement('span');
+    copy.className = 'sup-row-copy';
+    copy.setAttribute('data-str', r.body);
+    clip.appendChild(copy);
+    body.appendChild(clip);
+    btn.appendChild(title);
+    btn.appendChild(body);
+    btn.addEventListener('mouseenter', function(){
+      if (!C.rail.isTouch()) btn.classList.add('kb-hover');
+    });
+    btn.addEventListener('mouseleave', function(){ btn.classList.remove('kb-hover'); });
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      wake();
+      if (clickOk()) toggleRow(i);
+    });
+    stackEl.appendChild(btn);
+    rowEls.push(btn);
+  });
+  renderStrings(stackEl);
+}
+// Picking a sub-item is what FILLS the stack (frames 1/2).
+function chooseSub(i, sIdx){
+  if (openIdx !== i) return;
+  subIdx = sIdx;
+  buildStack();
+  SoundBus.play('commit'); hapticTick();
+  render();
+}
+// One plate open at a time — pressing the open one closes it.
+function toggleRow(i){
+  var opening = (rowIdx !== i);
+  rowIdx = opening ? i : -1;
+  SoundBus.play(opening ? 'commit' : 'detent'); hapticTick();
+  render();
+}
+
 // ── Render from state ─────────────────────────────────────────────────────
 function render(){
   for (var i = 0; i < menuItems.length; i++){
@@ -1118,9 +1391,31 @@ function render(){
   backBtn.setAttribute('aria-label', openIdx >= 0 ? T('navBack') : T('navHome'));
   // The form door empties while the form is up (see .sup-door.is-active).
   doorBtn.classList.toggle('is-active', isLocked());
-  var railOn = openIdx >= 0 && ITEMS[openIdx].real;
+  var railOn = isForm(openIdx);
   railEl.classList.toggle('is-on', railOn);
   railEl.setAttribute('aria-hidden', String(!railOn));
+  // THE SUB-LISTS: only the open item's list is out, and only its chosen
+  // sub carries the hollow ring. Tab reaches a list only while it is out.
+  for (var w = 0; w < subWraps.length; w++){
+    if (!subWraps[w]) continue;
+    var on = (w === openIdx);
+    subWraps[w].classList.toggle('is-on', on);
+    for (var q = 0; q < subEls[w].length; q++){
+      subEls[w][q].classList.toggle('is-chosen', on && q === subIdx);
+      subEls[w][q].tabIndex = on ? 0 : -1;
+    }
+  }
+  // THE STACK: present whenever the open panel item has rows to show —
+  // which, for an item WITH a sub-list, means only after a sub is picked.
+  var stackRows = rowsFor(openIdx, subIdx);
+  var stackOn = !isForm(openIdx) && !!stackRows && stackRows.length > 0;
+  stackEl.classList.toggle('is-on', stackOn);
+  stackEl.setAttribute('aria-hidden', String(!stackOn));
+  for (var r2 = 0; r2 < rowEls.length; r2++){
+    rowEls[r2].classList.toggle('is-open', r2 === rowIdx);
+    rowEls[r2].setAttribute('aria-expanded', String(r2 === rowIdx));
+    rowEls[r2].tabIndex = stackOn ? 0 : -1;
+  }
   // Tab enters the FORM only when locked (the machine law). The options
   // are the PREVIEW's own control, so they are reachable while it is up.
   var tabbable = isLocked();
@@ -1158,18 +1453,28 @@ function focusStep(dir){
 function openFor(i){
   openIdx = i;
   locked = false;
+  subIdx = -1;
   SoundBus.play('commit'); hapticTick();
-  drawPanel(i, false);
+  if (isForm(i)){
+    buildStack();               // clears it — the form item has no plates
+    drawPanel(i, false);        // …and the window draws instead
+  } else {
+    hidePanel();                // panel items never open the window
+    buildStack();               // empty until a sub is picked, if it has subs
+  }
   render();
 }
-function closeWindow(){
+function closeItem(){
   if (openIdx < 0) return;
   openIdx = -1;
   locked = false;
-  // Never leave the keyboard inside a window that is going away.
+  subIdx = -1;
+  // Never leave the keyboard inside a surface that is going away. The MENU
+  // is deliberately excluded — the cursor outlives the item it opened.
   var a = document.activeElement;
-  if (a && panel.contains(a) && a.blur) a.blur();
+  if (a && (panel.contains(a) || stackEl.contains(a)) && a.blur) a.blur();
   hidePanel();
+  buildStack();
   render();
 }
 
@@ -1228,12 +1533,22 @@ function goBack(){
     unlock();
     return;
   }
-  // 3. OPEN retracts the window. The cursor SURVIVES it — it was never
-  //    the thing that opened it.
-  if (openIdx >= 0){ lastRung = 'window'; closeWindow(); return; }
-  // 4. the cursor clears.
+  // 3. a PANEL item unwinds its own two levels before the item closes:
+  //    the expanded plate first, then the chosen sub-item.
+  if (rowIdx >= 0){ lastRung = 'plate'; rowIdx = -1; render(); return; }
+  if (subIdx >= 0){
+    lastRung = 'sub';
+    subIdx = -1;
+    buildStack();
+    render();
+    return;
+  }
+  // 4. OPEN retracts the item. The cursor SURVIVES it — it was never the
+  //    thing that opened it.
+  if (openIdx >= 0){ lastRung = 'window'; closeItem(); return; }
+  // 5. the cursor clears.
   if (focusIdx >= 0){ lastRung = 'cursor'; setFocus(-1); return; }
-  // 5. rest -> the page boundary (a TRUE history pop; cold boot is silent).
+  // 6. rest -> the page boundary (a TRUE history pop; cold boot is silent).
   lastRung = 'boundary';
   if (arrival) popBoundary();
 }
@@ -1335,7 +1650,7 @@ emailBtn.addEventListener('click', function(){
 // denies until it is set). From PREVIEW this is a COMMIT.
 doorBtn.addEventListener('click', function(){
   wake();
-  if (openIdx < 0 || !ITEMS[openIdx].real) return;
+  if (!isForm(openIdx)) return;
   if (!isLocked()){
     if (!clickOk()) return;
     lock();
@@ -1463,7 +1778,7 @@ C.init({
       trayItems: function(){ return links; } }
   ],
   touchSurfaces: [document.getElementById('bs-stage'), menuEl],
-  sweepRoots: [cornerEl, menuEl, panel, railEl],
+  sweepRoots: [cornerEl, menuEl, panel, railEl, stackEl],
   hooks: {
     isLocked:       isLocked,
     denyLocked:     denyLocked,
@@ -1491,6 +1806,10 @@ C.init({
     // belongs to the panel's native scroll and the bridge hands off
     // entirely (ends clamp silently, as everywhere).
     wheelNative:    function(e){
+      // The STACK owns its wheel whenever it can actually scroll.
+      if (stackEl.contains(e.target)){
+        return stackEl.scrollHeight > stackEl.clientHeight + 1;
+      }
       if (!panelBody.contains(e.target)) return false;
       if (isLocked()) return true;          // the locked panel owns its wheel outright
       // While merely OPEN the wheel still belongs to the MENU, so the
@@ -1505,7 +1824,7 @@ C.init({
     // Attract: everything pops back in — the window included. A LOCKED
     // window is exempt upstream (armIdle re-arms without resetting), so
     // a half-filled form is never swept away.
-    idleReset:      function(){ setFocus(-1); closeWindow(); C.rail.focus(-1); },
+    idleReset:      function(){ setFocus(-1); closeItem(); C.rail.focus(-1); },
     onLangChange:   function(T2){
       links.forEach(function(l){ l.textContent = T2(l.getAttribute('data-section')); });
       renderStrings();
@@ -1520,7 +1839,8 @@ C.init({
       if (openIdx >= 0) sizePanel();
     },
     devState:       function(){
-      return { focusIdx: focusIdx, openIdx: openIdx, locked: locked, view: view, rung: lastRung,
+      return { focusIdx: focusIdx, openIdx: openIdx, subIdx: subIdx, rowIdx: rowIdx,
+               locked: locked, view: view, rung: lastRung,
                chosenType: chosenType, menuPitch: menuPitch, arrival: arrival,
                railOn: railEl.classList.contains('is-on') };
     }
@@ -1542,7 +1862,7 @@ window.addEventListener('resize', function(){
 window.addEventListener('pageshow', function(e){
   if (e.persisted){
     _leaving = false;
-    closeWindow();
+    closeItem();
     setFocus(-1);
     C.rail.focus(-1);
   }

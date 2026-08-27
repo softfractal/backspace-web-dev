@@ -111,6 +111,24 @@ var STR = {
     // content (Eric, Aug 24). Real copy swaps in at these keys — no code
     // changes.
     supLoremExcerpt: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    // ── The five non-anchor items run the EXPAND-DOWNWARD model (the
+    // company, Aug 25, frames 1-4): a sub-list opens inside the MENU, and
+    // the right side is a STACK OF PLATES that each expand in place. No
+    // window, no form — that treatment belongs to CONTACT US alone.
+    // These lorem keys stand in for the real copy. The manifest in
+    // support.html lists KEYS, so the real content replaces these strings
+    // (or points at new keys) with no code change.
+    supLoremSub1:  'lorem ipsum dolor',
+    supLoremSub2:  'consectetur adipiscing',
+    supLoremSub3:  'sed do eiusmod tempor',
+    supLoremSub4:  'incididunt ut labore',
+    supLoremSub5:  'magna aliqua enim',
+    supLoremRow1:  'lorem ipsum dolor sit amet?',
+    supLoremRow2:  'consectetur adipiscing elit?',
+    supLoremRow3:  'sed do eiusmod tempor incididunt?',
+    supLoremRow4:  'ut labore et dolore magna aliqua?',
+    supLoremRow5:  'quis nostrud exercitation ullamco?',
+    supLoremRow6:  'duis aute irure dolor in reprehenderit?',
     supLoremBody:    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
   },
   zh: { /* populated when CN content lands; lookups fall back to en */ },
