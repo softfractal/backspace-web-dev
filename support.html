@@ -293,8 +293,37 @@
        Revert = restore `, text-shadow .2s ease`. */
     transition: color .16s;
   }
+  /* LABELED PERF DEVIATION #2 (Eric, Aug 25: still lagging after the
+     snap — so the ramp was not the bill, ONE PAINT of the chain was).
+     PROFILED at 1728x1117 with a 25-crossing/s sweep: the full 12-ring
+     chain ran 14.6ms/frame with spikes past 25ms; REMOVING THE 184px
+     RING ALONE returned it to 8.5ms with zero spikes, and dropping 96px
+     too bought nothing further (8.3). The 184px TEXT ring is the entire
+     lag — the same radius already killed once as a FILTER ring for the
+     same reason (software phase, 6.8x paint, on record); its text-shadow
+     exemption was about serial texture inflation, not about a 184px blur
+     kernel being free to rasterize.
+     THE GLOW COST OF THE TRIM IS NOISE, harness-measured: near-halo
+     52.5 -> 52.3 (-0.4%), peak unchanged 67, total -4.4% — all of it
+     far wash past 32px, which is REACH, NOT INTENSITY (law rule 2).
+     So this list is --glow-text-icons-word VERBATIM minus its 184px
+     ring — 7 base + the 4 comp rings, var()s resolving against this
+     element's own --wg-fh exactly as the token's do. The TOKEN is
+     untouched; community and the utility trays keep their certified
+     chain. A reach change strictly needs a reach ruling — Eric's lag
+     report is treated as that ruling for THIS surface; one line returns
+     the token if his eye disagrees. */
   .bs-subitem.kb-hover, .bs-subitem:focus-visible {
-    color: #fff; outline: none; text-shadow: var(--glow-text-icons-word);
+    color: #fff; outline: none;
+    text-shadow:
+      0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1),
+      0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95),
+      0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75),
+      0 0 96px rgba(255,255,255,0.5),
+      0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))),
+      0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))),
+      0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95))),
+      0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95)));
   }
   .bs-subitem.is-chosen { color: #fff; font-weight: 600; }
   /* THE HOLLOW RING — the sub level's own marker, and a THIRD marker
