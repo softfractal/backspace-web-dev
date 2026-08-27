@@ -231,6 +231,23 @@
     display: grid;
     gap: calc(16px * var(--ui-scale));
   }
+  /* THE LAST ITEM'S DESCENDERS live inside this clip. The sub-items'
+     line box (14px) is TIGHTER than the face's natural box (measured:
+     ascent+descent = 12px at an 8.4px rendering — ink pokes 1.25px past
+     the box both ways). Mid-list that ink paints into the 16px gap; on
+     the LAST item it crossed the overflow edge and was cut (Eric,
+     Aug 25). The room is padding on the LAST CHILD, deliberately NOT on
+     the clipped list itself: border-box clamps a 0-height box at its own
+     padding, so list padding held every COLLAPSED sub-list open by a
+     phantom 5.6px (measured) and broke the closed-contributes-nothing
+     invariant. A child's padding collapses with the clip. */
+  .bs-sublist > :last-child { padding-bottom: calc(8px * var(--ui-scale)); }
+  /* The flex-centred label sits in the CONTENT box, so the padded last
+     item's text rides high while its ring's top:50% is padding-box —
+     re-centre the ring on the text by half the padding. */
+  .bs-sublist > :last-child.is-chosen::before {
+    top: calc(50% - 4px * var(--ui-scale));
+  }
   .bs-sublist > :first-child { margin-top: calc(18px * var(--ui-scale)); }
   .bs-subitem {
     position: relative;
@@ -261,7 +278,20 @@
        and total scale with the lamp. */
     text-shadow: var(--glow-text-word);
     cursor: var(--cursor-target);
-    transition: color .16s, text-shadow .2s ease;
+    /* LABELED PERF DEVIATION (Eric, Aug 25: hovering these lags the
+       page): text-shadow is NOT transitioned here — the glow SNAPS on.
+       The certified .2s shadow ease interpolates a 2-shadow rest list
+       against the 12-ring hover chain, so Chrome pads the lists and
+       repaints ALL TWELVE growing shadows — 96px and 184px rings
+       included — every frame for 200ms, and a swipe down the list runs
+       several such transitions at once inside this clip. Snapping makes
+       the hover ONE paint of the finished chain. Precedent: the icon
+       FILTER transition was measured DISCRETE and shipped that way
+       (software phase, on record). The landed intensity is untouched —
+       only the ramp is gone. Community's row keeps its certified ramp;
+       if Eric's eye wants the snap there too, it is the same one line.
+       Revert = restore `, text-shadow .2s ease`. */
+    transition: color .16s;
   }
   .bs-subitem.kb-hover, .bs-subitem:focus-visible {
     color: #fff; outline: none; text-shadow: var(--glow-text-icons-word);
