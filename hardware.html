@@ -174,8 +174,9 @@
     z-index: 16;
     display: grid;
     /* INTRODUCTION 242.4 → CUSTOM 293.4 collapsed: 51 frame-px header
-       pitch; 18px×ui line boxes leave 33px×ui of gap. */
-    gap: calc(33px * var(--ui-scale));
+       pitch, HELD through the halving — the 9px×ui line boxes leave
+       42px×ui of gap so the drawn rhythm survives the fifth word. */
+    gap: calc(42px * var(--ui-scale));
     color: var(--text-soft);
     justify-items: end;
   }
@@ -188,8 +189,14 @@
        certified 600-rest exclusion as heading-class controls; open
        state distinguishes by ink, not weight. */
     font-family: var(--font-ui); font-weight: 600;
-    font-size: calc(17px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
-    line-height: calc(18px * var(--ui-scale));
+    /* HALVED FROM THE OASIS RUNG (Eric, Aug 28 fifth word: the heads
+       had landed at the title's own 17px; his eye rules them to half —
+       small letterspaced caps over the larger item rows). 8.5px×ui
+       sits below the system's smallest shipped rung (11px) — legibility
+       flagged on the record, one line re-tunes; the §5.1 live-text
+       confirm still closes the rung class. */
+    font-size: calc(8.5px * var(--ui-scale));
+    line-height: calc(9px * var(--ui-scale));
     letter-spacing: .08em;
     text-align: right; white-space: nowrap;
     text-shadow: var(--glow-text-word);
