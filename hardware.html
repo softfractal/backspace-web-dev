@@ -571,7 +571,62 @@
      total renders "—" to its marked seam (source unruled; the $3,499
      bug never returns); view cart + checkout DENY to seams until the
      cart page and the commerce ruling land. */
+  /* EXPANDABLE (Eric's sixth word, p1): clicking the CART text calls
+     the row up and collapses it. Collapsed = the B-2 strip — a slim
+     surface bar at the stage's own center span (322..1379 → 18.63vw,
+     w 61.17vw, top 95.34vh) with the corner triangle, an inset rule
+     and the label. Expanded = the full band. Both travel on the house
+     tempo; adding to cart calls the row up. */
   #hw-tray { position: fixed; inset: 0; z-index: 14; pointer-events: none; }
+  #hw-tray-strip {
+    position: absolute;
+    left: 18.63vw; top: 95.34vh;
+    width: 61.17vw; height: calc(100vh - 95.34vh);
+    background: var(--bsw-fill);
+    border: 0; padding: 0;
+    pointer-events: auto;
+    cursor: var(--cursor-target);
+    opacity: 1;
+    transition: opacity var(--pop-fade), visibility 0s, background .16s;
+  }
+  #hw-tray-strip:hover, #hw-tray-strip:focus-visible { background: #fefefe24; outline: none; }
+  #hw-tray.is-open #hw-tray-strip {
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  .hw-strip-tri {
+    position: absolute; top: 0; left: 0;
+    width: calc(9px * var(--ui-scale)); height: calc(12px * var(--ui-scale));
+    background: linear-gradient(to bottom right,
+      var(--ink) calc(50% - .5px), transparent calc(50% + .5px));
+  }
+  .hw-strip-rule {
+    position: absolute;
+    left: calc(30px * var(--ui-scale)); right: calc(35px * var(--ui-scale));
+    top: calc(25px * var(--ui-scale));
+    height: 1px; background: var(--panel-line);
+  }
+  .hw-strip-label {
+    position: absolute;
+    left: calc(31px * var(--ui-scale)); top: calc(33px * var(--ui-scale));
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .08em;
+  }
+  #hw-tray-band {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    opacity: 0; visibility: hidden;
+    transform: translateY(calc(24px * var(--ui-scale)));
+    transition: opacity var(--pop-fade), transform var(--pop-motion),
+                visibility 0s var(--pop-fade-duration);
+  }
+  #hw-tray.is-open #hw-tray-band {
+    opacity: 1; visibility: visible; transform: none;
+    transition: opacity var(--pop-fade), transform var(--pop-motion), visibility 0s;
+  }
+  #hw-tray-band > * { pointer-events: auto; }
   .hw-tray-rule, .hw-tray-rail {
     position: absolute; background: var(--panel-line); pointer-events: none;
   }
@@ -583,34 +638,64 @@
   .hw-tray-label {
     position: absolute; left: 5.50vw; top: 85.45vh;
     color: var(--text-soft);
+    background: none; border: 0; padding: 0;
     font-family: var(--font-ui); font-weight: 300;
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .08em;
-    pointer-events: none;
+    cursor: var(--cursor-target);
+    transition: color .16s;
   }
+  .hw-tray-label:hover, .hw-tray-label:focus-visible {
+    color: #fff; outline: none; text-shadow: var(--glow-text);
+  }
+  /* UNLIMITED items (Eric's sixth word): the slot row is a horizontal
+     SCROLLER spanning the rail-to-divider region; the wheel belongs to
+     it natively when it can scroll (the wheelNative seam). */
   #hw-slots {
     position: absolute; left: 5.50vw; top: 89.08vh;
+    right: calc(29.22vw + 14px);
     display: flex; gap: calc(25px * var(--ui-scale));
+    overflow-x: auto; overflow-y: hidden;
+    padding-bottom: calc(6px * var(--ui-scale));
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #ffffff5c transparent;
     pointer-events: auto;
   }
+  #hw-slots::-webkit-scrollbar { height: calc(5px * var(--ui-scale)); }
+  #hw-slots::-webkit-scrollbar-thumb { background: #ffffff5c; }
+  #hw-slots::-webkit-scrollbar-track { background: transparent; }
   .hw-slot {
     position: relative;
+    flex: none;
     width: calc(160px * var(--ui-scale)); height: calc(90px * var(--ui-scale));
     background: #4a4a4a5c;
     border: 0; padding: 0;
     transition: background .16s;
   }
-  .hw-slot::before {
-    content: ''; position: absolute; top: 0; left: 0;
-    width: calc(9px * var(--ui-scale)); height: calc(9px * var(--ui-scale));
-    background: #fefefe2b;
-    transition: background .16s;
-  }
-  .hw-slot.is-filled { cursor: var(--cursor-target); }
-  .hw-slot.is-filled::before { background: #fefefe; }
+  .hw-slot.is-filled { cursor: var(--cursor-target); }   /* body click = preview */
   .hw-slot.is-filled:hover, .hw-slot.is-filled:focus-visible {
     background: #5c5c5c5c; outline: none;
   }
+  /* THE TRIANGLE CHECKBOX (Eric's sixth word + the B-2 note: 实心 =
+     checked, 空心 = unchecked): replaces the square tick AND the old
+     remove-on-click. Checked items are the ones that check out; the X
+     that deletes lives on the cart page's summary cards. */
+  .hw-slot-tri {
+    position: absolute; top: 0; left: 0;
+    width: calc(11px * var(--ui-scale)); height: calc(11px * var(--ui-scale));
+    display: block;
+    cursor: var(--cursor-target);
+    overflow: visible;
+  }
+  .hw-slot-tri path {
+    fill: none; stroke: #fefefe99; stroke-width: 1.1;
+    vector-effect: non-scaling-stroke;
+    transition: fill .16s, stroke .16s;
+  }
+  .hw-slot-tri.is-checked path { fill: #fefefe; stroke: #fefefe; }
+  .hw-slot-tri:hover path, .hw-slot-tri:focus-visible path { stroke: #fff; filter: drop-shadow(0 0 4px rgba(255,255,255,.6)); }
+  .hw-slot-tri:focus-visible { outline: none; }
   .hw-slot-name {
     position: absolute; left: calc(9px * var(--ui-scale)); bottom: calc(7px * var(--ui-scale));
     color: var(--text-soft);
@@ -705,7 +790,7 @@
     from = sessionStorage.getItem('bs-nav-from');
     sessionStorage.removeItem('bs-nav-from');
   } catch (e) {}
-  window.__bsArrival = (from === 'home' || from === 'software' || from === 'community' || from === 'support');
+  window.__bsArrival = (from === 'home' || from === 'software' || from === 'community' || from === 'support' || from === 'cart');
   window.__bsArrivalFrom = window.__bsArrival ? from : null;
   if (window.__bsArrival && !(window.CSS && CSS.supports && CSS.supports('view-transition-name: a'))){
     document.documentElement.classList.add('bs-arrive');
@@ -785,7 +870,14 @@
      Slots are built by the script; view cart + checkout deny to seams
      until the dedicated cart page and the commerce ruling land. -->
 <div id="hw-tray" aria-label="Cart">
-  <span class="hw-tray-label" data-str="hwCart"></span>
+  <!-- Collapsed: the B-2 strip. Clicking it calls the row up. -->
+  <button id="hw-tray-strip" type="button" aria-expanded="false" aria-label="Open cart row">
+    <span class="hw-strip-tri" aria-hidden="true"></span>
+    <span class="hw-strip-rule" aria-hidden="true"></span>
+    <span class="hw-strip-label" data-str="hwCart"></span>
+  </button>
+  <div id="hw-tray-band">
+  <button class="hw-tray-label" id="hw-tray-toggle" type="button" data-str="hwCart" aria-label="Collapse cart row"></button>
   <span class="hw-tray-rule" aria-hidden="true"></span>
   <span class="hw-tray-rail hw-tray-rail--l" aria-hidden="true"></span>
   <span class="hw-tray-rail hw-tray-rail--r" aria-hidden="true"></span>
@@ -801,11 +893,13 @@
     <button id="hw-checkout" class="hw-tray-btn" type="button" data-str="hwCheckout"></button>
     <button id="hw-viewcart" class="hw-tray-btn" type="button" data-str="hwViewCart"></button>
   </div>
+  </div><!-- /hw-tray-band -->
 </div>
 
 <input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
 
 <script src="shared/bs-chrome.js"></script>
+<script src="shared/bs-ball.js"></script>
 <script>
 (function(){
 'use strict';
@@ -1044,179 +1138,9 @@ function setRightFocus(i){
   render();
 }
 
-// ── The ball — the stage-binding seam's phase-one backend ────────────────
-var Ball = (function(){
-  var gl = null, prog = null, canvas = ballEl, nTri = 0;
-  var U = {};
-  var cur = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1, cx: 0.47, cy: 0.55, rad: 0.21 };
-  var tgt = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1, cx: 0.47, cy: 0.55, rad: 0.21 };
-  var running = false, visible = true, rot = 0, lastT = 0;
-
-  function buildSphere(rows, cols){
-    var pos = [], idx = [];
-    for (var r = 0; r <= rows; r++){
-      var phi = Math.PI * r / rows;
-      for (var c2 = 0; c2 <= cols; c2++){
-        var th = 2 * Math.PI * c2 / cols;
-        var x = Math.sin(phi) * Math.cos(th), y = Math.cos(phi), z = Math.sin(phi) * Math.sin(th);
-        pos.push(x, y, z);
-      }
-    }
-    for (var r2 = 0; r2 < rows; r2++){
-      for (var c3 = 0; c3 < cols; c3++){
-        var a = r2 * (cols + 1) + c3, b2 = a + cols + 1;
-        idx.push(a, b2, a + 1, b2, b2 + 1, a + 1);
-      }
-    }
-    return { pos: new Float32Array(pos), idx: new Uint16Array(idx) };
-  }
-
-  var VS = [
-    'attribute vec3 aPos;',
-    'uniform vec2 uRes; uniform vec2 uCenter; uniform float uRadius; uniform float uRot;',
-    'varying vec3 vN; varying vec3 vP;',
-    'void main(){',
-    '  float cr = cos(uRot), sr = sin(uRot);',
-    '  vec3 p = vec3(aPos.x*cr + aPos.z*sr, aPos.y, -aPos.x*sr + aPos.z*cr);',
-    '  vN = p; vP = p;',
-    '  vec2 px = uCenter + p.xy * uRadius * vec2(1.0, -1.0);',
-    '  vec2 ndc = (px / uRes) * 2.0 - 1.0;',
-    '  gl_Position = vec4(ndc.x, -ndc.y, -p.z * 0.001, 1.0);',   // front hemisphere depth-wins
-    '}'
-  ].join('\n');
-  var FS = [
-    // A studio read for the material ball: key + fill, a vertical
-    // gradient environment with an overhead softbox sampled along the
-    // view reflection, fresnel-weighted — metals reflect the room in
-    // their own tint, dielectrics carry lit albedo + white spec. The
-    // GLB phase brings real IBL; this is the placeholder's honest lie.
-    'precision mediump float;',
-    'varying vec3 vN; varying vec3 vP;',
-    'uniform vec3 uColor; uniform float uMetal; uniform float uRough;',
-    'void main(){',
-    '  vec3 N = normalize(vN);',
-    '  vec3 V = vec3(0.0, 0.0, 1.0);',
-    '  vec3 R = reflect(-V, N);',
-    '  float NdV = max(dot(N, V), 0.0);',
-    '  vec3 albedo = uColor;',
-    '  vec3 L1 = normalize(vec3(0.55, 0.70, 0.50));',
-    '  vec3 L2 = normalize(vec3(-0.65, 0.10, 0.40));',
-    '  float d1 = max(dot(N, L1), 0.0);',
-    '  float d2 = max(dot(N, L2), 0.0);',
-    '  vec3 diff = mix(albedo, vec3(0.0), uMetal) * (d1 * 1.0 + d2 * 0.25 + 0.10);',
-    '  float gloss = exp2(11.0 * (1.0 - uRough));',
-    '  vec3 H1 = normalize(L1 + V);',
-    '  vec3 H2 = normalize(L2 + V);',
-    '  float s1 = pow(max(dot(N, H1), 0.0), gloss);',
-    '  float s2 = pow(max(dot(N, H2), 0.0), gloss * 0.5);',
-    '  float sNorm = min((gloss + 2.0) * 0.02, 3.0);',
-    '  vec3 F0 = mix(vec3(0.04), albedo, uMetal);',
-    '  vec3 F = F0 + (vec3(1.0) - F0) * pow(1.0 - NdV, 4.0);',
-    '  float ry = R.y * 0.5 + 0.5;',
-    '  vec3 env = mix(vec3(0.05, 0.05, 0.058), vec3(0.34, 0.34, 0.38), smoothstep(0.15, 0.85, ry))',
-    '           + vec3(0.32) * pow(max(R.y, 0.0), 3.0);',
-    '  vec3 spec = F * (s1 * 1.1 + s2 * 0.35) * sNorm * (1.0 - uRough * 0.4);',
-    '  vec3 refl = env * F * (1.0 - uRough * 0.72);',
-    '  vec3 col = diff + spec + refl;',
-    '  gl_FragColor = vec4(col, 1.0);',
-    '}'
-  ].join('\n');
-
-  function boot(){
-    gl = canvas.getContext('webgl', { antialias: true, alpha: true });
-    if (!gl) return false;                       // no WebGL: the stage stays blank black
-    function sh(type, src){
-      var h = gl.createShader(type);
-      gl.shaderSource(h, src); gl.compileShader(h);
-      return h;
-    }
-    prog = gl.createProgram();
-    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
-    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
-    gl.useProgram(prog);
-    var mesh = buildSphere(40, 56);
-    nTri = mesh.idx.length;
-    var vb = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vb);
-    gl.bufferData(gl.ARRAY_BUFFER, mesh.pos, gl.STATIC_DRAW);
-    var ib = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.idx, gl.STATIC_DRAW);
-    var aPos = gl.getAttribLocation(prog, 'aPos');
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
-    ['uRes', 'uCenter', 'uRadius', 'uRot', 'uColor', 'uMetal', 'uRough'].forEach(function(n){
-      U[n] = gl.getUniformLocation(prog, n);
-    });
-    gl.enable(gl.DEPTH_TEST);
-    gl.clearColor(0, 0, 0, 0);
-    resize();
-    running = true;
-    requestAnimationFrame(tick);
-    return true;
-  }
-  function resize(){
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width  = Math.round(canvas.clientWidth  * dpr);
-    canvas.height = Math.round(canvas.clientHeight * dpr);
-    if (gl) gl.viewport(0, 0, canvas.width, canvas.height);
-  }
-  function drawFrame(dt){
-    rot += dt * 0.25;                            // the slow presentation turn
-    // Targets ease in — material changes read as a settle, not a snap
-    // (content snaps, SURFACES fade; a material is surface).
-    var k = 1 - Math.exp(-dt * 7);
-    for (var i = 0; i < 3; i++) cur.color[i] += (tgt.color[i] - cur.color[i]) * k;
-    cur.metal += (tgt.metal - cur.metal) * k;
-    cur.rough += (tgt.rough - cur.rough) * k;
-    cur.scale += (tgt.scale - cur.scale) * k;
-    cur.cx += (tgt.cx - cur.cx) * k;
-    cur.cy += (tgt.cy - cur.cy) * k;
-    cur.rad += (tgt.rad - cur.rad) * k;
-    var w = canvas.width, h = canvas.height;
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.uniform2f(U.uRes, w, h);
-    // The stage berth eases between modes: the midfield at rest, and
-    // pushed down + further away while the introduction plates stand
-    // (Eric, Aug 28 fourth word, p1 — the B-1-1 recomposition).
-    gl.uniform2f(U.uCenter, w * cur.cx, h * cur.cy);
-    gl.uniform1f(U.uRadius, Math.min(w, h) * cur.rad * cur.scale);
-    gl.uniform1f(U.uRot, rot);
-    gl.uniform3f(U.uColor, cur.color[0], cur.color[1], cur.color[2]);
-    gl.uniform1f(U.uMetal, cur.metal);
-    gl.uniform1f(U.uRough, cur.rough);
-    gl.drawElements(gl.TRIANGLES, nTri, gl.UNSIGNED_SHORT, 0);
-  }
-  function tick(t){
-    if (!running) return;
-    requestAnimationFrame(tick);
-    if (document.hidden || !visible) { lastT = t; return; }
-    var dt = Math.min((t - lastT) / 1000, 0.1); lastT = t;
-    drawFrame(dt);
-  }
-  window.addEventListener('resize', resize);
-  return {
-    boot: boot,
-    set: function(o){
-      if (o.color)  tgt.color = o.color.slice();
-      if (o.metal  != null) tgt.metal = o.metal;
-      if (o.rough  != null) tgt.rough = o.rough;
-      if (o.scale  != null) tgt.scale = o.scale;
-    },
-    show: function(on){ visible = on; ballEl.classList.toggle('is-off', !on); },
-    // The stage berth — fractions of the viewport; eased like materials.
-    stage: function(o){
-      if (o.cx  != null) tgt.cx  = o.cx;
-      if (o.cy  != null) tgt.cy  = o.cy;
-      if (o.rad != null) tgt.rad = o.rad;
-    },
-    // ?dev instrumentation: force one frame (headless/hidden captures
-    // never see rAF — the softfractal LOGGING-build precedent).
-    frame: function(){ if (gl){ for (var i = 0; i < 40; i++) drawFrame(0.05); } }
-  };
-})();
+// ── The ball — the shared stage module (factored Aug 28, second
+// consumer /cart); the stage-binding seam below is unchanged. ──────────────
+var Ball = BSBall(ballEl);
 
 // ══ THE STAGE-BINDING SEAM ═══════════════════════════════════════════════
 // Every material/size choice flows through HERE and only here. Phase one
@@ -1228,70 +1152,102 @@ function rampRGB(colorSel){
   var t = colorSel.t[colorSel.idx];
   return [0, 1, 2].map(function(i){ return col.a[i] + (col.b[i] - col.a[i]) * t; });
 }
-function applySelectionToStage(){
-  var p = SEL.parts[SEL.part || 'III'];        // the ball previews one part's material
+function stageParamsFor(parts, size, activePart){
+  var p = parts[activePart || 'III'];           // the ball previews one part's material
   var fam = HW.families[p.family];
   var fin = fam.finishes[p.finish] || fam.finishes[0];
   var rgb = rampRGB(p.color);
   var scale;
-  var cl = parseFloat(SEL.size.custom.len), cw = parseFloat(SEL.size.custom.wid);
+  var cl = parseFloat(size.custom.len), cw = parseFloat(size.custom.wid);
   if (cl > 0 && cw > 0){
     // The custom inputs drive the ball's size (Eric, Aug 28): the
     // footprint's diagonal against the standard preset's.
-    var unit = SEL.size.unit === 'in' ? 2.54 : 1;
+    var unit = size.unit === 'in' ? 2.54 : 1;
     var std = HW.sizes[1].cm;
     scale = Math.sqrt((cl * unit * cl * unit + cw * unit * cw * unit) /
                       (std[0] * std[0] + std[1] * std[1]));
     scale = Math.max(0.5, Math.min(1.6, scale));
   } else {
-    scale = HW.sizes[SEL.size.preset].scale;
+    scale = HW.sizes[size.preset].scale;
   }
-  Ball.set({ color: rgb, metal: fin.metal, rough: fin.rough, scale: scale });
+  return { color: rgb, metal: fin.metal, rough: fin.rough, scale: scale };
+}
+function applySelectionToStage(){
+  Ball.set(stageParamsFor(SEL.parts, SEL.size, SEL.part));
+}
+// A slot's body click previews ITS configuration on the ball (the cart
+// page's annotation, generalized): the live SEL is untouched, and the
+// next selection change re-binds it.
+function previewItem(item){
+  Ball.set(stageParamsFor(item.sel.parts, item.sel.size, null));
+  SoundBus.play('detent'); hapticTick();
 }
 
-// ── THE CART ROW — ruled into phase one (Eric, Aug 28, second word).
-// Six slots on the frames' tick occupancy grammar; ADD commits the live
-// configuration into the next slot. Clicking a filled slot REMOVES it —
-// SEAT INTERPRETATION, labeled: full cart management (and persistence)
-// belongs to the coming dedicated cart page; this row's state is
-// session-live, and attract never sweeps it (items are things to lose).
-var CART = [];
-var trayEl  = document.getElementById('hw-tray');
-var slotsEl = document.getElementById('hw-slots');
-var totalEl = document.getElementById('hw-total');
-var slotEls = [];
-(function buildTray(){
-  for (var i = 0; i < 6; i++){
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'hw-slot';
-    b.setAttribute('role', 'listitem');
-    b.tabIndex = -1;
-    (function(idx, btn){
-      btn.addEventListener('click', function(e){
-        e.stopPropagation();
-        wake();
-        if (!CART[idx]) return;                 // empty slots are inert
-        if (!clickOk()) return;
-        CART.splice(idx, 1);
-        SoundBus.play('detent'); hapticTick();
-        renderTray();
-      });
-    })(i, b);
-    slotsEl.appendChild(b);
-    slotEls.push(b);
-  }
-})();
+// ── THE CART ROW — Eric's second word built it; the SIXTH word made it
+// EXPANDABLE (strip <-> band), UNLIMITED (the slot row scrolls
+// horizontally), and gave every slot the TRIANGLE CHECKBOX: filled =
+// checked = checks out, hollow = held back. A slot's BODY click
+// previews that configuration on the ball (the cart page's own
+// annotation, generalized); nothing here deletes — the X lives on the
+// cart page's summary cards. State lives in C.cartStore (localStorage,
+// the labeled default), one truth shared with /cart.
+var CART = C.cartStore.load();
+var trayEl   = document.getElementById('hw-tray');
+var stripEl  = document.getElementById('hw-tray-strip');
+var toggleEl = document.getElementById('hw-tray-toggle');
+var slotsEl  = document.getElementById('hw-slots');
+var totalEl  = document.getElementById('hw-total');
+var trayOpen = false;
+function saveCart(){ C.cartStore.save(CART); }
+function setTrayOpen(on){
+  trayOpen = !!on;
+  trayEl.classList.toggle('is-open', trayOpen);
+  stripEl.setAttribute('aria-expanded', String(trayOpen));
+}
+stripEl.addEventListener('click', function(){ wake(); if (clickOk()) setTrayOpen(true); });
+toggleEl.addEventListener('click', function(){ wake(); if (clickOk()) setTrayOpen(false); });
 function cssRGB(rgb){
   return 'rgb(' + rgb.map(function(v){ return Math.round(v * 255); }).join(',') + ')';
 }
+var TRI_NS = 'http://www.w3.org/2000/svg';
+function makeTri(item){
+  var svg = document.createElementNS(TRI_NS, 'svg');
+  svg.setAttribute('class', 'hw-slot-tri' + (item.checked ? ' is-checked' : ''));
+  svg.setAttribute('viewBox', '0 0 10 10');
+  svg.setAttribute('role', 'checkbox');
+  svg.setAttribute('aria-checked', String(!!item.checked));
+  svg.setAttribute('tabindex', '0');
+  svg.setAttribute('aria-label', T(item.classKey) + ' — include at checkout');
+  var path = document.createElementNS(TRI_NS, 'path');
+  path.setAttribute('d', 'M0.5 0.5 H9 L0.5 9.5 Z');
+  svg.appendChild(path);
+  function toggle(e){
+    e.stopPropagation();
+    wake();
+    if (!clickOk()) return;
+    item.checked = !item.checked;
+    saveCart();
+    SoundBus.play(item.checked ? 'commit' : 'detent'); hapticTick();
+    renderTray();
+  }
+  svg.addEventListener('click', toggle);
+  svg.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(e); }
+  });
+  return svg;
+}
 function renderTray(){
-  for (var i = 0; i < slotEls.length; i++){
-    var b = slotEls[i], item = CART[i];
-    b.classList.toggle('is-filled', !!item);
+  slotsEl.innerHTML = '';
+  var n = Math.max(6, CART.length);              // the frames' six at rest; unlimited beyond
+  for (var i = 0; i < n; i++){
+    var item = CART[i] || null;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'hw-slot' + (item ? ' is-filled' : '');
+    b.setAttribute('role', 'listitem');
     b.tabIndex = item ? 0 : -1;
-    b.innerHTML = '';
     if (item){
+      b.appendChild(makeTri(item));
       var name = document.createElement('span');
       name.className = 'hw-slot-name';
       name.textContent = T(item.classKey);
@@ -1300,25 +1256,48 @@ function renderTray(){
       chip.style.background = item.css;
       b.appendChild(name);
       b.appendChild(chip);
-      b.setAttribute('aria-label', T(item.classKey) + ' — remove from cart');
+      b.setAttribute('aria-label', T(item.classKey) + ' — preview');
+      (function(it){
+        b.addEventListener('click', function(e){
+          e.stopPropagation();
+          wake();
+          previewItem(it);                       // the body click PREVIEWS
+        });
+      })(item);
     } else {
-      b.removeAttribute('aria-label');
+      // Empty slots keep the resting tick so the row reads per the
+      // frames — hollow, inert.
+      var ghost = document.createElementNS(TRI_NS, 'svg');
+      ghost.setAttribute('class', 'hw-slot-tri');
+      ghost.setAttribute('viewBox', '0 0 10 10');
+      ghost.setAttribute('aria-hidden', 'true');
+      var gp = document.createElementNS(TRI_NS, 'path');
+      gp.setAttribute('d', 'M0.5 0.5 H9 L0.5 9.5 Z');
+      gp.setAttribute('style', 'stroke:#fefefe2b');
+      ghost.appendChild(gp);
+      b.appendChild(ghost);
     }
+    slotsEl.appendChild(b);
   }
-  // ══ PRICE SEAM ══ the total sums manifest prices per configuration
-  // once the price-source ruling lands — never static, never faked.
+  // ══ PRICE SEAM ══ the total sums CHECKED items' manifest prices per
+  // configuration once the price-source ruling lands — never static.
   totalEl.textContent = '—';
 }
 function addToCart(from){
   if (!realClass(SEL.classIdx)) return;          // unreal classes never sell
-  if (CART.length >= slotEls.length){ denyOn(from); return; }   // a full tray refuses loudly
   CART.push({
+    id: 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     classKey: HW.classes[SEL.classIdx].key,
     css: cssRGB(rampRGB(SEL.parts['III'].color)),   // the desktop face fronts the config
-    sel: JSON.parse(JSON.stringify({ parts: SEL.parts, size: SEL.size }))
+    sel: JSON.parse(JSON.stringify({ parts: SEL.parts, size: SEL.size })),
+    qty: 1,
+    checked: true                                 // adding = intent to buy
   });
+  saveCart();
   SoundBus.play('commit'); hapticTick();
+  setTrayOpen(true);                              // adding calls the row up
   renderTray();
+  slotsEl.scrollLeft = slotsEl.scrollWidth;       // the new slot arrives in view
 }
 
 // ── The options panel — measured height, diagonal redraw discipline ─────
@@ -1786,18 +1765,24 @@ panel.addEventListener('keydown', function(e){
     if (clickOk()) addToCart(b);
   });
 });
-// VIEW CART + CHECKOUT — seams to the coming DEDICATED CART PAGE and the
-// commerce ruling: when the cart page lands, ROUTES.cart flips these to
-// commits (the utility cluster's cart-circle stub with them, house-wide,
-// zero page edits). They deny with the shake meanwhile.
-['hw-checkout', 'hw-viewcart'].forEach(function(id){
-  var b = document.getElementById(id);
-  b.addEventListener('click', function(e){
+// VIEW CART commits — the cart page landed (Eric's sixth word) and
+// ROUTES.cart carries it; CHECKOUT stays a deny seam until the commerce
+// wiring ruling (phase 2+).
+(function(){
+  var vc = document.getElementById('hw-viewcart');
+  vc.addEventListener('click', function(e){
     e.stopPropagation();
     wake();
-    denyOn(b);
+    if (!C.ROUTES.cart){ denyOn(vc); return; }
+    if (clickOk()) C.nav.commit('cart');
   });
-});
+  var co = document.getElementById('hw-checkout');
+  co.addEventListener('click', function(e){
+    e.stopPropagation();
+    wake();
+    denyOn(co);
+  });
+})();
 
 // ── Corner nav — witness grammar; the ‹ is level-aware ──────────────────
 var pillPrimary = C.bindPill(primary, fwdBtn);
@@ -1886,6 +1871,11 @@ C.init({
     },
     horizontalCold: function(){ /* A/D drive the rail (and the panel's own keys) */ },
     wheelNative:    function(e){
+      // The slot row owns its wheel while it can scroll (unlimited
+      // items, Eric's sixth word).
+      if (slotsEl.contains(e.target)){
+        return slotsEl.scrollWidth > slotsEl.clientWidth + 1;
+      }
       if (!panelBody.contains(e.target)) return false;
       return panelBody.scrollHeight > panelBody.clientHeight + 1;
     },
@@ -1917,7 +1907,7 @@ C.init({
     },
     devState:       function(){
       window.__hwBall = Ball;   // ?dev only — devState is only wired under ?dev
-      return { cart: CART.length, focusIdx: focusIdx, rightFocus: rightFocus, openHead: openHead,
+      return { cart: CART.length, trayOpen: trayOpen, focusIdx: focusIdx, rightFocus: rightFocus, openHead: openHead,
                introSub: introSub, customSub: customSub, part: SEL.part,
                panelView: panelView, classIdx: SEL.classIdx, rung: ladder.last(),
                colorFocus: colorFocus, sel: JSON.parse(JSON.stringify(SEL)),
