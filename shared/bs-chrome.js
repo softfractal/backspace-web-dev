@@ -164,8 +164,11 @@ var STR = {
     hwSubDesklegs:   'desklegs',
     hwSecMaterials:  'materials',
     hwSecColor:      'color',
-    hwSecSize:       'size presets',
-    hwSecCustomSize: 'custom size',
+    // The size panel's heads and field label — the design team's own
+    // copy (Eric, Aug 28 fourth word, p2 reference).
+    hwSecSize:       'options',
+    hwSecCustomSize: 'customize',
+    hwFldEnterSize:  'enter the size you want:',
     // Material families + finishes — PLACEHOLDER catalog (manifest confirm
     // owed); the finish carries the metal/roughness preset (Eric, Aug 28:
     // metallic and roughness come as presets; structures built now).

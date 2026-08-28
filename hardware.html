@@ -182,7 +182,12 @@
   .hw-head {
     background: none; border: 0; padding: 0;
     color: var(--text-soft);
-    font-family: var(--font-ui); font-weight: 300;
+    /* WEIGHT 600 AT REST (Eric, Aug 28 fourth word: INTRODUCTION and
+       CUSTOM read at the OASIS title's size — the rest-300 made them
+       read smaller than the same 17px rung). They join the home menu's
+       certified 600-rest exclusion as heading-class controls; open
+       state distinguishes by ink, not weight. */
+    font-family: var(--font-ui); font-weight: 600;
     font-size: calc(17px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
     line-height: calc(18px * var(--ui-scale));
     letter-spacing: .08em;
@@ -270,24 +275,16 @@
   #hw-plate-1 { left: 19.04vw; }
   #hw-plate-2 { left: 39.58vw; }
   #hw-plate-3 { left: 60.19vw; }
+  /* TEXTLESS (Eric, Aug 28 fourth word, p1): the plates carry no copy
+     in phase one — the frame IS the content slot; picture/video mounts
+     into the media box at the manifest. */
   .hw-plate-body {
     position: absolute; inset: 0;
-    display: grid;
-    grid-template-rows: 1fr auto;
-    gap: calc(10px * var(--ui-scale));
     padding: calc(14px * var(--ui-scale));
   }
   .hw-plate-media {
+    width: 100%; height: 100%;
     background: #00000066;          /* the picture/video slot, dark at rest */
-    min-height: 0;
-  }
-  .hw-plate-copy {
-    color: var(--text-soft);
-    font-family: var(--font-sans); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
-    line-height: 1.6;
-    max-height: calc(72px * var(--ui-scale));
-    overflow: hidden;
   }
 
   /* ── The options panel — THE diagonal window, right-anchored on the
@@ -296,7 +293,13 @@
   #hw-panel {
     position: fixed;
     right: var(--hw-panel-right);
-    top: var(--hw-panel-top);
+    /* BOTTOM-ANCHORED (Eric, Aug 28 fourth word): every pop-up window
+       EXPANDS UPWARD, growing out of the fixed add row. The frames'
+       panel bottom is 856/1117 -> 23.37vh (8 frame-px above the row at
+       864); short content hugs the row, and a face switch travels the
+       TOP edge on the tempo. The 38.94vh frame top is the full-height
+       cap's far end (measurePanel). */
+    bottom: 23.37vh;
     width: var(--hw-panel-w);
     min-width: calc(320px * var(--ui-scale));  /* usability floor (proposal) */
     height: calc(180px * var(--ui-scale));     /* boot value; the machine measures */
@@ -306,8 +309,9 @@
   #hw-panel .hw-body {
     position: absolute; inset: 0;
     /* Frame interior: content inset ~14-22 of 455 wide; 18px×ui the
-       consistent reading (panel internals ride ui-scale). */
-    padding: calc(18px * var(--ui-scale)) calc(18px * var(--ui-scale)) calc(46px * var(--ui-scale));
+       consistent reading (panel internals ride ui-scale). The add row
+       lives OUTSIDE now — no cleared band at the foot. */
+    padding: calc(18px * var(--ui-scale));
     overflow: hidden auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
@@ -342,7 +346,7 @@
   .hw-opt {
     position: relative;
     background: none; border: 0;
-    padding: 0 0 0 calc(14px * var(--ui-scale));  /* the ring's gutter */
+    padding: 0;
     width: max-content; max-width: 100%;
     text-align: left;
     color: var(--text-soft);
@@ -358,17 +362,13 @@
     color: #fff; outline: none;
     text-shadow: var(--glow-text);
   }
+  /* NO DOTS IN THE PANELS (Eric, Aug 28 fourth word, p4: "all
+     customization selection indication shouldn't be dots") — the outer
+     GLOW is the focused indicator, BOLD is the selected indicator. The
+     outline-ring vocabulary member survives outside the customization
+     panels (support's sub-items keep it); the menu dots (red, blue)
+     are menu grammar and untouched. */
   .hw-opt.is-chosen { color: #fff; font-weight: 600; }
-  /* THE OUTLINE RING — chosen options carry the signal-red ring (the
-     vocabulary's third member; the shared sub-item recipe, verbatim). */
-  .hw-opt.is-chosen::before {
-    content: ''; position: absolute; left: 0; top: 50%;
-    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
-    border: 1px solid var(--color-signal-red);
-    border-radius: 50%;
-    box-shadow: 0 0 calc(9px * var(--ui-scale)) rgba(157, 31, 0, .45);
-    transform: translateY(-50%);
-  }
 
   /* Color rows — Eric's p1 reference: label left, TICK SCRUBBER filling
      the row's right; the active row is bold+lit; A/D scrubs it. The
@@ -423,18 +423,19 @@
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .04em;
     white-space: nowrap;
+    transition: color .16s;
   }
-  .hw-custom-grid {
-    display: grid; grid-template-columns: 1fr 1fr auto;
-    column-gap: calc(18px * var(--ui-scale));
-    align-items: end;
-  }
-  .hw-custom-grid .bs-input { text-align: left; }
+  /* The chosen preset bolds label AND dims (the design's own reading). */
+  .hw-sizerow.is-chosen .hw-sizedims { color: var(--ink); font-weight: 600; }
+  /* The section head can carry the unit toggle at its right — the
+     design's placement (p2): "options" left, CM / IN right. */
+  .hw-sec--row { display: flex; align-items: baseline; justify-content: space-between; }
   .hw-unit {
-    display: flex; gap: calc(6px * var(--ui-scale));
+    display: inline-flex; align-items: baseline;
+    gap: calc(5px * var(--ui-scale));
   }
   .hw-unit button {
-    background: none; border: 0; padding: 0 calc(4px * var(--ui-scale));
+    background: none; border: 0; padding: 0 calc(2px * var(--ui-scale));
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
     font-size: calc(11px * var(--ui-scale));
@@ -445,15 +446,76 @@
   }
   .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; }
   .hw-unit button.is-live { color: var(--ink); font-weight: 600; text-shadow: var(--glow-text); }
+  .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(11px * var(--ui-scale)); }
+  /* THE PILL FIELDS (Eric, Aug 28 fourth word, p2: "size dimension
+     inputs happen within a pill") — the design team's capsule: hairline
+     outline, full radius, label inside-left, the value bold right, the
+     unit inside the right end. The frames drew them at 278.7×21.7
+     (extracted rects in the sizs frame). No marker dots — the pill is
+     the affordance. */
+  .hw-custom {
+    display: grid; grid-template-columns: auto 1fr;
+    column-gap: calc(14px * var(--ui-scale));
+    align-items: start;
+  }
+  .hw-custom-label {
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    line-height: calc(24px * var(--ui-scale));   /* centers on the first pill */
+    letter-spacing: .02em;
+    white-space: nowrap;
+  }
+  .hw-pills { display: grid; gap: calc(8px * var(--ui-scale)); }
+  .hw-pill-field {
+    display: flex; align-items: center;
+    gap: calc(8px * var(--ui-scale));
+    height: calc(24px * var(--ui-scale));
+    padding: 0 calc(12px * var(--ui-scale));
+    border: 1px solid var(--panel-line);
+    border-radius: 999px;
+    transition: border-color .16s, box-shadow .2s ease;
+  }
+  .hw-pill-field:focus-within {
+    border-color: #fefefe73;
+    box-shadow: 0 0 calc(14px * var(--ui-scale)) rgba(255, 255, 255, .14);
+  }
+  .hw-pill-field > label {
+    flex: none;
+    color: var(--bs-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+  .hw-pill-field .bs-input { flex: 1; width: auto; }
+  .hw-pill-unit {
+    flex: none;
+    color: var(--bs-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(10px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
 
-  /* The add row — rendered per the frames, DENIED per the ruling (cart
-     UI is phase 2). The price slot is a MARKED SEAM: no price source is
-     ruled; the static $3,499 is the on-record bug and never returns. */
+  /* The add row — FIXED PAGE FURNITURE (Eric, Aug 28 fourth word:
+     "the add to cart tab should always remain on the page at a fixed
+     location"). The frames' y864 -> 77.35vh, the panel's own column;
+     present whenever a real product is selected, panel open or not.
+     The price slot stays a MARKED SEAM: no price source is ruled; the
+     static $3,499 is the on-record bug and never returns. */
   .hw-addrow {
-    position: absolute; left: 0; right: 0; bottom: 0;
+    position: fixed;
+    right: var(--hw-panel-right);
+    top: 77.35vh;
+    width: var(--hw-panel-w);
+    min-width: calc(320px * var(--ui-scale));
     height: calc(30px * var(--ui-scale));
     display: flex; align-items: stretch;
-    z-index: 1;
+    z-index: 17;
+    transition: opacity var(--pop-fade), visibility 0s;
+  }
+  .hw-addrow.is-off {
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
   }
   .hw-addrow .hw-add-chip {
     flex: none;
@@ -687,25 +749,29 @@
 
 <!-- Introduction plates — three diagonal windows. -->
 <div id="hw-plate-1" class="hw-plate bs-window bs-window--diag is-hidden" role="region" aria-label="Introduction">
-  <div class="hw-plate-body"><div class="hw-plate-media"></div><div class="hw-plate-copy" data-str="hwPlateLorem"></div></div>
+  <div class="hw-plate-body"><div class="hw-plate-media"></div></div>
 </div>
 <div id="hw-plate-2" class="hw-plate bs-window bs-window--diag is-hidden" role="region" aria-label="Introduction">
-  <div class="hw-plate-body"><div class="hw-plate-media"></div><div class="hw-plate-copy" data-str="hwPlateLorem"></div></div>
+  <div class="hw-plate-body"><div class="hw-plate-media"></div></div>
 </div>
 <div id="hw-plate-3" class="hw-plate bs-window bs-window--diag is-hidden" role="region" aria-label="Introduction">
-  <div class="hw-plate-body"><div class="hw-plate-media"></div><div class="hw-plate-copy" data-str="hwPlateLorem"></div></div>
+  <div class="hw-plate-body"><div class="hw-plate-media"></div></div>
 </div>
 
-<!-- The options panel — THE diagonal window. -->
+<!-- The options panel — THE diagonal window, growing UPWARD out of the
+     add row below it. -->
 <div id="hw-panel" class="bs-window bs-window--diag is-hidden" role="region" aria-label="Customization">
   <div class="hw-body" id="hw-panel-body"></div>
-  <div class="hw-addrow" aria-hidden="false">
-    <button class="hw-add-chip" id="hw-add-chip" type="button" aria-label="Cart">+</button>
-    <!-- PRICE SEAM: renders from the manifest per configuration when the
-         price-source ruling lands (phase 2 with the cart). Never static. -->
-    <div class="hw-add-price" id="hw-price">—</div>
-    <button class="hw-add-go" id="hw-add-go" type="button" data-str="hwAddToCart"></button>
-  </div>
+</div>
+
+<!-- THE ADD ROW — fixed page furniture at the frames' berth (77.35vh);
+     always present for a real product, panel open or not. -->
+<div id="hw-addrow" class="hw-addrow" aria-label="Add to cart">
+  <button class="hw-add-chip" id="hw-add-chip" type="button" aria-label="Cart">+</button>
+  <!-- PRICE SEAM: renders from the manifest per configuration when the
+       price-source ruling lands (phase 2 with the cart). Never static. -->
+  <div class="hw-add-price" id="hw-price">—</div>
+  <button class="hw-add-go" id="hw-add-go" type="button" data-str="hwAddToCart"></button>
 </div>
 
 <!-- THE CART ROW — always on stage (page anatomy, every frame draws it).
@@ -793,11 +859,13 @@ var HW = {
     { key: 'hwColYellow', a: [0.33, 0.24, 0.02], b: [0.96, 0.78, 0.12] },
     { key: 'hwColGreen',  a: [0.02, 0.15, 0.06], b: [0.25, 0.72, 0.35] }
   ],
+  // The design team's own preset numbers (Eric's p2 reference); scales
+  // are the footprint diagonals against standard.
   sizes: [
-    { key: 'hwSizeCompact',  scale: 0.82, cm: [100, 50] },
-    { key: 'hwSizeStandard', scale: 1.00, cm: [140, 70] },
-    { key: 'hwSizeWide',     scale: 1.14, cm: [180, 80] },
-    { key: 'hwSizeStudio',   scale: 1.30, cm: [220, 90] }
+    { key: 'hwSizeCompact',  scale: 0.89, cm: [120, 75] },
+    { key: 'hwSizeStandard', scale: 1.00, cm: [140, 75] },
+    { key: 'hwSizeWide',     scale: 1.11, cm: [160, 75] },
+    { key: 'hwSizeStudio',   scale: 1.23, cm: [180, 75] }
   ],
   // The free-size range — manifest data behind the ops gate: the VISUAL
   // ships (Eric, Aug 28: the input drives the ball's scale); the
@@ -973,8 +1041,8 @@ function setRightFocus(i){
 var Ball = (function(){
   var gl = null, prog = null, canvas = ballEl, nTri = 0;
   var U = {};
-  var cur = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1 };
-  var tgt = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1 };
+  var cur = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1, cx: 0.47, cy: 0.55, rad: 0.21 };
+  var tgt = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1, cx: 0.47, cy: 0.55, rad: 0.21 };
   var running = false, visible = true, rot = 0, lastT = 0;
 
   function buildSphere(rows, cols){
@@ -1097,13 +1165,17 @@ var Ball = (function(){
     cur.metal += (tgt.metal - cur.metal) * k;
     cur.rough += (tgt.rough - cur.rough) * k;
     cur.scale += (tgt.scale - cur.scale) * k;
+    cur.cx += (tgt.cx - cur.cx) * k;
+    cur.cy += (tgt.cy - cur.cy) * k;
+    cur.rad += (tgt.rad - cur.rad) * k;
     var w = canvas.width, h = canvas.height;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.uniform2f(U.uRes, w, h);
-    // The stage's midfield: between the class rail and the panel rail,
-    // biased to the frames' own product placement (~47vw, 55vh).
-    gl.uniform2f(U.uCenter, w * 0.47, h * 0.55);
-    gl.uniform1f(U.uRadius, Math.min(w, h) * 0.21 * cur.scale);
+    // The stage berth eases between modes: the midfield at rest, and
+    // pushed down + further away while the introduction plates stand
+    // (Eric, Aug 28 fourth word, p1 — the B-1-1 recomposition).
+    gl.uniform2f(U.uCenter, w * cur.cx, h * cur.cy);
+    gl.uniform1f(U.uRadius, Math.min(w, h) * cur.rad * cur.scale);
     gl.uniform1f(U.uRot, rot);
     gl.uniform3f(U.uColor, cur.color[0], cur.color[1], cur.color[2]);
     gl.uniform1f(U.uMetal, cur.metal);
@@ -1127,6 +1199,12 @@ var Ball = (function(){
       if (o.scale  != null) tgt.scale = o.scale;
     },
     show: function(on){ visible = on; ballEl.classList.toggle('is-off', !on); },
+    // The stage berth — fractions of the viewport; eased like materials.
+    stage: function(o){
+      if (o.cx  != null) tgt.cx  = o.cx;
+      if (o.cy  != null) tgt.cy  = o.cy;
+      if (o.rad != null) tgt.rad = o.rad;
+    },
     // ?dev instrumentation: force one frame (headless/hidden captures
     // never see rAF — the softfractal LOGGING-build precedent).
     frame: function(){ if (gl){ for (var i = 0; i < 40; i++) drawFrame(0.05); } }
@@ -1262,7 +1340,15 @@ function hidePanel(){ panel.classList.add('is-hidden'); }
 
 // ── Panel content — built from the manifest per (part | size) ───────────
 var colRowEls = [], colScrubEls = [], famEls = [], finEls = [], sizeEls = [], unitEls = {};
+var sizeRowEls = [], dimEls = [], pillUnitEls = [];
 var lenInput = null, widInput = null;
+// Preset dims read in the live unit (the CM/IN toggle re-renders them).
+function dimsText(sz){
+  if (SEL.size.unit === 'in'){
+    return Math.round(sz.cm[0] / 2.54) + ' × ' + Math.round(sz.cm[1] / 2.54) + ' in';
+  }
+  return sz.cm[0] + ' × ' + sz.cm[1] + ' cm';
+}
 function el(tag, cls, str){
   var e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -1272,6 +1358,7 @@ function el(tag, cls, str){
 function buildPanelContent(){
   panelBody.innerHTML = '';
   colRowEls = []; colScrubEls = []; famEls = []; finEls = []; sizeEls = [];
+  sizeRowEls = []; dimEls = []; pillUnitEls = [];
   unitEls = {}; lenInput = null; widInput = null;
   colorFocus = -1;
   if (panelView === 'part'){
@@ -1357,7 +1444,31 @@ function buildPanelContent(){
     });
     panelBody.appendChild(colList);
   } else if (panelView === 'size'){
-    panelBody.appendChild(el('span', 'hw-sec', 'hwSecSize'));
+    // "options" head with the CM/IN toggle at its right — the design's
+    // own placement (Eric, fourth word, p2).
+    var head = el('span', 'hw-sec hw-sec--row');
+    head.appendChild(el('span', null, 'hwSecSize'));
+    var unit = el('span', 'hw-unit');
+    ['cm', 'in'].forEach(function(u, ui2){
+      if (ui2 === 1){
+        var slash = document.createElement('span');
+        slash.className = 'hw-unit-slash';
+        slash.textContent = '/';
+        unit.appendChild(slash);
+      }
+      var b = el('button', null, u === 'cm' ? 'hwUnitCM' : 'hwUnitIN');
+      b.type = 'button';
+      b.addEventListener('click', function(){
+        wake();
+        SEL.size.unit = u;
+        SoundBus.play('detent'); hapticTick();
+        refreshPanel();
+      });
+      unit.appendChild(b);
+      unitEls[u] = b;
+    });
+    head.appendChild(unit);
+    panelBody.appendChild(head);
     var list = el('div', 'hw-optlist');
     HW.sizes.forEach(function(sz, si){
       var row = el('div', 'hw-sizerow');
@@ -1373,17 +1484,20 @@ function buildPanelContent(){
         refreshPanel();
       });
       var dims = el('span', 'hw-sizedims');
-      dims.textContent = sz.cm[0] + ' × ' + sz.cm[1] + ' cm';
+      dims.textContent = dimsText(sz);
       row.appendChild(b); row.appendChild(dims);
       list.appendChild(row);
-      sizeEls.push(b);
+      sizeEls.push(b); sizeRowEls.push(row); dimEls.push(dims);
     });
     panelBody.appendChild(list);
-    // custom size — the form subsystem's second consumer.
+    // customize — the PILL fields (the design's capsules, p2): label
+    // inside-left, value bold right, the unit inside the right end.
     panelBody.appendChild(el('span', 'hw-sec', 'hwSecCustomSize'));
-    var grid2 = el('div', 'hw-custom-grid');
+    var custom = el('div', 'hw-custom');
+    custom.appendChild(el('span', 'hw-custom-label', 'hwFldEnterSize'));
+    var pills = el('div', 'hw-pills');
     [['hwFldLength', 'len'], ['hwFldWidth', 'wid']].forEach(function(fld){
-      var f = el('div', 'bs-field');
+      var pill = el('div', 'hw-pill-field');
       var lab = el('label', null, fld[0]);
       lab.htmlFor = 'hw-f-' + fld[1];
       var inp = document.createElement('input');
@@ -1397,25 +1511,15 @@ function buildPanelContent(){
         SEL.size.custom[fld[1]] = inp.value;
         applySelectionToStage();                 // the size drives the ball live
       });
-      f.appendChild(lab); f.appendChild(inp);
-      grid2.appendChild(f);
+      var u = el('span', 'hw-pill-unit');
+      u.textContent = SEL.size.unit;
+      pill.appendChild(lab); pill.appendChild(inp); pill.appendChild(u);
+      pills.appendChild(pill);
+      pillUnitEls.push(u);
       if (fld[1] === 'len') lenInput = inp; else widInput = inp;
     });
-    var unit = el('div', 'hw-unit');
-    ['cm', 'in'].forEach(function(u){
-      var b = el('button', null, u === 'cm' ? 'hwUnitCM' : 'hwUnitIN');
-      b.type = 'button';
-      b.addEventListener('click', function(){
-        wake();
-        SEL.size.unit = u;
-        SoundBus.play('detent'); hapticTick();
-        refreshPanel();
-      });
-      unit.appendChild(b);
-      unitEls[u] = b;
-    });
-    grid2.appendChild(unit);
-    panelBody.appendChild(grid2);
+    custom.appendChild(pills);
+    panelBody.appendChild(custom);
   }
   renderStrings(panelBody);
   alignPanelMarkers();
@@ -1453,6 +1557,9 @@ function refreshPanel(){
   });
   var custom = !!(parseFloat(SEL.size.custom.len) > 0 && parseFloat(SEL.size.custom.wid) > 0);
   sizeEls.forEach(function(b, i){ b.classList.toggle('is-chosen', !custom && i === SEL.size.preset); });
+  sizeRowEls.forEach(function(row, i){ row.classList.toggle('is-chosen', !custom && i === SEL.size.preset); });
+  dimEls.forEach(function(d, i){ d.textContent = dimsText(HW.sizes[i]); });
+  pillUnitEls.forEach(function(u){ u.textContent = SEL.size.unit; });
   if (unitEls.cm){
     unitEls.cm.classList.toggle('is-live', SEL.size.unit === 'cm');
     unitEls.in.classList.toggle('is-live', SEL.size.unit === 'in');
@@ -1520,12 +1627,16 @@ function showPlates(){
     void pl.offsetWidth;
     pl.classList.add('is-open');
   });
+  // The plates push the product DOWN by moving the camera further away
+  // (Eric, p1): lower berth, smaller radius, eased on the ball's clock.
+  Ball.stage({ cx: 0.50, cy: 0.72, rad: 0.125 });
 }
 function hidePlates(){
   plates.forEach(function(pl){
     pl.classList.add('is-hidden');
     pl.classList.remove('is-open');
   });
+  Ball.stage({ cx: 0.47, cy: 0.55, rad: 0.21 });   // the resting berth
 }
 function closePanelLevel(){
   SEL.part = null; panelView = null; customSub = -1; introSub = -1;
@@ -1579,6 +1690,7 @@ function render(){
   // preview the coming-soon stage (the locked-classes game pattern).
   productMenuEl.style.visibility = isReal ? '' : 'hidden';
   comingEl.classList.toggle('is-on', !isReal);
+  document.getElementById('hw-addrow').classList.toggle('is-off', !isReal);
   Ball.show(isReal);
   backBtn.setAttribute('aria-label', openHead >= 0 ? T('navBack') : T('navHome'));
   subWrapEls.forEach(function(w, h){
