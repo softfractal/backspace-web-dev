@@ -193,9 +193,17 @@ var STR = {
     hwUnitCM:        'CM',
     hwUnitIN:        'IN',
     hwInvalidSize:   'Enter both dimensions within range.',
-    // Add-to-cart renders per the frames but DENIES — cart UI is a phase
-    // 2 session (Eric, Aug 28). The key ships so the control is honest.
+    // THE CART ROW (Eric, Aug 28, second word — supersedes the same-day
+    // phase-2 hold for the ROW alone): the tray is phase one; the
+    // dedicated FULL CART PAGE stays a coming page (the cart circle and
+    // the view-cart/checkout controls deny to marked seams until it and
+    // the commerce ruling land). The frames' lowercase "cart" stays on
+    // the do-not-port list — the certified casing ships.
     hwAddToCart:     'add to cart',
+    hwCart:          'CART',
+    hwCartTotal:     'total',
+    hwCheckout:      'checkout',
+    hwViewCart:      'view cart',
     hwPlateLorem:    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.'
   },
   zh: { /* populated when CN content lands; lookups fall back to en */ },

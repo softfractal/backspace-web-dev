@@ -485,6 +485,113 @@
     background: #fff; outline: none;
   }
 
+  /* ── THE CART ROW — ruled INTO phase one (Eric, Aug 28, second word:
+     "the cart row is very important for the product page"; the same-day
+     phase-2 hold now covers only the dedicated FULL CART PAGE, which is
+     a coming page). Geometry from the proportional layer: band rails
+     84.51→98.12vh on the 3.76vw / 3.30vw rails, center rule 87.11vh at
+     1.91vw insets, divider 70.78vw; slots 160×90 ×ui, gap 25×ui, row
+     from 5.50vw at 89.08vh — SIX (the frames' count; the values doc's
+     "seven" is the flagged miscount). Occupancy rides the frames' tick
+     grammar: lit #fefefe filled, #fefefe2b empty. The price column's
+     total renders "—" to its marked seam (source unruled; the $3,499
+     bug never returns); view cart + checkout DENY to seams until the
+     cart page and the commerce ruling land. */
+  #hw-tray { position: fixed; inset: 0; z-index: 14; pointer-events: none; }
+  .hw-tray-rule, .hw-tray-rail {
+    position: absolute; background: var(--panel-line); pointer-events: none;
+  }
+  .hw-tray-rule { left: 1.91vw; right: 1.91vw; top: 87.11vh; height: 1px; }
+  .hw-tray-rail { width: 1px; top: 84.51vh; height: 13.61vh; }
+  .hw-tray-rail--l   { left: max(clamp(34px, 3.8vw, 68px), 3.76vw); }
+  .hw-tray-rail--r   { right: 3.30vw; }
+  .hw-tray-rail--div { left: 70.78vw; }
+  .hw-tray-label {
+    position: absolute; left: 5.50vw; top: 85.45vh;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .08em;
+    pointer-events: none;
+  }
+  #hw-slots {
+    position: absolute; left: 5.50vw; top: 89.08vh;
+    display: flex; gap: calc(25px * var(--ui-scale));
+    pointer-events: auto;
+  }
+  .hw-slot {
+    position: relative;
+    width: calc(160px * var(--ui-scale)); height: calc(90px * var(--ui-scale));
+    background: #4a4a4a5c;
+    border: 0; padding: 0;
+    transition: background .16s;
+  }
+  .hw-slot::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: calc(9px * var(--ui-scale)); height: calc(9px * var(--ui-scale));
+    background: #fefefe2b;
+    transition: background .16s;
+  }
+  .hw-slot.is-filled { cursor: var(--cursor-target); }
+  .hw-slot.is-filled::before { background: #fefefe; }
+  .hw-slot.is-filled:hover, .hw-slot.is-filled:focus-visible {
+    background: #5c5c5c5c; outline: none;
+  }
+  .hw-slot-name {
+    position: absolute; left: calc(9px * var(--ui-scale)); bottom: calc(7px * var(--ui-scale));
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .02em;
+    pointer-events: none;
+  }
+  .hw-slot-chip {
+    position: absolute; right: calc(9px * var(--ui-scale)); bottom: calc(9px * var(--ui-scale));
+    width: calc(10px * var(--ui-scale)); height: calc(10px * var(--ui-scale));
+    border: 1px solid var(--panel-line);
+    pointer-events: none;
+  }
+  .hw-tray-price {
+    position: absolute; left: 74.07vw; right: 6.66vw; top: 89.79vh;
+    pointer-events: auto;
+  }
+  .hw-total-row {
+    position: relative;
+    height: calc(30px * var(--ui-scale));
+    background: #4a4a4a5c;
+    display: flex; align-items: center;
+    padding-left: calc(12px * var(--ui-scale));
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+  #hw-total {
+    margin-left: auto;
+    margin-right: calc(111px * var(--ui-scale));   /* clears the checkout plate */
+    color: var(--ink); font-weight: 600;
+  }
+  .hw-tray-btn {
+    position: absolute;
+    border: 0; padding: 0;
+    background: #ededed; color: #0b0b0a;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .04em;
+    cursor: var(--cursor-target);
+    transition: background .16s;
+  }
+  .hw-tray-btn:hover, .hw-tray-btn:focus-visible { background: #fff; outline: none; }
+  #hw-checkout {
+    top: 0; right: 0;
+    width: calc(99px * var(--ui-scale)); height: calc(30px * var(--ui-scale));
+  }
+  #hw-viewcart {
+    /* the frames' second row: 1048/1117 → 4.03vh below the total row */
+    top: calc(93.82vh - 89.79vh); left: 0; right: 0;
+    height: calc(30px * var(--ui-scale));
+  }
+
   /* THE REDRAW'S SILENT FRAME — the /support discipline for the diag
      variant: collapse instantly (host clip + traveler + content all
      silenced for exactly one frame), then draw out on the tempo. */
@@ -510,6 +617,7 @@
     #hw-panel { right: 6vw; left: 6vw; width: 88vw; min-width: 0; top: 46vh; }
     .hw-plate { display: none; }    /* the plates cannot coexist at phone width */
     #hw-coming { left: 6vw; right: 6vw; }
+    #hw-tray { display: none; }     /* six slots cannot fit a phone; mobile grammar is Eric's later design */
   }
 </style>
 </head>
@@ -592,6 +700,28 @@
          price-source ruling lands (phase 2 with the cart). Never static. -->
     <div class="hw-add-price" id="hw-price">—</div>
     <button class="hw-add-go" id="hw-add-go" type="button" data-str="hwAddToCart"></button>
+  </div>
+</div>
+
+<!-- THE CART ROW — always on stage (page anatomy, every frame draws it).
+     Slots are built by the script; view cart + checkout deny to seams
+     until the dedicated cart page and the commerce ruling land. -->
+<div id="hw-tray" aria-label="Cart">
+  <span class="hw-tray-label" data-str="hwCart"></span>
+  <span class="hw-tray-rule" aria-hidden="true"></span>
+  <span class="hw-tray-rail hw-tray-rail--l" aria-hidden="true"></span>
+  <span class="hw-tray-rail hw-tray-rail--r" aria-hidden="true"></span>
+  <span class="hw-tray-rail hw-tray-rail--div" aria-hidden="true"></span>
+  <div id="hw-slots" role="list" aria-label="Cart slots"></div>
+  <div class="hw-tray-price">
+    <div class="hw-total-row">
+      <span data-str="hwCartTotal"></span>
+      <!-- PRICE SEAM: the total sums manifest prices per configuration
+           when the price-source ruling lands; never static. -->
+      <span id="hw-total">—</span>
+    </div>
+    <button id="hw-checkout" class="hw-tray-btn" type="button" data-str="hwCheckout"></button>
+    <button id="hw-viewcart" class="hw-tray-btn" type="button" data-str="hwViewCart"></button>
   </div>
 </div>
 
@@ -997,13 +1127,15 @@ var Ball = (function(){
 // binds the texture ball; the desk GLB (color ramp + procedural texture
 // nodes) rebinds at this exact function — the interaction layer, the
 // state model and the manifest never change.
+function rampRGB(colorSel){
+  var col = HW.colors[colorSel.idx];
+  return [0, 1, 2].map(function(i){ return col.a[i] + (col.b[i] - col.a[i]) * colorSel.t; });
+}
 function applySelectionToStage(){
   var p = SEL.parts[SEL.part || 'III'];        // the ball previews one part's material
   var fam = HW.families[p.family];
   var fin = fam.finishes[p.finish] || fam.finishes[0];
-  var col = HW.colors[p.color.idx];
-  var t = p.color.t;
-  var rgb = [0, 1, 2].map(function(i){ return col.a[i] + (col.b[i] - col.a[i]) * t; });
+  var rgb = rampRGB(p.color);
   var scale;
   var cl = parseFloat(SEL.size.custom.len), cw = parseFloat(SEL.size.custom.wid);
   if (cl > 0 && cw > 0){
@@ -1018,6 +1150,78 @@ function applySelectionToStage(){
     scale = HW.sizes[SEL.size.preset].scale;
   }
   Ball.set({ color: rgb, metal: fin.metal, rough: fin.rough, scale: scale });
+}
+
+// ── THE CART ROW — ruled into phase one (Eric, Aug 28, second word).
+// Six slots on the frames' tick occupancy grammar; ADD commits the live
+// configuration into the next slot. Clicking a filled slot REMOVES it —
+// SEAT INTERPRETATION, labeled: full cart management (and persistence)
+// belongs to the coming dedicated cart page; this row's state is
+// session-live, and attract never sweeps it (items are things to lose).
+var CART = [];
+var trayEl  = document.getElementById('hw-tray');
+var slotsEl = document.getElementById('hw-slots');
+var totalEl = document.getElementById('hw-total');
+var slotEls = [];
+(function buildTray(){
+  for (var i = 0; i < 6; i++){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'hw-slot';
+    b.setAttribute('role', 'listitem');
+    b.tabIndex = -1;
+    (function(idx, btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        wake();
+        if (!CART[idx]) return;                 // empty slots are inert
+        if (!clickOk()) return;
+        CART.splice(idx, 1);
+        SoundBus.play('detent'); hapticTick();
+        renderTray();
+      });
+    })(i, b);
+    slotsEl.appendChild(b);
+    slotEls.push(b);
+  }
+})();
+function cssRGB(rgb){
+  return 'rgb(' + rgb.map(function(v){ return Math.round(v * 255); }).join(',') + ')';
+}
+function renderTray(){
+  for (var i = 0; i < slotEls.length; i++){
+    var b = slotEls[i], item = CART[i];
+    b.classList.toggle('is-filled', !!item);
+    b.tabIndex = item ? 0 : -1;
+    b.innerHTML = '';
+    if (item){
+      var name = document.createElement('span');
+      name.className = 'hw-slot-name';
+      name.textContent = T(item.classKey);
+      var chip = document.createElement('span');
+      chip.className = 'hw-slot-chip';
+      chip.style.background = item.css;
+      b.appendChild(name);
+      b.appendChild(chip);
+      b.setAttribute('aria-label', T(item.classKey) + ' — remove from cart');
+    } else {
+      b.removeAttribute('aria-label');
+    }
+  }
+  // ══ PRICE SEAM ══ the total sums manifest prices per configuration
+  // once the price-source ruling lands — never static, never faked.
+  totalEl.textContent = '—';
+}
+function addToCart(from){
+  if (!realClass(SEL.classIdx)) return;          // unreal classes never sell
+  if (CART.length >= slotEls.length){ denyOn(from); return; }   // a full tray refuses loudly
+  CART.push({
+    classKey: HW.classes[SEL.classIdx].key,
+    css: cssRGB(rampRGB(SEL.parts['III'].color)),   // the desktop face fronts the config
+    sel: JSON.parse(JSON.stringify({ parts: SEL.parts, size: SEL.size }))
+  });
+  SoundBus.play('commit'); hapticTick();
+  renderTray();
 }
 
 // ── The options panel — measured height, diagonal redraw discipline ─────
@@ -1438,9 +1642,21 @@ panel.addEventListener('keydown', function(e){
   }
 });
 
-// The add row DENIES — cart UI is phase 2 (Eric, Aug 28); nothing
-// pretends to purchase. The chip and the go button shake alike.
+// THE ADD ROW COMMITS (Eric's second Aug 28 word) — the chip and the go
+// button both add the live configuration; a full tray denies loudly.
 ['hw-add-chip', 'hw-add-go'].forEach(function(id){
+  var b = document.getElementById(id);
+  b.addEventListener('click', function(e){
+    e.stopPropagation();
+    wake();
+    if (clickOk()) addToCart(b);
+  });
+});
+// VIEW CART + CHECKOUT — seams to the coming DEDICATED CART PAGE and the
+// commerce ruling: when the cart page lands, ROUTES.cart flips these to
+// commits (the utility cluster's cart-circle stub with them, house-wide,
+// zero page edits). They deny with the shake meanwhile.
+['hw-checkout', 'hw-viewcart'].forEach(function(id){
   var b = document.getElementById(id);
   b.addEventListener('click', function(e){
     e.stopPropagation();
@@ -1515,7 +1731,7 @@ C.init({
       trayItems: function(){ return links; } }
   ],
   touchSurfaces: [document.getElementById('bs-stage'), classMenuEl],
-  sweepRoots: [cornerEl, classMenuEl, productMenuEl, panel].concat(plates),
+  sweepRoots: [cornerEl, classMenuEl, productMenuEl, panel, trayEl].concat(plates),
   hooks: {
     isLocked:       function(){ return false; },   // NO page locks (law)
     goBack:         goBack,
@@ -1557,6 +1773,7 @@ C.init({
       links.forEach(function(l){ l.textContent = T2(l.getAttribute('data-section')); });
       renderStrings();
       if (panelView !== null) buildPanelContent();
+      renderTray();
       document.title = T2('hardwareTitle');
     },
     onFontsReady:   function(){
@@ -1566,7 +1783,7 @@ C.init({
     },
     devState:       function(){
       window.__hwBall = Ball;   // ?dev only — devState is only wired under ?dev
-      return { focusIdx: focusIdx, rightFocus: rightFocus, openHead: openHead,
+      return { cart: CART.length, focusIdx: focusIdx, rightFocus: rightFocus, openHead: openHead,
                introSub: introSub, customSub: customSub, part: SEL.part,
                panelView: panelView, classIdx: SEL.classIdx, rung: ladder.last(),
                colorFocus: colorFocus, sel: JSON.parse(JSON.stringify(SEL)),
@@ -1583,6 +1800,7 @@ measurePitch();
 alignPanelMarkers();
 Ball.boot();
 applySelectionToStage();
+renderTray();
 render();
 
 window.addEventListener('resize', function(){
