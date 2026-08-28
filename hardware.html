@@ -173,10 +173,10 @@
     right: max(clamp(34px, 3.8vw, 68px), 3.70vw);
     z-index: 16;
     display: grid;
-    /* INTRODUCTION 242.4 → CUSTOM 293.4 collapsed: 51 frame-px header
-       pitch, HELD through every rung change — 13.5px×ui line boxes
-       leave 37.5px×ui of gap so the drawn rhythm survives. */
-    gap: calc(37.5px * var(--ui-scale));
+    /* THE EIGHTH WORD (Eric, Aug 28): the INTRODUCTION↔CUSTOM gap
+       halved — 18.75px×ui (pitch 32.25×ui). This SUPERSEDES the drawn
+       51 frame-px header pitch; Eric's eye rules over the frame. */
+    gap: calc(18.75px * var(--ui-scale));
     color: var(--text-soft);
     justify-items: end;
   }
@@ -1637,21 +1637,45 @@ function chooseCustomSub(sIdx, partOverride){
   drawPanel();
   render();
 }
+// THE BALANCED GROUP (Eric's eighth word: the plates and the resized
+// showcase "should find their center together"). Solved at runtime —
+// Class S: the group's height depends on the window's aspect (the
+// plates are aspect-locked) and the ball's live size scale, so the
+// machine centers [plates · gap · ball] in the stage band on every
+// open and every resize. Band: below the nav zone (12vh) to the cart
+// strip (95.34vh); the fixed 31.51vh plate top yields to the solve
+// while the plates stand and returns when they leave.
+var INTRO_GAP_PX = 36;                            // ×ui — the group's breathing gap
+function layoutIntroStage(){
+  if (introSub < 0) return;
+  var w = window.innerWidth, h = window.innerHeight;
+  var ui = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale')) || 1;
+  var topBound = h * 0.12;
+  var bottomBound = h * 0.9534;                   // the collapsed cart strip
+  var plateH = plates[0].getBoundingClientRect().height;
+  var scale = stageParamsFor(SEL.parts, SEL.size, SEL.part).scale;
+  var D = 2 * Math.min(w, h) * 0.125 * scale;     // the pushed ball's diameter
+  var gap = INTRO_GAP_PX * ui;
+  var total = plateH + gap + D;
+  var top = Math.max(topBound, (topBound + bottomBound - total) / 2);
+  document.body.style.setProperty('--hw-plate-top', top + 'px');
+  var cy = (top + plateH + gap + D / 2) / h;
+  Ball.stage({ cx: 0.50, cy: cy, rad: 0.125 });
+}
 function showPlates(){
   plates.forEach(function(pl){
     pl.classList.remove('is-hidden');
     void pl.offsetWidth;
     pl.classList.add('is-open');
   });
-  // The plates push the product DOWN by moving the camera further away
-  // (Eric, p1): lower berth, smaller radius, eased on the ball's clock.
-  Ball.stage({ cx: 0.50, cy: 0.72, rad: 0.125 });
+  layoutIntroStage();                             // plates + ball center together
 }
 function hidePlates(){
   plates.forEach(function(pl){
     pl.classList.add('is-hidden');
     pl.classList.remove('is-open');
   });
+  document.body.style.removeProperty('--hw-plate-top');   // the frame top returns
   Ball.stage({ cx: 0.47, cy: 0.55, rad: 0.21 });   // the resting berth
 }
 function closePanelLevel(){
@@ -1963,6 +1987,7 @@ render();
 window.addEventListener('resize', function(){
   alignPanelMarkers();
   if (panelView !== null) sizePanel();
+  layoutIntroStage();                             // the balanced group re-centers
 });
 window.addEventListener('pageshow', function(e){
   if (e.persisted){
