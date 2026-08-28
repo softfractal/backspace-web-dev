@@ -389,12 +389,12 @@ body {
 a#bs-wordmark-link { display: contents; }
 /* Section pages share the wordmark-as-control grammar; the gate widens by
    one page name as each section lands (community: Aug 23). */
-body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"]) #bs-wordmark {
+body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"], [data-bs-page="cart"]) #bs-wordmark {
   pointer-events: auto; cursor: var(--cursor-target);
   transition: filter .2s;
 }
-body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"]) a#bs-wordmark-link:hover #bs-wordmark,
-body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"]) a#bs-wordmark-link:focus-visible #bs-wordmark {
+body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"], [data-bs-page="cart"]) a#bs-wordmark-link:hover #bs-wordmark,
+body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"], [data-bs-page="cart"]) a#bs-wordmark-link:focus-visible #bs-wordmark {
   filter: drop-shadow(0 0 18px rgba(255,255,255,0.55));
 }
 a#bs-wordmark-link:focus-visible { outline: none; }
@@ -1367,7 +1367,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   #bs-icons { transition: opacity var(--pop-fade); }
   /* On section pages the corner owns the top-left — the wordmark drops
      to a centered berth below the two top rails instead. */
-  body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"]) #bs-wordmark {
+  body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"], [data-bs-page="cart"]) #bs-wordmark {
     left: 50%; transform: translateX(-50%);
     top: calc(100px * var(--ui-scale));
     width: 104px;

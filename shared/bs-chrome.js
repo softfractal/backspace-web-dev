@@ -207,7 +207,29 @@ var STR = {
     hwCartTotal:     'total',
     hwCheckout:      'checkout',
     hwViewCart:      'view cart',
-    hwPlateLorem:    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.'
+    hwPlateLorem:    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
+    // ── /cart (the dedicated cart page — Eric's sixth word, Aug 28).
+    // Labels from the B-2 frames (outlined; read from true-aspect
+    // renders). Prices, shipping, tax, promo and kickstarter are SEAMS:
+    // the static $4141/$2499/$3499 are the on-record do-not-port bugs.
+    cartTitle:        'BACKSPACE — Cart',
+    cartCrumb:        'CART',
+    cartCheckoutCrumb:'CHECKOUT',
+    cartOrderSummary: 'ORDER SUMMARY',
+    cartItems:        'items',
+    cartItemDeskTitle:'The OASIS DESK (Pre-order)',
+    cartSpecSize:     'size',
+    cartSpecOptions:  'options',
+    cartEstimated:    'Estimated completion',
+    cartKickstarter:  'KICKSTARTER',
+    cartKickNote:     'Also available on kickstarter',
+    cartPromo:        'promo code',
+    cartApply:        'apply',
+    cartTotal:        'total',
+    cartSubtotal:     'subtotal',
+    cartShipping:     'shipping',
+    cartTax:          'tax',
+    cartCheckout:     'checkout'
   },
   zh: { /* populated when CN content lands; lookups fall back to en */ },
   ja: {},
@@ -237,9 +259,13 @@ var SECTIONS = ['hardware','software','community','support'];
 var HTMLISH = /\.html$/i.test(location.pathname) || location.protocol === 'file:';
 // ROUTES.hardware (Eric's product phase, Aug 28): the one-line flip — every
 // page's HARDWARE denial becomes a commit, zero page edits (ratified grammar).
+// ROUTES.cart (Eric's sixth word, Aug 28): the dedicated cart page —
+// a DESTINATION, not a section (the away pill stays four). Its landing
+// flips the utility cart circle and /hardware's view-cart seam to
+// commits, house-wide, zero page edits.
 var ROUTES = HTMLISH
-  ? { home: 'home.html', hardware: 'hardware.html', software: 'software.html', community: 'community.html', support: 'support.html' }
-  : { home: '/', hardware: '/hardware', software: '/software', community: '/community', support: '/support' };
+  ? { home: 'home.html', hardware: 'hardware.html', software: 'software.html', community: 'community.html', support: 'support.html', cart: 'cart.html' }
+  : { home: '/', hardware: '/hardware', software: '/software', community: '/community', support: '/support', cart: '/cart' };
 
 // Commit-arrival vs cold boot (Part B deliverable 3): the committing page
 // stamps a same-tab flag before real navigation; the arriving page
@@ -981,12 +1007,17 @@ function bindUtility(){
     pillAccount.touchOpenConsumed();
   });
 
-  // Cart — redirects to the cart page when it exists; denies meanwhile.
-  // (Bound on the hit pad so clicks in the vicinity count; the shake
-  // still lands on the visible button.)
+  // Cart — COMMITS to the cart page (Eric's sixth word landed it);
+  // on the cart page itself it is the current destination and denies
+  // (the away-nav current-section grammar). Bound on the hit pad so
+  // clicks in the vicinity count; the shake lands on the button.
   (function(){
     var cart = document.getElementById('bs-cart');
-    (cart.closest('.bs-hit') || cart).addEventListener('click', function(){ wake(); denyOn(cart); });
+    (cart.closest('.bs-hit') || cart).addEventListener('click', function(){
+      wake();
+      if (PAGE_ID === 'cart' || !ROUTES.cart){ denyOn(cart); return; }
+      if (clickOk()) commitNavigate('cart');
+    });
   })();
 }
 
@@ -1216,6 +1247,27 @@ function validateFields(els){
   return null;
 }
 
+// ── THE CART STORE — one truth for the row and the page (Eric's sixth
+// word; factored at its second consumer). localStorage-backed, LABELED
+// DEFAULT pending a persistence ruling: carts conventionally survive
+// visits; the versioned schema keeps stale shapes harmless, and every
+// touch is try/catch — storage may be denied. Item shape:
+// { id, classKey, css, sel, qty, checked } — checked items are the
+// ones that check out (the triangle grammar).
+var CART_STORE_KEY = 'bs-cart-v1';
+var cartStore = {
+  load: function(){
+    try {
+      var d = JSON.parse(localStorage.getItem(CART_STORE_KEY));
+      if (d && d.v === 1 && Array.isArray(d.items)) return d.items;
+    } catch (e) {}
+    return [];
+  },
+  save: function(items){
+    try { localStorage.setItem(CART_STORE_KEY, JSON.stringify({ v: 1, items: items })); } catch (e) {}
+  }
+};
+
 // ── Shared measurement primitives (the measured-never-hardcoded law) ─────
 // Cap-midpoint solve: a marker dot aligns to the TEXT's cap midpoint, from
 // real font metrics — never to the line box (leading + divider padding
@@ -1265,6 +1317,7 @@ window.BSChrome = {
   validateFields: validateFields,
   capMid: capMid,
   measureListPitch: measureListPitch,
+  cartStore: cartStore,
   rail: {
     focus: setIconFocus,
     step: iconStep,
