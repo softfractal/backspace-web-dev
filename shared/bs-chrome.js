@@ -129,7 +129,74 @@ var STR = {
     supLoremRow4:  'ut labore et dolore magna aliqua?',
     supLoremRow5:  'quis nostrud exercitation ullamco?',
     supLoremRow6:  'duis aute irure dolor in reprehenderit?',
-    supLoremBody:    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    supLoremBody:    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    // ── /hardware (the product page, OASIS) — phase one, Eric's Aug 28
+    // rulings. Labels from the six B-1 frames (read from true-aspect
+    // renders; outlined SVGs carry no strings). Class names, families,
+    // finishes and colors are MANIFEST DATA behind these keys — the real
+    // catalog is a copy edit, no code change. The frames' lowercase
+    // "cart" and static prices are on the do-not-port list and have no
+    // keys here.
+    hardwareTitle:   'BACKSPACE — Hardware',
+    hwOasis:         'OASIS',
+    hwClassDesk:     'desk',
+    hwClassModule:   'module',
+    hwClassKeyboard: 'keyboard',
+    hwClassMouse:    'mouse',
+    hwClassLight:    'light',
+    hwClassPowerbank:'powerbank',
+    hwClassWatercup: 'watercup',
+    hwClassHeadset:  'headset',
+    hwClassSpeakers: 'speakers',
+    // The eight unreal classes preview as coming-soon (Eric, Aug 28 —
+    // the locked-classes game pattern).
+    hwComingSoon:    'COMING SOON...',
+    hwComingSoonSub: 'This class joins the OASIS catalog soon.',
+    hwIntroduction:  'INTRODUCTION',
+    hwCustom:        'CUSTOM',
+    hwIntroOverview: 'overview',
+    hwIntroDesign:   'industrial design',
+    hwIntroSpecs:    'specifications',
+    hwIntroEco:      'ecosystem',
+    hwIntroSupport:  'support',
+    hwSubSize:       'size',
+    hwSubDesktop:    'desktop',
+    hwSubDesklegs:   'desklegs',
+    hwSecMaterials:  'materials',
+    hwSecColor:      'color',
+    hwSecSize:       'size presets',
+    hwSecCustomSize: 'custom size',
+    // Material families + finishes — PLACEHOLDER catalog (manifest confirm
+    // owed); the finish carries the metal/roughness preset (Eric, Aug 28:
+    // metallic and roughness come as presets; structures built now).
+    hwMatSteel:      'stainless steel',
+    hwMatAluminum:   'aluminum alloy',
+    hwMatWalnut:     'walnut wood',
+    hwFinBrushed:    'brushed',
+    hwFinPVD:        'PVD',
+    hwFinPowder:     'powder-coated',
+    hwFinNatural:    'natural oiled',
+    hwFinLacquer:    'matte lacquer',
+    // Color rows — the reference screenshot's own set (Eric, Aug 28, p1).
+    hwColSilver:     'metallic silver',
+    hwColBW:         'black & white',
+    hwColRed:        'red',
+    hwColOrange:     'orange',
+    hwColYellow:     'yellow',
+    hwColGreen:      'green',
+    hwSizeCompact:   'compact',
+    hwSizeStandard:  'standard',
+    hwSizeWide:      'wide',
+    hwSizeStudio:    'studio',
+    hwFldLength:     'length',
+    hwFldWidth:      'width',
+    hwUnitCM:        'CM',
+    hwUnitIN:        'IN',
+    hwInvalidSize:   'Enter both dimensions within range.',
+    // Add-to-cart renders per the frames but DENIES — cart UI is a phase
+    // 2 session (Eric, Aug 28). The key ships so the control is honest.
+    hwAddToCart:     'add to cart',
+    hwPlateLorem:    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.'
   },
   zh: { /* populated when CN content lands; lookups fall back to en */ },
   ja: {},
@@ -141,6 +208,15 @@ var LANGS = ['en','zh','ja','es'];
 var LANG_ATTR = { en:'en', zh:'zh-CN', ja:'ja', es:'es' };
 var lang = 'en';
 function T(key){ return (STR[lang] && STR[lang][key]) || STR.en[key] || key; }
+// Every visible string flows from a key — the data-str render pass pages
+// run at boot, on locale swaps, and over freshly built DOM (factored from
+// /support with the trio, Aug 28).
+function renderStrings(root){
+  var els = (root || document).querySelectorAll('[data-str]');
+  for (var i = 0; i < els.length; i++){
+    els[i].textContent = T(els[i].getAttribute('data-str'));
+  }
+}
 
 var SECTIONS = ['hardware','software','community','support'];
 
@@ -148,9 +224,11 @@ var SECTIONS = ['hardware','software','community','support'];
 // Production serves clean paths (/software); the local python server and
 // file:// serve sibling .html files. Resolved once at boot.
 var HTMLISH = /\.html$/i.test(location.pathname) || location.protocol === 'file:';
+// ROUTES.hardware (Eric's product phase, Aug 28): the one-line flip — every
+// page's HARDWARE denial becomes a commit, zero page edits (ratified grammar).
 var ROUTES = HTMLISH
-  ? { home: 'home.html', software: 'software.html', community: 'community.html', support: 'support.html' }
-  : { home: '/', software: '/software', community: '/community', support: '/support' };
+  ? { home: 'home.html', hardware: 'hardware.html', software: 'software.html', community: 'community.html', support: 'support.html' }
+  : { home: '/', hardware: '/hardware', software: '/software', community: '/community', support: '/support' };
 
 // Commit-arrival vs cold boot (Part B deliverable 3): the committing page
 // stamps a same-tab flag before real navigation; the arriving page
@@ -967,6 +1045,194 @@ function init(config){
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   THE THREE FACTORINGS (product phase, Aug 28 2026) — the ratified
+   second-consumer trigger fired: /hardware consumes what /support built
+   page-side. Factored in the handoff's order (1. plate stack + sub-list
+   accordion · 2. click-to-open ladder · 3. form subsystem), DEFAULT-
+   RATIFIED AND LABELED: Eric's initiation reply answered every queue item
+   except this one; the stated default (ratify all three) executes per the
+   collection contract, and one word strikes any of them back out.
+   The code is /support's own, moved verbatim where it was already
+   house-generic and parameterized only where the page owned a choice.
+   CSS halves live in bs-chrome.css under the same banner.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+// ── 1a. The sub-list accordion — each menu item owns a SLOT; its sub-list
+// lives inside that slot (a collapsed sibling would still collect the
+// menu grid's gap). Structure is data: items = [{ key, subs?: [{key}] }];
+// every string renders through data-str. Callbacks own page state; the
+// builder owns only wiring (touch-guarded hover, wake, stopPropagation on
+// sub clicks — /support's certified event order, moved verbatim).
+function buildSlots(menuEl, items, cb){
+  var menuItems = [], subWraps = [], subEls = [];
+  items.forEach(function(it, idx){
+    var slot = document.createElement('div');
+    slot.className = 'bs-menu-slot';
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'bs-item';
+    if (cb.itemId) b.id = cb.itemId(idx);
+    var span = document.createElement('span');
+    span.className = 'bs-nav-label';
+    span.setAttribute('data-str', it.key);
+    b.appendChild(span);
+    b.addEventListener('mouseenter', function(){
+      if (_touchInput) return;
+      wake();
+      cb.onFocus(idx);
+    });
+    b.addEventListener('mouseleave', function(){
+      if (_touchInput) return;
+      cb.onBlur(idx);
+    });
+    b.addEventListener('click', function(){ wake(); cb.onClick(idx); });
+    slot.appendChild(b);
+    var ss = it.subs || null;
+    if (ss){
+      var wrap = document.createElement('div');
+      wrap.className = 'bs-sublist-wrap';
+      var list = document.createElement('div');
+      list.className = 'bs-sublist';
+      var mine = [];
+      ss.forEach(function(sub, sIdx){
+        var sb = document.createElement('button');
+        sb.type = 'button';
+        sb.className = 'bs-subitem';
+        sb.setAttribute('data-str', sub.key);
+        sb.tabIndex = -1;
+        sb.addEventListener('mouseenter', function(){
+          if (!_touchInput) sb.classList.add('kb-hover');
+        });
+        sb.addEventListener('mouseleave', function(){ sb.classList.remove('kb-hover'); });
+        sb.addEventListener('click', function(e){
+          e.stopPropagation();
+          wake();
+          cb.onSub(idx, sIdx);
+        });
+        list.appendChild(sb);
+        mine.push(sb);
+      });
+      wrap.appendChild(list);
+      slot.appendChild(wrap);
+      subWraps.push(wrap);
+      subEls.push(mine);
+    } else {
+      subWraps.push(null);
+      subEls.push(null);
+    }
+    menuEl.appendChild(slot);
+    menuItems.push(b);
+  });
+  return { items: menuItems, subWraps: subWraps, subEls: subEls };
+}
+
+// ── 1b. The plate stack — the right-hand detail column whose rows expand
+// DOWNWARD in place (0fr→1fr on --pop-motion). rows = [{ key, body }].
+// Phrasing content only: the plate is a <button>, so spans throughout and
+// the CSS gives them their boxes (/support's own note, moved with it).
+function buildPlates(stackEl, rows, cb){
+  stackEl.innerHTML = '';
+  var rowEls = [];
+  if (!rows) return rowEls;
+  rows.forEach(function(r, i){
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'bs-plate';
+    btn.setAttribute('aria-expanded', 'false');
+    var title = document.createElement('span');
+    title.className = 'bs-plate-title';
+    title.setAttribute('data-str', r.key);
+    var body = document.createElement('span');
+    body.className = 'bs-plate-body';
+    var clip = document.createElement('span');       // the overflow clip
+    var copy = document.createElement('span');
+    copy.className = 'bs-plate-copy';
+    copy.setAttribute('data-str', r.body);
+    clip.appendChild(copy);
+    body.appendChild(clip);
+    btn.appendChild(title);
+    btn.appendChild(body);
+    btn.addEventListener('mouseenter', function(){
+      if (!_touchInput) btn.classList.add('kb-hover');
+    });
+    btn.addEventListener('mouseleave', function(){ btn.classList.remove('kb-hover'); });
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      wake();
+      cb.onToggle(i);
+    });
+    stackEl.appendChild(btn);
+    rowEls.push(btn);
+  });
+  return rowEls;
+}
+
+// ── 2. The click-to-open ladder's walker — ONE instrumented function,
+// one honest level per press (house law). rungs = [{ name, when(), step() }]
+// in descent order; the first live rung steps. Esc, the level-aware corner
+// ‹ and door #1 all walk THIS, so they can never disagree. The page reads
+// .last() for its devState.
+function makeLadder(rungs){
+  var last = null;
+  return {
+    back: function(){
+      for (var i = 0; i < rungs.length; i++){
+        if (rungs[i].when()){
+          last = rungs[i].name;
+          rungs[i].step();
+          return true;
+        }
+      }
+      return false;
+    },
+    last: function(){ return last; }
+  };
+}
+
+// ── 3. The form subsystem's checks — the house validation grammar
+// (/support's submit loop, factored): first offending control back, or
+// null. Denial is the caller's job (denyOn + focus — nothing fails
+// silently). The email test is the one /support certified.
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function validateFields(els){
+  for (var i = 0; i < els.length; i++){
+    var f = els[i];
+    var v = (f.value || '').trim();
+    var okEmail = (f.type !== 'email') || EMAIL_RE.test(v);
+    if (!v || !okEmail) return f;
+  }
+  return null;
+}
+
+// ── Shared measurement primitives (the measured-never-hardcoded law) ─────
+// Cap-midpoint solve: a marker dot aligns to the TEXT's cap midpoint, from
+// real font metrics — never to the line box (leading + divider padding
+// both move it, measured on /support). Returns null on engines without
+// the metrics so the CSS fallback stays in charge.
+var _mctx = null;
+function capMid(el){
+  if (!_mctx) _mctx = document.createElement('canvas').getContext('2d');
+  var cs = getComputedStyle(el);
+  _mctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+  var cap = _mctx.measureText('H');
+  var lh = parseFloat(cs.lineHeight);
+  var fa = cap.fontBoundingBoxAscent, fd = cap.fontBoundingBoxDescent;
+  var ca = cap.actualBoundingBoxAscent;
+  if (!isFinite(lh) || !isFinite(fa) || !isFinite(fd) || !isFinite(ca)) return null;
+  return (lh - (fa + fd)) / 2 + fa - ca / 2;     // line-box top -> cap midpoint
+}
+// List pitch, measured from the first two live rows (item top -> next
+// item top) so wheel triggers follow any spacing tune.
+function measureListPitch(els, fallback){
+  if (els.length > 1){
+    var a = els[0].getBoundingClientRect(), b = els[1].getBoundingClientRect();
+    var p = b.top - a.top;
+    if (p > 0) return p;
+  }
+  return fallback;
+}
+
 // ── Export ────────────────────────────────────────────────────────────────
 window.BSChrome = {
   init: init,
@@ -980,6 +1246,14 @@ window.BSChrome = {
   // re-runs it for locale swaps.
   normalizeWordGlow: normalizeWordGlow,
   bindPill: bindPill,
+  renderStrings: renderStrings,
+  // The factored trio (Aug 28) + the measurement primitives they lean on.
+  buildSlots: buildSlots,
+  buildPlates: buildPlates,
+  makeLadder: makeLadder,
+  validateFields: validateFields,
+  capMid: capMid,
+  measureListPitch: measureListPitch,
   rail: {
     focus: setIconFocus,
     step: iconStep,

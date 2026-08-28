@@ -249,6 +249,35 @@
   --side-menu-shift-x: calc(33px * var(--ui-scale));
   --side-menu-motion: var(--pop-motion);
   --side-menu-fade: var(--pop-fade);
+  /* ── THE WARM MARKER — house vocabulary member two (canon §7), factored
+     from /support with the form subsystem (Aug 28). #f2e7d5 exactly (the
+     frame's core pixel), with the FITTED 3-ring spread halo — measured
+     radial falloff, box-shadows compose in parallel (radii ≤44px).
+     Ranking grammar: dim at rest (--bs-dot-rest), full under the pointer
+     and on the open/hovered owner. Do not harmonize with the signal-red
+     dot or the outline ring — three vocabularies by design (canon §7),
+     four with the blue product dot (Eric ratified Aug 28, below). */
+  --bs-marker-warm: #f2e7d5;
+  --bs-marker-warm-glow:
+    0 0 calc(9px  * var(--ui-scale))                              rgba(242, 231, 213, .85),
+    0 0 calc(32px * var(--ui-scale)) calc(3px  * var(--ui-scale)) rgba(242, 231, 213, .42),
+    0 0 calc(44px * var(--ui-scale)) calc(14px * var(--ui-scale)) rgba(242, 231, 213, .16);
+  --bs-dot-rest: .45;
+  /* THE BLUE DOT — vocabulary member four: right/product-menu active
+     (Eric, Aug 28: "the blue dot might appear elsewhere in other pages
+     as well" — ratified house-wide, first consumer /hardware). #125277
+     exactly, from the six B-1 frames; 5×5 grammar; y cap-mid solved
+     like every marker. p.5 world palette, per the palette doctrine. */
+  --bs-marker-blue: #125277;
+  /* Form-subsystem rhythm — /support's measured values as the shared
+     defaults (title→divider→value; ink-to-rule distances are MEASURED
+     per face, so retune by re-measuring, never by nudging one side). */
+  --bs-rule: var(--panel-line);
+  --bs-rule-above: calc(14px * var(--ui-scale));
+  --bs-rule-below: calc(8px  * var(--ui-scale));
+  --bs-fld-above:  calc(7px  * var(--ui-scale));
+  --bs-fld-below:  calc(4px  * var(--ui-scale));
+  --bs-label: #ffffff94;
   /* Witness layout anchors (scene-layer vars, lvw/lvh → vw/vh per the
      certified port convention): */
   --edge-x: max(clamp(34px, 3.8vw, 68px), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
@@ -360,12 +389,12 @@ body {
 a#bs-wordmark-link { display: contents; }
 /* Section pages share the wordmark-as-control grammar; the gate widens by
    one page name as each section lands (community: Aug 23). */
-body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"]) #bs-wordmark {
+body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"]) #bs-wordmark {
   pointer-events: auto; cursor: var(--cursor-target);
   transition: filter .2s;
 }
-body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"]) a#bs-wordmark-link:hover #bs-wordmark,
-body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"]) a#bs-wordmark-link:focus-visible #bs-wordmark {
+body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"]) a#bs-wordmark-link:hover #bs-wordmark,
+body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"]) a#bs-wordmark-link:focus-visible #bs-wordmark {
   filter: drop-shadow(0 0 18px rgba(255,255,255,0.55));
 }
 a#bs-wordmark-link:focus-visible { outline: none; }
@@ -921,6 +950,354 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   }
 }
 
+/* ── bs-window--diag — THE DIAGONAL DRAW, REVIVED (Eric, Aug 28: the
+   product frames draw the second lower-right triangle because the design
+   team designed against the v2 mechanic — "bring back the old diagonally
+   expansion frame draw from the support page and use it here").
+   A VARIANT, not a supersession: the waterfall above stays the mechanic
+   on /support where Eric feel-ruled it; /hardware mounts this one. The
+   mechanic is v2's own (shared/bs-window.css, the frozen review record),
+   re-expressed against the merged structure and the frame-measured
+   tokens: at rest the window IS the seed square — the two corner
+   triangles co-located; on .is-open the lower-right triangle TRAVELS to
+   the far corner while the host's clip-path draws the fill out behind it,
+   both on one duration + curve (--expand-curve), so wide/tall/mixed
+   expansion falls out of the target ratio alone. Content fades once the
+   frame lands. Removing .is-open retracts to the seed square — v2's own
+   free close. The fill lives on the HOST here (v2 structure): the clip is
+   never line-thin, so the triangles are never sheared the way the
+   waterfall's line phase would shear them. ::after is the TRAVELER, not
+   the fill — everything else (::before origin triangle, content fade,
+   .is-hidden absence) is the merged subsystem's own. */
+.bs-window--diag {
+  background: var(--bsw-fill);
+  clip-path: inset(0 calc(100% - var(--bsw-corner)) calc(100% - var(--bsw-corner)) 0);
+  transition:
+    clip-path  var(--pop-duration) var(--expand-curve),
+    height     var(--pop-duration) var(--expand-curve),
+    opacity    var(--pop-fade),
+    visibility 0s;
+}
+.bs-window--diag::after {
+  inset: auto;                       /* the fill layer becomes the traveler */
+  top: 0; left: 0;
+  width: var(--bsw-corner);
+  height: var(--bsw-corner);
+  z-index: 2;
+  clip-path: none;
+  filter: var(--bsw-glow);
+  background: linear-gradient(to bottom right,
+    transparent calc(50% - .5px), var(--ink) calc(50% + .5px));
+  transition:
+    top  var(--pop-duration) var(--expand-curve),
+    left var(--pop-duration) var(--expand-curve);
+}
+.bs-window--diag.is-open { clip-path: inset(0 0 0 0); }
+.bs-window--diag.is-open::after {
+  animation: none;                   /* the waterfall never runs on this variant */
+  top:  calc(100% - var(--bsw-corner));
+  left: calc(100% - var(--bsw-corner));
+}
+.bs-window--diag.is-hidden::after { animation: none; clip-path: none; }
+@media (prefers-reduced-motion: reduce) {
+  /* Same cascade trap as the waterfall's (see above): the blanket
+     .bs-window reduce rules sit at lower specificity than this variant's
+     own declarations, so each is repeated at the state selectors' rank. */
+  .bs-window--diag { transition: opacity var(--pop-fade), visibility 0s; }
+  .bs-window--diag.is-hidden { transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration); }
+  .bs-window--diag::after, .bs-window--diag.is-open::after { transition: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE THREE FACTORINGS — CSS halves (product phase, Aug 28; the engine
+   halves and the ratification note live in bs-chrome.js under the same
+   banner). /support's certified page-side rules, moved verbatim; only
+   names and tokens changed hands (sup-* → bs-*, page tokens → the :root
+   defaults above). Placement stays page-side everywhere — the shared
+   sheet carries component mechanics only.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1a. The sub-list accordion — a second level INSIDE a menu. Each item
+   owns a SLOT; the sub-list lives inside its parent's slot rather than as
+   a sibling in the menu grid (a collapsed sibling would still take the
+   grid's gap on both sides). Inside the slot, a collapsed list
+   contributes exactly nothing. The slot is itself a grid so the item's
+   negative hit-area margins cannot collapse against it. */
+.bs-menu-slot { display: grid; }
+.bs-sublist-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--pop-motion);
+}
+.bs-sublist-wrap.is-on { grid-template-rows: 1fr; }
+.bs-sublist {
+  overflow: hidden;
+  display: grid;
+  gap: calc(16px * var(--ui-scale));
+}
+/* THE LAST ITEM'S DESCENDERS live inside this clip (measured on
+   /support): room is padding on the LAST CHILD, deliberately NOT on the
+   clipped list — border-box props a 0-height box open at its own padding
+   and breaks the closed-contributes-nothing invariant. */
+.bs-sublist > :last-child { padding-bottom: calc(8px * var(--ui-scale)); }
+.bs-sublist > :last-child.is-chosen::before {
+  top: calc(50% - 4px * var(--ui-scale));
+}
+.bs-sublist > :first-child { margin-top: calc(18px * var(--ui-scale)); }
+.bs-subitem {
+  position: relative;
+  /* Indented to sit under the POPPED parent's label; the box HUGS the
+     label rather than stretching across the menu column (an unbounded
+     box makes the empty gutter a click target — the measured fault). */
+  padding-left: var(--side-menu-shift-x);
+  width: max-content; max-width: 100%;
+  justify-self: start;
+  display: flex; align-items: center;
+  background: none; border: 0;
+  color: var(--text-soft);
+  font-family: var(--font-ui); font-weight: 300;
+  font-size: calc(12px * var(--ui-scale));
+  line-height: calc(14px * var(--ui-scale));
+  letter-spacing: 0; white-space: nowrap; text-align: left;
+  text-shadow: var(--glow-text-word);
+  cursor: var(--cursor-target);
+  /* LABELED PERF DEVIATION (measured on /support, now the SHARED
+     default): text-shadow is NOT transitioned — the glow SNAPS on (one
+     paint of the finished chain; the certified .2s ease repainted twelve
+     growing shadows per frame across a swept list). */
+  transition: color .16s;
+}
+/* The hover chain is --glow-text-icons-word VERBATIM minus its 184px
+   ring — the swept-surface rider (canon §5.5): the 184px kernel was
+   profiled as the entire lag on /support's list (14.6→8.5 ms/frame),
+   and every .bs-subitem surface is a swept list by construction. The
+   TOKEN is untouched; the trim is the class's own. */
+.bs-subitem.kb-hover, .bs-subitem:focus-visible {
+  color: #fff; outline: none;
+  text-shadow:
+    0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1),
+    0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95),
+    0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75),
+    0 0 96px rgba(255,255,255,0.5),
+    0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))),
+    0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))),
+    0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95))),
+    0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95)));
+}
+.bs-subitem.is-chosen { color: #fff; font-weight: 600; }
+/* THE HOLLOW RING — vocabulary member three: a chosen sub-item carries
+   the signal-red OUTLINE ring in the parent's own left gutter. */
+.bs-subitem.is-chosen::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+  border: 1px solid var(--color-signal-red);
+  border-radius: 50%;
+  box-shadow: 0 0 calc(9px * var(--ui-scale)) rgba(157, 31, 0, .45);
+  transform: translateY(-50%);
+}
+
+/* ── 1b. The plate stack — the right-hand detail column; rows expand
+   DOWNWARD in place, one at a time. Container placement is page-side;
+   this class carries the mechanics. */
+.bs-stack {
+  display: grid;
+  grid-auto-rows: max-content;
+  gap: calc(10px * var(--ui-scale));
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff5c transparent;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+}
+.bs-stack.is-on {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transition: opacity var(--pop-fade), visibility 0s;
+}
+.bs-plate {
+  position: relative;
+  display: block; width: 100%;
+  border: 0; margin: 0;
+  background: var(--bsw-fill);
+  padding: calc(20px * var(--ui-scale)) calc(34px * var(--ui-scale));
+  text-align: left;
+  cursor: var(--cursor-target);
+  transition: background .16s;
+}
+.bs-plate-title {
+  display: block;
+  color: var(--text-soft);
+  font-family: var(--font-sans); font-weight: 300;
+  font-size: calc(13px * var(--ui-scale));
+  line-height: calc(18px * var(--ui-scale));
+  letter-spacing: .01em;
+  transition: color .16s, text-shadow .2s ease;
+}
+/* The plate's marker — on the RIGHT (the company, Aug 25): the warm
+   marker with the fitted halo, ranked dim at rest / full on the plate
+   under the pointer / full on the open plate. y is SOLVED into
+   --bs-dot-y from the title's own metrics (C.capMid). */
+.bs-plate::after {
+  content: ''; position: absolute;
+  right: calc(34px * var(--ui-scale));
+  top: var(--bs-dot-y, calc(29px * var(--ui-scale)));
+  width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+  background: var(--bs-marker-warm); border-radius: 50%;
+  box-shadow: var(--bs-marker-warm-glow);
+  transform: translateY(-50%);
+  opacity: var(--bs-dot-rest);
+  transition: opacity .2s ease;
+}
+.bs-plate.kb-hover::after,
+.bs-plate:focus-visible::after,
+.bs-plate.is-open::after { opacity: 1; }
+.bs-plate.kb-hover, .bs-plate:focus-visible { outline: none; background: #fefefe24; }
+.bs-plate.kb-hover .bs-plate-title, .bs-plate:focus-visible .bs-plate-title {
+  color: #fff; text-shadow: var(--glow-text);
+}
+.bs-plate.is-open .bs-plate-title {
+  color: var(--ink); font-weight: 600; text-shadow: var(--glow-text);
+}
+/* The downward expansion: 0fr → 1fr travels to the content's OWN height
+   — the one way to animate to `auto` honestly. House tempo, no local
+   duration. Spans, not divs: the plate is a <button> (phrasing content);
+   the CSS gives them their boxes. */
+.bs-plate-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--pop-motion);
+}
+.bs-plate.is-open .bs-plate-body { grid-template-rows: 1fr; }
+.bs-plate-body > span { display: block; overflow: hidden; }
+.bs-plate-copy {
+  display: block;
+  margin: calc(14px * var(--ui-scale)) 0 0;
+  color: var(--text-soft);
+  font-family: var(--font-sans); font-weight: 300;
+  font-size: calc(12px * var(--ui-scale));
+  line-height: 1.75;
+}
+
+/* ── 3. The form subsystem — title → divider → value fields, the warm
+   field markers, the option list, the inverted submit plate. The label
+   is a stretched grid item, so its own border IS the full-column rule. */
+.bs-form { display: grid; gap: calc(30px * var(--ui-scale)); }
+.bs-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  column-gap: calc(61px * var(--ui-scale));
+  row-gap: calc(30px * var(--ui-scale));
+}
+.bs-field { position: relative; display: grid; gap: var(--bs-fld-below); }
+.bs-field--wide { grid-column: 1 / -1; }
+.bs-field > label {
+  text-align: right;
+  color: var(--bs-label);
+  font-family: var(--font-ui); font-weight: 300;
+  font-size: calc(11px * var(--ui-scale));
+  line-height: calc(13px * var(--ui-scale));
+  letter-spacing: .04em;
+  padding-bottom: var(--bs-fld-above);
+  border-bottom: 1px solid var(--bs-rule);
+}
+/* The field's marker answers the pointer (Eric, Aug 25): the dot on the
+   field under the mouse/keyboard glows, every other dot sits dim.
+   :focus-within is the keyboard twin; native :hover is right here —
+   fields are native controls, not machine-cursor surfaces. */
+.bs-field::before {
+  content: ''; position: absolute; left: 0;
+  top: var(--bs-dot-y, calc(6.5px * var(--ui-scale)));   /* cap midpoint — measured */
+  width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+  background: var(--bs-marker-warm); border-radius: 50%;
+  box-shadow: var(--bs-marker-warm-glow);
+  transform: translateY(-50%);
+  opacity: var(--bs-dot-rest);
+  transition: opacity .2s ease;
+}
+.bs-field:hover::before,
+.bs-field:focus-within::before { opacity: 1; }
+.bs-input, .bs-area {
+  width: 100%;
+  background: none; border: 0; padding: 0;
+  color: var(--ink);
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: calc(13px * var(--ui-scale));
+  line-height: calc(17px * var(--ui-scale));
+  letter-spacing: 0;
+  text-align: right;
+  text-shadow: var(--glow-text);
+  caret-color: var(--ink);
+  cursor: var(--cursor-target);
+  transition: text-shadow .2s ease;
+}
+.bs-input:focus, .bs-area:focus { outline: none; text-shadow: var(--glow-text-hover); }
+.bs-input::placeholder, .bs-area::placeholder { color: #ffffff42; }
+.bs-area {
+  text-align: left; resize: none;
+  min-height: calc(96px * var(--ui-scale));
+  line-height: 1.45;
+}
+/* The option list — right-aligned bold rows on the frames' 27px pitch;
+   the target HUGS its label (an unbounded box makes empty panel a click
+   target — the measured fault), pushed right by the auto margin. */
+.bs-options { margin-top: var(--bs-opt-below, calc(4px * var(--ui-scale))); display: grid; }
+.bs-option {
+  display: block;
+  width: max-content; max-width: 100%;
+  margin-left: auto;
+  padding: 0 0 0 calc(24px * var(--ui-scale));
+  border: 0; background: none;
+  text-align: right;
+  color: var(--ink);
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: calc(13px * var(--ui-scale));
+  line-height: calc(27px * var(--ui-scale));
+  letter-spacing: 0;
+  text-shadow: var(--glow-text);
+  cursor: var(--cursor-target);
+  transition: color .16s, text-shadow .2s ease;
+}
+.bs-option.kb-hover, .bs-option:focus-visible {
+  color: #fff; outline: none;
+  text-shadow: var(--glow-text-hover);
+}
+.bs-option.is-chosen { color: #fff; }
+.bs-foot {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: calc(24px * var(--ui-scale));
+  margin-top: calc(6px * var(--ui-scale));
+}
+.bs-note {
+  margin: 0; max-width: 62%;
+  color: var(--bs-label);
+  font-family: var(--font-sans); font-weight: 300;
+  font-size: calc(11px * var(--ui-scale));
+  line-height: 1.5;
+}
+.bs-note.is-said { color: var(--ink); text-shadow: var(--glow-text); }
+/* Submit — the one INVERTED control in the interface: light plate, dark
+   ink, exactly as the frames draw it. */
+.bs-submit {
+  flex: none;
+  padding: calc(7px * var(--ui-scale)) calc(22px * var(--ui-scale));
+  border: 0; border-radius: 0;
+  background: #ededed;
+  color: #0b0b0a;
+  font-family: var(--font-ui); font-weight: 300;
+  font-size: calc(12px * var(--ui-scale));
+  letter-spacing: .04em;
+  cursor: var(--cursor-target);
+  box-shadow: 0 0 calc(18px * var(--ui-scale)) rgba(255,255,255,.20);
+  transition: background .16s, box-shadow .2s ease;
+}
+.bs-submit:hover, .bs-submit:focus-visible, .bs-submit.kb-hover {
+  background: #fff; outline: none;
+  box-shadow: 0 0 calc(26px * var(--ui-scale)) rgba(255,255,255,.42);
+}
+@media (prefers-reduced-motion: reduce) {
+  .bs-sublist-wrap, .bs-plate-body { transition: none; }
+  .bs-plate::after, .bs-field::before { transition: none; }
+}
+
 /* iOS-style "locked" shake — denied input shakes; nothing fails
    silently. Under reduced motion the shake becomes a non-motion blink. */
 @keyframes bs-shake {
@@ -990,7 +1367,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   #bs-icons { transition: opacity var(--pop-fade); }
   /* On section pages the corner owns the top-left — the wordmark drops
      to a centered berth below the two top rails instead. */
-  body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"]) #bs-wordmark {
+  body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"]) #bs-wordmark {
     left: 50%; transform: translateX(-50%);
     top: calc(100px * var(--ui-scale));
     width: 104px;
