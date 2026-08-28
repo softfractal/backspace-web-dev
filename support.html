@@ -470,7 +470,7 @@
     from = sessionStorage.getItem('bs-nav-from');
     sessionStorage.removeItem('bs-nav-from');
   } catch (e) {}
-  window.__bsArrival = (from === 'home' || from === 'software' || from === 'community' || from === 'hardware');
+  window.__bsArrival = (from === 'home' || from === 'software' || from === 'community' || from === 'hardware' || from === 'cart');
   window.__bsArrivalFrom = window.__bsArrival ? from : null;
   if (window.__bsArrival && !(window.CSS && CSS.supports && CSS.supports('view-transition-name: a'))){
     document.documentElement.classList.add('bs-arrive');

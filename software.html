@@ -113,7 +113,7 @@
     sessionStorage.removeItem('bs-nav-from');
   } catch (e) {}
   // Arrivals commit from home or a sibling section (community, Aug 23).
-  window.__bsArrival = (from === 'home' || from === 'community' || from === 'support' || from === 'hardware');
+  window.__bsArrival = (from === 'home' || from === 'community' || from === 'support' || from === 'hardware' || from === 'cart');
   window.__bsArrivalFrom = window.__bsArrival ? from : null;
   // Fallback resolve only where the browser cannot run the shared
   // chrome's view-transition morph.

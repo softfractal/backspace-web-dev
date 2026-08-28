@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#040402">
+<title>BACKSPACE — Cart</title>
+<!--
+  backspace — /cart (the dedicated cart page; Eric's sixth word, Aug 28:
+  "upon close inspection, the cart page isn't actually too complicated,
+  let's build it along with the product page"). A DESTINATION, not a
+  section: the away pill stays four; the utility cart circle and
+  /hardware's view-cart seam commit here through ROUTES.cart (one line,
+  house-wide). GEOMETRY from the B-2 frames (outlined SVGs; extracted by
+  bbox pass + true-aspect renders, values in the build report): the page
+  reuses the tray's own construction rails — 65 (3.76vw), the divider
+  1223 (70.78vw), 1671 (3.30vw inset) — with the section rule at y275.
+
+  THE GRAMMAR (the design team's note frame, translated):
+  · click any small frame -> the big frame shows that product's preview
+    + the detail column shows its information;
+  · FILLED triangle = checked, HOLLOW = unchecked (the checkbox);
+  · checked items surface in ORDER SUMMARY — they are the final order;
+  · the X on a summary card is where DELETION lives;
+  · qty steppers on the cards; promo/apply, totals, checkout below.
+
+  SEAMS, honest: every money figure renders "—" (the frames' $4141 /
+  $2499 are the on-record do-not-port statics; the price source is
+  unruled). checkout / apply / kickstarter DENY with the shake —
+  commerce wiring and the third-party overlay question are phase 2+.
+  The item-switch rows in the detail column are a LABELED INTERPRETATION
+  of the note's "click button -> expand below" (design confirm owed).
+
+  The preview mounts the shared stage ball (bs-ball.js — factored at
+  this, its second consumer); the desk GLB rebinds behind the same api.
+-->
+<link rel="stylesheet" href="shared/bs-chrome.css">
+<style>
+  body[data-bs-page="cart"] {
+    --ct-top: 22.02vh;          /* rails y246 */
+    --ct-rule: 24.62vh;         /* the section rule y275 */
+    --ct-crumb: 22.33vh;        /* breadcrumb ink y249 */
+  }
+
+  /* ── Construction: the tray's rails carried up the page ─────────────── */
+  .ct-rail {
+    position: fixed; width: 1px;
+    top: var(--ct-top); height: calc(98.12vh - var(--ct-top));
+    background: var(--panel-line);
+    pointer-events: none;
+  }
+  #ct-rail-l   { left: max(clamp(34px, 3.8vw, 68px), 3.76vw); }
+  #ct-rail-div { left: 70.78vw; }
+  #ct-rail-r   { right: 3.30vw; }
+  #ct-rule {
+    position: fixed; left: 1.91vw; right: 1.91vw;
+    top: var(--ct-rule); height: 1px;
+    background: var(--panel-line);
+    pointer-events: none;
+  }
+
+  /* ── Breadcrumb: CART › CHECKOUT ────────────────────────────────────── */
+  #ct-crumbs {
+    position: fixed; left: 5.56vw; top: var(--ct-crumb);
+    z-index: 16;
+    display: flex; align-items: baseline;
+    gap: calc(14px * var(--ui-scale));
+    font-family: var(--font-ui);
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .08em;
+  }
+  #ct-crumbs .is-here { color: var(--ink); font-weight: 600; text-shadow: var(--glow-text); }
+  #ct-crumbs .ct-crumb-sep { color: #e6e6e6; opacity: .5; font-weight: 300; }
+  #ct-crumb-checkout {
+    background: none; border: 0; padding: 0;
+    color: var(--bs-label); font-weight: 300;
+    font-family: var(--font-ui);
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .08em;
+    cursor: var(--cursor-target);
+    transition: color .16s;
+  }
+  #ct-crumb-checkout:hover, #ct-crumb-checkout:focus-visible { color: #fff; outline: none; }
+  #ct-summary-head {
+    position: fixed; left: 72.5vw; top: var(--ct-crumb);
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .12em;
+  }
+
+  /* ── The big preview (95,305,715,467) — the selected item's stage ───── */
+  #ct-preview {
+    position: fixed;
+    left: 5.50vw; top: 27.31vh;
+    width: 41.38vw; height: 41.83vh;
+    background: #4a4a4a5c;
+    z-index: 4;
+  }
+  #ct-preview canvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+  }
+  /* The preview's corner triangle mirrors the SELECTED item's checkbox. */
+  .ct-tri {
+    position: absolute; top: 0; left: 0;
+    width: calc(11px * var(--ui-scale)); height: calc(11px * var(--ui-scale));
+    display: block; overflow: visible;
+    cursor: var(--cursor-target);
+    z-index: 2;
+  }
+  .ct-tri path {
+    fill: none; stroke: #fefefe99; stroke-width: 1.1;
+    vector-effect: non-scaling-stroke;
+    transition: fill .16s, stroke .16s;
+  }
+  .ct-tri.is-checked path { fill: #fefefe; stroke: #fefefe; }
+  .ct-tri:hover path, .ct-tri:focus-visible path { stroke: #fff; filter: drop-shadow(0 0 4px rgba(255,255,255,.6)); }
+  .ct-tri:focus-visible { outline: none; }
+
+  /* ── The thumbnail grid — the slot chrome recycled (rows pitch 105) ── */
+  #ct-grid {
+    position: fixed;
+    left: 5.50vw; top: 70.28vh;
+    width: 41.38vw;
+    max-height: calc(98.12vh - 70.28vh);
+    display: flex; flex-wrap: wrap;
+    gap: calc(15px * var(--ui-scale)) calc(25px * var(--ui-scale));
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #ffffff5c transparent;
+    z-index: 4;
+  }
+  .ct-thumb {
+    position: relative;
+    flex: none;
+    width: calc(160px * var(--ui-scale)); height: calc(90px * var(--ui-scale));
+    background: #4a4a4a5c;
+    border: 0; padding: 0;
+    transition: background .16s;
+  }
+  .ct-thumb.is-filled { cursor: var(--cursor-target); }
+  .ct-thumb.is-filled:hover, .ct-thumb.is-filled:focus-visible {
+    background: #5c5c5c5c; outline: none;
+  }
+  .ct-thumb.is-live { background: #5c5c5c7a; }   /* the previewed one */
+  .ct-thumb-name {
+    position: absolute; left: calc(9px * var(--ui-scale)); bottom: calc(7px * var(--ui-scale));
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .02em;
+    pointer-events: none;
+  }
+  .ct-thumb-chip {
+    position: absolute; right: calc(9px * var(--ui-scale)); bottom: calc(9px * var(--ui-scale));
+    width: calc(10px * var(--ui-scale)); height: calc(10px * var(--ui-scale));
+    border: 1px solid var(--panel-line);
+    pointer-events: none;
+  }
+
+  /* ── The detail column (845..1189) ──────────────────────────────────── */
+  #ct-detail {
+    position: fixed;
+    left: 48.90vw; top: 27.31vh;
+    width: 19.91vw;
+    bottom: calc(100vh - 98.12vh);
+    z-index: 4;
+    display: flex; flex-direction: column;
+    gap: calc(12px * var(--ui-scale));
+  }
+  /* Item-switch rows — LABELED INTERPRETATION of the note's "click
+     button -> expand below": one row per cart item; the open row is the
+     previewed one and its details render below. */
+  #ct-rows {
+    display: grid; gap: calc(6px * var(--ui-scale));
+    max-height: calc(102px * var(--ui-scale));
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #ffffff5c transparent;
+  }
+  .ct-row {
+    display: flex; align-items: stretch;
+    height: calc(30px * var(--ui-scale));
+    border: 0; padding: 0; background: none;
+    cursor: var(--cursor-target);
+    flex: none;
+  }
+  .ct-row-chip {
+    flex: none;
+    width: calc(30px * var(--ui-scale));
+    display: grid; place-items: center;
+    background: #ededed; color: #0b0b0a;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+  }
+  .ct-row-bar {
+    flex: none;
+    width: calc(87px * var(--ui-scale));
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 calc(8px * var(--ui-scale));
+    background: #4a4a4a5c;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(10px * var(--ui-scale));
+    letter-spacing: .04em;
+    white-space: nowrap;
+    transition: background .16s, color .16s;
+  }
+  .ct-row:hover .ct-row-bar, .ct-row:focus-visible .ct-row-bar { background: #5c5c5c5c; color: #fff; }
+  .ct-row:focus-visible { outline: none; }
+  .ct-row.is-live .ct-row-bar { color: var(--ink); font-weight: 600; }
+  /* Kickstarter — drawn per the frames; an EXTERNAL hand-off seam: the
+     click DENIES until the third-party overlay ruling (phase 2+). */
+  #ct-kick {
+    position: absolute; right: 0; top: 0;
+    width: calc(133px * var(--ui-scale));
+    display: grid; gap: calc(0px * var(--ui-scale));
+  }
+  #ct-kick-btn {
+    height: calc(30px * var(--ui-scale));
+    border: 0;
+    background: #fefefe;
+    color: #05ce78;
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .08em;
+    cursor: var(--cursor-target);
+    transition: background .16s;
+  }
+  #ct-kick-btn:hover, #ct-kick-btn:focus-visible { background: #fff; outline: none; }
+  #ct-kick-note {
+    height: calc(30px * var(--ui-scale));
+    display: flex; align-items: center; justify-content: center;
+    background: #4a4a4a5c;
+    color: var(--bs-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(9px * var(--ui-scale));
+    letter-spacing: .02em;
+    text-align: center;
+  }
+  #ct-title {
+    margin-top: calc(160px * var(--ui-scale));   /* the frames' air above the title */
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(14px * var(--ui-scale));
+    letter-spacing: .04em;
+    text-shadow: var(--glow-text);
+  }
+  #ct-specs {
+    display: grid; gap: calc(6px * var(--ui-scale));
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    line-height: 1.5;
+    letter-spacing: .02em;
+  }
+  #ct-specs .ct-spec-k { color: var(--bs-label); margin-right: calc(8px * var(--ui-scale)); }
+  #ct-pricebar {
+    margin-top: auto;                            /* the frames put it at the column's foot */
+    height: calc(30px * var(--ui-scale));
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 calc(12px * var(--ui-scale));
+    background: #4a4a4a5c;
+    color: var(--bs-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+  #ct-pricebar b { color: var(--ink); font-weight: 600; }
+
+  /* ── ORDER SUMMARY (1243..1651) ─────────────────────────────────────── */
+  #ct-summary {
+    position: fixed;
+    left: 71.93vw; right: 4.46vw;
+    top: 27.31vh; bottom: calc(100vh - 98.12vh);
+    z-index: 4;
+    display: flex; flex-direction: column;
+    gap: calc(15px * var(--ui-scale));
+  }
+  #ct-items-head {
+    flex: none;
+    height: calc(30px * var(--ui-scale));
+    display: flex; align-items: center;
+    padding-left: calc(12px * var(--ui-scale));
+    background: #4a4a4a5c;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .04em;
+    position: relative;
+  }
+  #ct-items-count {
+    position: absolute; right: 0; top: 0;
+    width: calc(30px * var(--ui-scale)); height: calc(30px * var(--ui-scale));
+    display: grid; place-items: center;
+    background: #ededed; color: #0b0b0a;
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(12px * var(--ui-scale));
+  }
+  #ct-cards {
+    flex: 1; min-height: 0;
+    display: grid; gap: calc(15px * var(--ui-scale));
+    grid-auto-rows: max-content;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #ffffff5c transparent;
+  }
+  .ct-card {
+    position: relative;
+    height: calc(115px * var(--ui-scale));
+    background: #4a4a4a5c;
+  }
+  .ct-card-chipimg {
+    position: absolute;
+    left: calc(11px * var(--ui-scale)); top: calc(31px * var(--ui-scale));
+    width: calc(87px * var(--ui-scale)); height: calc(65px * var(--ui-scale));
+    border: 1px solid var(--panel-line);
+  }
+  .ct-card-title {
+    position: absolute;
+    left: calc(110px * var(--ui-scale)); top: calc(16px * var(--ui-scale));
+    right: calc(36px * var(--ui-scale));
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .02em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ct-card-sub {
+    position: absolute;
+    left: calc(110px * var(--ui-scale)); top: calc(34px * var(--ui-scale));
+    right: calc(36px * var(--ui-scale));
+    color: var(--bs-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(9px * var(--ui-scale));
+    letter-spacing: .02em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ct-card-x {
+    position: absolute; right: calc(10px * var(--ui-scale)); top: calc(10px * var(--ui-scale));
+    width: calc(14px * var(--ui-scale)); height: calc(14px * var(--ui-scale));
+    background: none; border: 0; padding: 0;
+    color: var(--text-soft);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(13px * var(--ui-scale)); line-height: 1;
+    cursor: var(--cursor-target);
+    transition: color .16s;
+  }
+  .ct-card-x:hover, .ct-card-x:focus-visible { color: #fff; outline: none; text-shadow: var(--glow-text); }
+  .ct-step {
+    position: absolute;
+    left: calc(110px * var(--ui-scale)); bottom: calc(14px * var(--ui-scale));
+    display: flex; align-items: stretch;
+    height: calc(20px * var(--ui-scale));
+  }
+  .ct-step button {
+    width: calc(20px * var(--ui-scale));
+    border: 0; padding: 0;
+    background: #ededed; color: #101010;
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale)); line-height: 1;
+    cursor: var(--cursor-target);
+    transition: background .16s;
+  }
+  .ct-step button:hover, .ct-step button:focus-visible { background: #fff; outline: none; }
+  .ct-step .ct-step-n {
+    width: calc(29px * var(--ui-scale));
+    display: grid; place-items: center;
+    background: #4a4a4a;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+  }
+  .ct-card-price {
+    position: absolute;
+    right: calc(12px * var(--ui-scale)); bottom: calc(16px * var(--ui-scale));
+    color: #e6e6e6;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+  #ct-foot {
+    flex: none;
+    display: grid; gap: calc(6px * var(--ui-scale));
+  }
+  .ct-bar {
+    position: relative;
+    height: calc(30px * var(--ui-scale));
+    display: flex; align-items: center;
+    padding-left: calc(12px * var(--ui-scale));
+    background: #4a4a4a5c;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+  .ct-bar .ct-bar-btn {
+    position: absolute; right: 0; top: 0;
+    width: calc(99px * var(--ui-scale)); height: 100%;
+    border: 0;
+    background: #ededed; color: #6a6a6c;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .04em;
+    cursor: var(--cursor-target);
+    transition: background .16s, color .16s;
+  }
+  .ct-bar .ct-bar-btn:hover, .ct-bar .ct-bar-btn:focus-visible { background: #fff; color: #0b0b0a; outline: none; }
+  #ct-promo-in {
+    flex: 1; min-width: 0;
+    background: none; border: 0; padding: 0;
+    margin-right: calc(105px * var(--ui-scale));
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(12px * var(--ui-scale));
+    caret-color: var(--ink);
+    cursor: var(--cursor-target);
+  }
+  #ct-promo-in:focus { outline: none; text-shadow: var(--glow-text); }
+  #ct-promo-in::placeholder { color: #ffffff42; }
+  #ct-total-amt {
+    position: absolute; right: 0; top: 0;
+    width: calc(99px * var(--ui-scale)); height: 100%;
+    display: grid; place-items: center;
+    background: #ededed; color: #040402;
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(12px * var(--ui-scale));
+  }
+  .ct-subline {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 0 calc(2px * var(--ui-scale));
+    color: var(--mid);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(10px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+  #ct-checkout {
+    margin-top: calc(6px * var(--ui-scale));
+    height: calc(30px * var(--ui-scale));
+    border: 0;
+    background: #fefefe; color: #333333;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .06em;
+    cursor: var(--cursor-target);
+    transition: background .16s;
+  }
+  #ct-checkout:hover, #ct-checkout:focus-visible { background: #fff; outline: none; }
+
+  /* Commit-arrival resolve for browsers WITHOUT view transitions. */
+  @keyframes bs-arrive { from { opacity: 0; } }
+  html.bs-arrive #bs-corner,
+  html.bs-arrive #bs-wordmark { animation: bs-arrive var(--pop-fade); }
+  @media (prefers-reduced-motion: reduce) {
+    html.bs-arrive #bs-corner,
+    html.bs-arrive #bs-wordmark { animation: none; }
+  }
+
+  /* PROVISIONAL narrow-portrait rules — collision prevention only. */
+  @media (max-width: 900px) {
+    #ct-detail, #ct-summary-head { display: none; }
+    #ct-preview { left: 6vw; width: 88vw; }
+    #ct-grid { left: 6vw; width: 88vw; }
+    #ct-summary { left: 6vw; right: 6vw; top: 74vh; }
+    .ct-rail, #ct-rule { display: none; }
+  }
+</style>
+</head>
+<body data-bs-page="cart">
+
+<script>
+(function(){
+  var from = null;
+  try {
+    from = sessionStorage.getItem('bs-nav-from');
+    sessionStorage.removeItem('bs-nav-from');
+  } catch (e) {}
+  window.__bsArrival = (from === 'home' || from === 'software' || from === 'community' || from === 'support' || from === 'hardware');
+  window.__bsArrivalFrom = window.__bsArrival ? from : null;
+  if (window.__bsArrival && !(window.CSS && CSS.supports && CSS.supports('view-transition-name: a'))){
+    document.documentElement.classList.add('bs-arrive');
+  }
+})();
+</script>
+
+<div id="bs-stage"></div>
+
+<a id="bs-wordmark-link" href="home.html" aria-label="backspace — home">
+  <img id="bs-wordmark" src="assets/bs_wordmark.svg" alt="backspace">
+</a>
+
+<!-- The away iteration — /cart is a DESTINATION, not a section: no link
+     is committed; all four sections commit away. -->
+<div id="bs-corner" class="site-header__nav site-header__nav--primary" aria-label="Section navigation">
+  <div class="bs-hit"><button id="bs-back" class="site-round-button site-header__back-button" type="button" aria-label="Home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button></div>
+  <div class="bs-hit"><nav id="bs-primary" class="site-primary-nav" aria-label="Primary" aria-expanded="false">
+    <button class="site-primary-nav__forward-button" type="button" aria-label="Open section navigation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <button class="site-primary-nav__link site-primary-nav__link--hardware" type="button" data-section="hardware">HARDWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--software" type="button" data-section="software">SOFTWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--community" type="button" data-section="community">COMMUNITY</button>
+    <button class="site-primary-nav__link site-primary-nav__link--support" type="button" data-section="support">SUPPORT</button>
+  </nav></div>
+</div>
+
+<div id="bs-icons"></div>
+
+<!-- Construction rails + rule -->
+<span id="ct-rail-l" class="ct-rail" aria-hidden="true"></span>
+<span id="ct-rail-div" class="ct-rail" aria-hidden="true"></span>
+<span id="ct-rail-r" class="ct-rail" aria-hidden="true"></span>
+<span id="ct-rule" aria-hidden="true"></span>
+
+<!-- Breadcrumb -->
+<div id="ct-crumbs">
+  <span class="is-here" data-str="cartCrumb"></span>
+  <span class="ct-crumb-sep" aria-hidden="true">›</span>
+  <button id="ct-crumb-checkout" type="button" data-str="cartCheckoutCrumb"></button>
+</div>
+<span id="ct-summary-head" data-str="cartOrderSummary"></span>
+
+<!-- The big preview -->
+<div id="ct-preview" role="region" aria-label="Product preview">
+  <canvas id="ct-ball" aria-hidden="true"></canvas>
+</div>
+
+<!-- The thumbnail grid -->
+<div id="ct-grid" role="list" aria-label="Cart items"></div>
+
+<!-- The detail column -->
+<div id="ct-detail">
+  <div style="position:relative">
+    <div id="ct-rows" role="tablist" aria-label="Cart items"></div>
+    <div id="ct-kick">
+      <button id="ct-kick-btn" type="button" data-str="cartKickstarter"></button>
+      <span id="ct-kick-note" data-str="cartKickNote"></span>
+    </div>
+  </div>
+  <div id="ct-title"></div>
+  <div id="ct-specs"></div>
+  <div id="ct-pricebar"><span data-str="cartEstimated"></span><b id="ct-est-price">—</b></div>
+</div>
+
+<!-- Order summary -->
+<div id="ct-summary">
+  <div id="ct-items-head"><span data-str="cartItems"></span><span id="ct-items-count">0</span></div>
+  <div id="ct-cards"></div>
+  <div id="ct-foot">
+    <div class="ct-bar">
+      <input id="ct-promo-in" type="text" autocomplete="off">
+      <button id="ct-apply" class="ct-bar-btn" type="button" data-str="cartApply"></button>
+    </div>
+    <div class="ct-bar"><span data-str="cartTotal"></span><span id="ct-total-amt">—</span></div>
+    <div class="ct-subline"><span data-str="cartSubtotal"></span><span>—</span></div>
+    <div class="ct-subline"><span data-str="cartShipping"></span><span>—</span></div>
+    <div class="ct-subline"><span data-str="cartTax"></span><span>—</span></div>
+    <button id="ct-checkout" type="button" data-str="cartCheckout"></button>
+  </div>
+</div>
+
+<input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
+
+<script src="shared/bs-chrome.js"></script>
+<script src="shared/bs-ball.js"></script>
+<script>
+(function(){
+'use strict';
+var C = window.BSChrome;
+var T = C.T, SoundBus = C.SoundBus;
+var wake = C.wake, denyOn = C.denyOn, clickOk = C.clickOk, hapticTick = C.hapticTick;
+
+var arrival     = window.__bsArrival === true;
+var arrivalFrom = window.__bsArrivalFrom;
+var renderStrings = C.renderStrings;
+
+// The same catalog shape the product page binds — the manifest slice the
+// cart needs to read configurations back out (structure as data; the
+// real catalog swaps at the keys).
+var HW = {
+  families: [
+    { key: 'hwMatSteel',    finishes: [
+        { key: 'hwFinBrushed', metal: 1.0, rough: 0.40 },
+        { key: 'hwFinPVD',     metal: 1.0, rough: 0.14 },
+        { key: 'hwFinPowder',  metal: 0.06, rough: 0.62 } ] },
+    { key: 'hwMatAluminum', finishes: [
+        { key: 'hwFinBrushed', metal: 1.0, rough: 0.34 },
+        { key: 'hwFinPVD',     metal: 1.0, rough: 0.12 },
+        { key: 'hwFinPowder',  metal: 0.06, rough: 0.58 } ] },
+    { key: 'hwMatWalnut',   finishes: [
+        { key: 'hwFinNatural', metal: 0.0, rough: 0.68 },
+        { key: 'hwFinLacquer', metal: 0.0, rough: 0.42 } ] }
+  ],
+  colors: [
+    { key: 'hwColSilver', a: [0.28, 0.30, 0.33], b: [0.87, 0.89, 0.91] },
+    { key: 'hwColBW',     a: [0.04, 0.04, 0.04], b: [0.95, 0.95, 0.95] },
+    { key: 'hwColRed',    a: [0.24, 0.02, 0.01], b: [0.85, 0.16, 0.09] },
+    { key: 'hwColOrange', a: [0.30, 0.10, 0.01], b: [0.95, 0.45, 0.08] },
+    { key: 'hwColYellow', a: [0.33, 0.24, 0.02], b: [0.96, 0.78, 0.12] },
+    { key: 'hwColGreen',  a: [0.02, 0.15, 0.06], b: [0.25, 0.72, 0.35] }
+  ],
+  sizes: [
+    { key: 'hwSizeCompact',  scale: 0.89, cm: [120, 75] },
+    { key: 'hwSizeStandard', scale: 1.00, cm: [140, 75] },
+    { key: 'hwSizeWide',     scale: 1.11, cm: [160, 75] },
+    { key: 'hwSizeStudio',   scale: 1.23, cm: [180, 75] }
+  ],
+  partsOrder: ['III', 'IV', 'V'],
+  partNames: { 'III': 'hwSubDesktop', 'IV': 'hwSubDesklegs', 'V': 'hwSubDesklegs' }
+};
+
+// ── State — the ONE cart truth, shared with /hardware ───────────────────
+var ITEMS = C.cartStore.load();
+var selIdx = ITEMS.length ? 0 : -1;
+function save(){ C.cartStore.save(ITEMS); }
+
+// ── DOM ─────────────────────────────────────────────────────────────────
+var gridEl   = document.getElementById('ct-grid');
+var rowsEl   = document.getElementById('ct-rows');
+var cardsEl  = document.getElementById('ct-cards');
+var countEl  = document.getElementById('ct-items-count');
+var titleEl  = document.getElementById('ct-title');
+var specsEl  = document.getElementById('ct-specs');
+var previewEl= document.getElementById('ct-preview');
+var cornerEl = document.getElementById('bs-corner');
+var backBtn  = document.getElementById('bs-back');
+var primary  = document.getElementById('bs-primary');
+var fwdBtn   = primary.querySelector('.site-primary-nav__forward-button');
+var links    = Array.prototype.slice.call(primary.querySelectorAll('.site-primary-nav__link'));
+
+document.getElementById('bs-wordmark-link').setAttribute('href', C.ROUTES.home);
+
+// ── The preview ball — the shared stage module's second consumer ───────
+var Ball = BSBall(document.getElementById('ct-ball'));
+function rampRGB(colorSel){
+  var col = HW.colors[colorSel.idx];
+  var t = colorSel.t[colorSel.idx];
+  return [0, 1, 2].map(function(i){ return col.a[i] + (col.b[i] - col.a[i]) * t; });
+}
+function stageParamsFor(sel){
+  var p = sel.parts['III'];
+  var fam = HW.families[p.family];
+  var fin = fam.finishes[p.finish] || fam.finishes[0];
+  var rgb = rampRGB(p.color);
+  var scale;
+  var cl = parseFloat(sel.size.custom.len), cw = parseFloat(sel.size.custom.wid);
+  if (cl > 0 && cw > 0){
+    var unit = sel.size.unit === 'in' ? 2.54 : 1;
+    var std = HW.sizes[1].cm;
+    scale = Math.sqrt((cl * unit * cl * unit + cw * unit * cw * unit) /
+                      (std[0] * std[0] + std[1] * std[1]));
+    scale = Math.max(0.5, Math.min(1.6, scale));
+  } else {
+    scale = HW.sizes[sel.size.preset].scale;
+  }
+  return { color: rgb, metal: fin.metal, rough: fin.rough, scale: scale };
+}
+
+// ── Read-outs ───────────────────────────────────────────────────────────
+function sizeText(sel){
+  var cl = parseFloat(sel.size.custom.len), cw = parseFloat(sel.size.custom.wid);
+  if (cl > 0 && cw > 0) return cl + ' × ' + cw + ' ' + sel.size.unit;
+  var sz = HW.sizes[sel.size.preset];
+  return T(sz.key) + ' — ' + sz.cm[0] + ' × ' + sz.cm[1] + ' cm';
+}
+function partText(sel, part){
+  var p = sel.parts[part];
+  var fam = HW.families[p.family];
+  var fin = fam.finishes[p.finish] || fam.finishes[0];
+  return T(fam.key) + ' · ' + T(fin.key) + ' · ' + T(HW.colors[p.color.idx].key);
+}
+function configLine(sel){
+  return sizeText(sel) + ' · ' + partText(sel, 'III');
+}
+
+// ── The triangle checkbox (shared recipe with /hardware's slots) ───────
+var TRI_NS = 'http://www.w3.org/2000/svg';
+function makeTri(item, cls){
+  var svg = document.createElementNS(TRI_NS, 'svg');
+  svg.setAttribute('class', cls + (item.checked ? ' is-checked' : ''));
+  svg.setAttribute('viewBox', '0 0 10 10');
+  svg.setAttribute('role', 'checkbox');
+  svg.setAttribute('aria-checked', String(!!item.checked));
+  svg.setAttribute('tabindex', '0');
+  svg.setAttribute('aria-label', T(item.classKey) + ' — include at checkout');
+  var path = document.createElementNS(TRI_NS, 'path');
+  path.setAttribute('d', 'M0.5 0.5 H9 L0.5 9.5 Z');
+  svg.appendChild(path);
+  function toggle(e){
+    e.stopPropagation();
+    wake();
+    if (!clickOk()) return;
+    item.checked = !item.checked;
+    save();
+    SoundBus.play(item.checked ? 'commit' : 'detent'); hapticTick();
+    render();
+  }
+  svg.addEventListener('click', toggle);
+  svg.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(e); }
+  });
+  return svg;
+}
+
+function selectItem(i){
+  if (i === selIdx) return;
+  selIdx = i;
+  SoundBus.play('detent'); hapticTick();
+  render();
+}
+function removeItem(i){
+  ITEMS.splice(i, 1);
+  if (selIdx >= ITEMS.length) selIdx = ITEMS.length - 1;
+  save();
+  SoundBus.play('detent'); hapticTick();
+  render();
+}
+
+// ── Render ──────────────────────────────────────────────────────────────
+function render(){
+  // grid — items + empties to the frames' resting count
+  gridEl.innerHTML = '';
+  var n = Math.max(8, ITEMS.length);
+  for (var i = 0; i < n; i++){
+    (function(idx){
+      var item = ITEMS[idx] || null;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ct-thumb' + (item ? ' is-filled' : '') + (idx === selIdx ? ' is-live' : '');
+      b.setAttribute('role', 'listitem');
+      b.tabIndex = item ? 0 : -1;
+      if (item){
+        b.appendChild(makeTri(item, 'ct-tri'));
+        var name = document.createElement('span');
+        name.className = 'ct-thumb-name';
+        name.textContent = T(item.classKey);
+        var chip = document.createElement('span');
+        chip.className = 'ct-thumb-chip';
+        chip.style.background = item.css;
+        b.appendChild(name); b.appendChild(chip);
+        b.setAttribute('aria-label', T(item.classKey));
+        b.addEventListener('click', function(e){
+          e.stopPropagation();
+          wake();
+          selectItem(idx);                       // the note's rule: small frame -> big frame
+        });
+      }
+      gridEl.appendChild(b);
+    })(i);
+  }
+
+  // the big preview's corner triangle mirrors the selected item
+  var old = previewEl.querySelector('.ct-tri');
+  if (old) old.remove();
+  var sel = ITEMS[selIdx] || null;
+  if (sel) previewEl.insertBefore(makeTri(sel, 'ct-tri'), previewEl.firstChild);
+  Ball.show(!!sel);
+  if (sel) Ball.set(stageParamsFor(sel.sel));
+
+  // item-switch rows (labeled interpretation of the note)
+  rowsEl.innerHTML = '';
+  ITEMS.forEach(function(item, i){
+    var r = document.createElement('button');
+    r.type = 'button';
+    r.className = 'ct-row' + (i === selIdx ? ' is-live' : '');
+    r.setAttribute('role', 'tab');
+    r.setAttribute('aria-selected', String(i === selIdx));
+    var chip = document.createElement('span');
+    chip.className = 'ct-row-chip';
+    chip.textContent = (i + 1);
+    var bar = document.createElement('span');
+    bar.className = 'ct-row-bar';
+    var lbl = document.createElement('span');
+    lbl.textContent = T(item.classKey);
+    var arrow = document.createElement('span');
+    arrow.textContent = i === selIdx ? '▾' : '▸';
+    bar.appendChild(lbl); bar.appendChild(arrow);
+    r.appendChild(chip); r.appendChild(bar);
+    r.addEventListener('click', function(e){
+      e.stopPropagation();
+      wake();
+      selectItem(i);
+    });
+    rowsEl.appendChild(r);
+  });
+
+  // detail
+  titleEl.textContent = sel ? T('cartItemDeskTitle') : '—';
+  specsEl.innerHTML = '';
+  if (sel){
+    var lines = [
+      [T('cartSpecSize'), sizeText(sel.sel)],
+      [T('hwSubDesktop') + ' III', partText(sel.sel, 'III')],
+      [T('hwSubDesklegs') + ' IV', partText(sel.sel, 'IV')],
+      [T('hwSubDesklegs') + ' V', partText(sel.sel, 'V')]
+    ];
+    lines.forEach(function(l){
+      var d = document.createElement('div');
+      var k = document.createElement('span');
+      k.className = 'ct-spec-k';
+      k.textContent = l[0];
+      d.appendChild(k);
+      d.appendChild(document.createTextNode(l[1]));
+      specsEl.appendChild(d);
+    });
+  }
+
+  // order summary — CHECKED items are the final order
+  var checked = ITEMS.filter(function(it){ return it.checked; });
+  countEl.textContent = checked.length;
+  cardsEl.innerHTML = '';
+  checked.forEach(function(item){
+    var idx = ITEMS.indexOf(item);
+    var card = document.createElement('div');
+    card.className = 'ct-card';
+    card.appendChild(makeTri(item, 'ct-tri'));
+    var img = document.createElement('span');
+    img.className = 'ct-card-chipimg';
+    img.style.background = item.css;
+    var title = document.createElement('span');
+    title.className = 'ct-card-title';
+    title.textContent = T('cartItemDeskTitle');
+    var sub = document.createElement('span');
+    sub.className = 'ct-card-sub';
+    sub.textContent = configLine(item.sel);
+    var x = document.createElement('button');
+    x.className = 'ct-card-x';
+    x.type = 'button';
+    x.textContent = '×';
+    x.setAttribute('aria-label', 'Remove');
+    x.addEventListener('click', function(e){
+      e.stopPropagation();
+      wake();
+      if (clickOk()) removeItem(idx);            // the X is where deletion lives
+    });
+    var step = document.createElement('span');
+    step.className = 'ct-step';
+    var minus = document.createElement('button');
+    minus.type = 'button'; minus.textContent = '−';
+    minus.setAttribute('aria-label', 'Fewer');
+    var nEl = document.createElement('span');
+    nEl.className = 'ct-step-n';
+    nEl.textContent = item.qty || 1;
+    var plus = document.createElement('button');
+    plus.type = 'button'; plus.textContent = '+';
+    plus.setAttribute('aria-label', 'More');
+    minus.addEventListener('click', function(e){
+      e.stopPropagation(); wake();
+      item.qty = Math.max(1, (item.qty || 1) - 1);
+      save(); SoundBus.play('detent'); hapticTick(); render();
+    });
+    plus.addEventListener('click', function(e){
+      e.stopPropagation(); wake();
+      item.qty = (item.qty || 1) + 1;
+      save(); SoundBus.play('detent'); hapticTick(); render();
+    });
+    step.appendChild(minus); step.appendChild(nEl); step.appendChild(plus);
+    var price = document.createElement('span');
+    price.className = 'ct-card-price';
+    price.textContent = '—';                     // PRICE SEAM
+    card.appendChild(img); card.appendChild(title); card.appendChild(sub);
+    card.appendChild(x); card.appendChild(step); card.appendChild(price);
+    cardsEl.appendChild(card);
+  });
+  // ══ PRICE SEAMS ══ total/subtotal/shipping/tax stay "—" until the
+  // price-source ruling lands; never static, never faked.
+}
+
+// ── The deny seams: checkout / apply / kickstarter / checkout crumb ────
+[['ct-checkout'], ['ct-apply'], ['ct-kick-btn'], ['ct-crumb-checkout']].forEach(function(pair){
+  var b = document.getElementById(pair[0]);
+  b.addEventListener('click', function(e){
+    e.stopPropagation();
+    wake();
+    denyOn(b);   // commerce wiring + the third-party overlay are later phases
+  });
+});
+
+// ── Corner nav — a destination page: ‹ goes back where you came from ───
+var pillPrimary = C.bindPill(primary, fwdBtn);
+pillPrimary.onOpenChange = function(open){
+  links.forEach(function(l){ l.tabIndex = open ? 0 : -1; });
+  primary.setAttribute('aria-expanded', String(open));
+};
+pillPrimary.onOpenChange(false);
+
+var _leaving = false;
+function leaveBack(){
+  if (_leaving || !clickOk()) return;
+  _leaving = true;
+  if (arrival){
+    setTimeout(function(){
+      if (_leaving && !document.hidden){ _leaving = false; location.assign(C.ROUTES.home); }
+    }, 350);
+    history.back();
+    return;
+  }
+  location.assign(C.ROUTES.home);
+}
+(backBtn.closest('.bs-hit') || backBtn).addEventListener('click', function(){ wake(); leaveBack(); });
+
+links.forEach(function(link){
+  link.addEventListener('click', function(e){
+    e.stopPropagation();
+    wake();
+    var sec = link.getAttribute('data-section');
+    if (C.ROUTES[sec]){ if (clickOk()) C.nav.commit(sec); return; }
+    denyOn(link);
+  });
+});
+primary.addEventListener('click', function(e){
+  if (e.target.closest('.site-primary-nav__link')) return;
+  wake();
+  if (pillPrimary.touchOpenConsumed()) return;
+  if (C.rail.lockIndex() === RAIL_PILL) C.rail.unlock();
+  else C.rail.lock(RAIL_PILL);
+});
+
+// ── Mount ───────────────────────────────────────────────────────────────
+var RAIL_BACK = 0, RAIL_PILL = 1;
+var ladder = C.makeLadder([
+  { name: 'boundary', when: function(){ return true; },
+    step: function(){ if (arrival) leaveBack(); } }
+]);
+C.init({
+  page: 'cart',
+  leadingControls: [
+    { headEl: backBtn, pill: null, activate: leaveBack },
+    { headEl: primary, pill: pillPrimary, trayAxis: 'x',
+      trayItems: function(){ return links; } }
+  ],
+  touchSurfaces: [document.getElementById('bs-stage')],
+  sweepRoots: [cornerEl, gridEl, cardsEl, document.getElementById('ct-detail')],
+  hooks: {
+    isLocked:       function(){ return false; },
+    goBack:         function(){ ladder.back(); },
+    escapeFromRail: function(){},
+    enterAtPrimary: function(){},
+    verticalStep:   function(){},
+    railVertical:   function(){},
+    horizontalCold: function(){},
+    wheelNative:    function(e){
+      if (gridEl.contains(e.target))  return gridEl.scrollHeight > gridEl.clientHeight + 1;
+      if (cardsEl.contains(e.target)) return cardsEl.scrollHeight > cardsEl.clientHeight + 1;
+      var rows = document.getElementById('ct-rows');
+      if (rows.contains(e.target)) return rows.scrollHeight > rows.clientHeight + 1;
+      return false;
+    },
+    wheelStep:      function(){ return false; },
+    wheelPitch:     function(){ return 55; },
+    clearPrimary:   function(){},
+    idleReset:      function(){ C.rail.focus(-1); },
+    onLangChange:   function(T2){
+      links.forEach(function(l){ l.textContent = T2(l.getAttribute('data-section')); });
+      renderStrings();
+      render();
+      document.title = T2('cartTitle');
+    },
+    onFontsReady:   function(){},
+    devState:       function(){
+      window.__ctBall = Ball;
+      return { items: ITEMS.length, checked: ITEMS.filter(function(i){ return i.checked; }).length,
+               selIdx: selIdx, arrival: arrival };
+    }
+  }
+});
+
+// ── Boot ────────────────────────────────────────────────────────────────
+renderStrings();
+links.forEach(function(l){ l.textContent = T(l.getAttribute('data-section')); });
+document.getElementById('ct-promo-in').setAttribute('placeholder', T('cartPromo'));
+C.normalizeWordGlow();
+Ball.boot();
+Ball.stage({ cx: 0.5, cy: 0.55, rad: 0.36 });    // centered in the preview frame
+render();
+
+window.addEventListener('pageshow', function(e){
+  if (e.persisted){
+    _leaving = false;
+    ITEMS = C.cartStore.load();                  // /hardware may have changed the truth
+    if (selIdx >= ITEMS.length) selIdx = ITEMS.length - 1;
+    render();
+  }
+});
+
+})();
+</script>
+</body>
+</html>
