@@ -174,9 +174,9 @@
     z-index: 16;
     display: grid;
     /* INTRODUCTION 242.4 → CUSTOM 293.4 collapsed: 51 frame-px header
-       pitch, HELD through the halving — the 9px×ui line boxes leave
-       42px×ui of gap so the drawn rhythm survives the fifth word. */
-    gap: calc(42px * var(--ui-scale));
+       pitch, HELD through every rung change — 13.5px×ui line boxes
+       leave 37.5px×ui of gap so the drawn rhythm survives. */
+    gap: calc(37.5px * var(--ui-scale));
     color: var(--text-soft);
     justify-items: end;
   }
@@ -189,14 +189,12 @@
        certified 600-rest exclusion as heading-class controls; open
        state distinguishes by ink, not weight. */
     font-family: var(--font-ui); font-weight: 600;
-    /* HALVED FROM THE OASIS RUNG (Eric, Aug 28 fifth word: the heads
-       had landed at the title's own 17px; his eye rules them to half —
-       small letterspaced caps over the larger item rows). 8.5px×ui
-       sits below the system's smallest shipped rung (11px) — legibility
-       flagged on the record, one line re-tunes; the §5.1 live-text
-       confirm still closes the rung class. */
-    font-size: calc(8.5px * var(--ui-scale));
-    line-height: calc(9px * var(--ui-scale));
+    /* 75% OF THE OASIS RUNG (Eric, Aug 28 seventh word — supersedes the
+       fifth word's halving, which his eye read as too small): 17 × 0.75
+       = 12.75px×ui, letterspaced caps sitting between the title and the
+       item rows. The §5.1 live-text confirm still closes the rung class. */
+    font-size: calc(12.75px * var(--ui-scale));
+    line-height: calc(13.5px * var(--ui-scale));
     letter-spacing: .08em;
     text-align: right; white-space: nowrap;
     text-shadow: var(--glow-text-word);
@@ -212,37 +210,55 @@
      mirror is page-side: rows right-aligned, indent on the RIGHT. */
   #hw-product-menu .bs-menu-slot { justify-items: end; }
   #hw-product-menu .bs-sublist { justify-items: end; }
+  /* THE POP-OUT (Eric's seventh word: the blue-dot children pop out
+     like the red-dot side's) — the .bs-item grammar MIRRORED, which is
+     what the frames drew all along: REST sub-items sit FLUSH at the
+     rail (right edge 1664); the hovered/active one slides INWARD by the
+     shift (→ 1629.6) while the blue dot fades in at the rail — and the
+     part numerals reveal WITH the pop (the frames draw them only on
+     the active row). */
   #hw-product-menu .bs-subitem {
     padding-left: 0;
-    padding-right: var(--side-menu-shift-x);
+    padding-right: 0;                          /* flush at the rail at rest */
     justify-self: end;
     text-align: right;
     font-size: calc(14px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
     line-height: calc(16px * var(--ui-scale));
   }
-  /* THE BLUE DOT — the product menu's ACTIVE marker (Eric, Aug 28,
-     ratified): solid #125277, 5×5×ui, flush to the right rail, y on the
-     cap midpoint (--bs-dot-y, solved). The ACTIVE sub-item indents
-     INWARD off the rail — the left menu's shift, mirrored — which is
-     exactly what the frames draw (right edge 1664 → 1629.6). */
+  #hw-product-menu .bs-subitem .bs-nav-label {
+    display: inline-block;
+    transition: transform var(--side-menu-motion);
+  }
+  #hw-product-menu .bs-subitem.kb-hover .bs-nav-label,
+  #hw-product-menu .bs-subitem:focus-visible .bs-nav-label,
+  #hw-product-menu .bs-subitem.is-live .bs-nav-label {
+    transform: translateX(calc(-1 * var(--side-menu-shift-x)));
+  }
   #hw-product-menu .bs-subitem.is-live {
     color: #fff; font-weight: 600;
   }
-  #hw-product-menu .bs-subitem.is-live::after {
+  /* THE BLUE DOT — vocabulary member four (ratified): solid #125277,
+     5×5×ui at the rail, y cap-mid solved (--bs-dot-y). A pseudo on
+     every sub-item, revealed by the pop — hover AND active, exactly
+     the red dot's fade grammar. */
+  #hw-product-menu .bs-subitem::after {
     content: ''; position: absolute;
     right: 0;
     top: var(--bs-dot-y, 50%);
     width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
     background: var(--bs-marker-blue); border-radius: 50%;
-    /* The blue dot carries the field-marker glow ladder at the blue's
-       own hue — same fitted spread, re-tinted (PROVISIONAL: the frames
-       draw no measurable halo at 5px; parity with the warm marker's
-       ladder is the consistent reading, one line strikes it). */
+    /* The fitted spread ladder at the blue's own hue (PROVISIONAL —
+       parity with the warm marker's ladder; one line strikes it). */
     box-shadow:
       0 0 calc(9px  * var(--ui-scale))                              rgba(18, 82, 119, .85),
       0 0 calc(32px * var(--ui-scale)) calc(3px  * var(--ui-scale)) rgba(18, 82, 119, .42);
     transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity var(--side-menu-fade);
   }
+  #hw-product-menu .bs-subitem.kb-hover::after,
+  #hw-product-menu .bs-subitem:focus-visible::after,
+  #hw-product-menu .bs-subitem.is-live::after { opacity: 1; }
   /* The chosen-ring stays available in this menu for CHOSEN semantics
      (none in phase one — the ring belongs to the panel's options). */
 
@@ -262,10 +278,21 @@
     line-height: calc(14px * var(--ui-scale));
     letter-spacing: .06em;
     cursor: var(--cursor-target);
-    opacity: .55;
-    transition: color .16s, opacity .16s;
+    /* Hidden at rest — the frames draw numerals on the ACTIVE row only;
+       they reveal with the row's pop (hover or live). */
+    opacity: 0;
+    pointer-events: none;
+    transition: color .16s, opacity var(--side-menu-fade);
   }
-  .hw-num:hover, .hw-num:focus-visible { color: #fff; opacity: 1; outline: none; }
+  .hw-subrow:hover .hw-num,
+  .hw-subrow:focus-within .hw-num,
+  .hw-subrow.is-live .hw-num {
+    opacity: .55;
+    pointer-events: auto;
+  }
+  .hw-subrow:hover .hw-num:hover,
+  .hw-num:focus-visible { color: #fff; opacity: 1; outline: none; }
+  .hw-subrow:hover .hw-num.is-live, .hw-subrow.is-live .hw-num.is-live,
   .hw-num.is-live { color: var(--ink); font-weight: 600; opacity: 1; text-shadow: var(--glow-text); }
 
   /* ── The introduction plates — three DIAGONAL windows center-stage
@@ -1079,8 +1106,11 @@ var headEls = [], subWrapEls = [], introSubEls = [], customSubEls = [], numEls =
       var subBtn = document.createElement('button');
       subBtn.type = 'button';
       subBtn.className = 'bs-subitem';
-      subBtn.setAttribute('data-str', sub.key);
       subBtn.tabIndex = -1;
+      var subLabel = document.createElement('span');
+      subLabel.className = 'bs-nav-label';
+      subLabel.setAttribute('data-str', sub.key);
+      subBtn.appendChild(subLabel);
       subBtn.addEventListener('mouseenter', function(){
         if (!C.rail.isTouch()) subBtn.classList.add('kb-hover');
       });
@@ -1688,8 +1718,11 @@ function render(){
     b.tabIndex = openHead === 0 ? 0 : -1;
   });
   customSubEls.forEach(function(b, i){
-    b.classList.toggle('is-live', openHead === 1 && i === customSub);
+    var live = openHead === 1 && i === customSub;
+    b.classList.toggle('is-live', live);
     b.tabIndex = openHead === 1 ? 0 : -1;
+    var row = b.parentElement;
+    if (row && row.classList.contains('hw-subrow')) row.classList.toggle('is-live', live);
   });
   Object.keys(numEls).forEach(function(p){
     numEls[p].classList.toggle('is-live', SEL.part === p);
