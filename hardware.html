@@ -394,13 +394,18 @@
   }
   .hw-scrub-fill {
     position: absolute; left: 0; top: 0; bottom: 0;
-    width: 50%;                      /* JS writes the fraction */
+    width: 50%;                      /* JS writes each row's own fraction */
     overflow: hidden;
+    /* SCRUB MEMORY (Eric, Aug 28 third word): every row keeps and SHOWS
+       its own value — unchosen rows hold their fill at memory rank, the
+       chosen row's renders lit below. Progress is never erased. */
     background: repeating-linear-gradient(90deg,
-      #fefefeb8 0, #fefefeb8 1px, transparent 1px, transparent 5px);
+      #fefefe59 0, #fefefe59 1px, transparent 1px, transparent 5px);
     pointer-events: none;
   }
   .hw-colrow.is-chosen .hw-scrub-fill {
+    background: repeating-linear-gradient(90deg,
+      #fefefeb8 0, #fefefeb8 1px, transparent 1px, transparent 5px);
     box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .22);
   }
 
@@ -777,8 +782,9 @@ var HW = {
         { key: 'hwFinNatural', metal: 0.0, rough: 0.68 },
         { key: 'hwFinLacquer', metal: 0.0, rough: 0.42 } ] }
   ],
-  // Color rows (the p1 reference set): each is a RAMP — the scrub value
-  // t mixes a→b, which is the color-ramp structure the GLB inherits.
+  // Color rows (the p1 reference set): each is a RAMP — the row's own
+  // scrub value mixes a→b, which is the color-ramp structure the GLB
+  // inherits. Values are PER ROW (scrub memory, Eric's third word).
   colors: [
     { key: 'hwColSilver', a: [0.28, 0.30, 0.33], b: [0.87, 0.89, 0.91] },
     { key: 'hwColBW',     a: [0.04, 0.04, 0.04], b: [0.95, 0.95, 0.95] },
@@ -801,13 +807,18 @@ var HW = {
 
 // ── SELECTION STATE — fully modeled, every visual backend binds at the
 // seam below without touching the interaction layer (seed §2).
+// Per-color SCRUB MEMORY (Eric, Aug 28, third word: "going into the new
+// slide bar would erase the progress i've done in the last slide bar" —
+// it must not): every color row holds its OWN remembered value in t[],
+// aligned with HW.colors; idx marks the row that is CHOSEN and applied.
+// The seed's "per-color scrubbers" phrasing, now enforced in the model.
 var SEL = {
   classIdx: 0,                       // desk
   part: null,                        // 'III' | 'IV' | 'V' — the open part
   parts: {
-    'III': { family: 0, finish: 0, color: { idx: 1, t: 0.62 } },
-    'IV':  { family: 0, finish: 0, color: { idx: 0, t: 0.50 } },
-    'V':   { family: 0, finish: 0, color: { idx: 0, t: 0.50 } }
+    'III': { family: 0, finish: 0, color: { idx: 1, t: [0.50, 0.62, 0.50, 0.50, 0.50, 0.50] } },
+    'IV':  { family: 0, finish: 0, color: { idx: 0, t: [0.50, 0.50, 0.50, 0.50, 0.50, 0.50] } },
+    'V':   { family: 0, finish: 0, color: { idx: 0, t: [0.50, 0.50, 0.50, 0.50, 0.50, 0.50] } }
   },
   size: { preset: 1, custom: { len: '', wid: '' }, unit: 'cm' }
 };
@@ -1129,7 +1140,8 @@ var Ball = (function(){
 // state model and the manifest never change.
 function rampRGB(colorSel){
   var col = HW.colors[colorSel.idx];
-  return [0, 1, 2].map(function(i){ return col.a[i] + (col.b[i] - col.a[i]) * colorSel.t; });
+  var t = colorSel.t[colorSel.idx];
+  return [0, 1, 2].map(function(i){ return col.a[i] + (col.b[i] - col.a[i]) * t; });
 }
 function applySelectionToStage(){
   var p = SEL.parts[SEL.part || 'III'];        // the ball previews one part's material
@@ -1324,7 +1336,8 @@ function buildPanelContent(){
         var r = scrub.getBoundingClientRect();
         if (r.width <= 0) return;
         var t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-        p.color.idx = ci; p.color.t = t;
+        p.color.idx = ci;
+        p.color.t[ci] = t;               // this row's own memory — no other row moves
         refreshPanel();
       }
       scrub.addEventListener('pointerdown', function(e){
@@ -1433,8 +1446,10 @@ function refreshPanel(){
     var opt = row.querySelector('.hw-opt');
     opt.classList.toggle('is-chosen', chosen);
     opt.classList.toggle('kb-hover', i === colorFocus);
-    colScrubEls[i].style.width = (chosen ? Math.round(p.color.t * 100) : 0) + '%';
-    row.querySelector('.hw-scrub').setAttribute('aria-valuenow', chosen ? Math.round(p.color.t * 100) : 0);
+    // Every row shows its remembered value (scrub memory, Eric's third
+    // word); the chosen row's fill renders lit, the rest at memory rank.
+    colScrubEls[i].style.width = Math.round(p.color.t[i] * 100) + '%';
+    row.querySelector('.hw-scrub').setAttribute('aria-valuenow', Math.round(p.color.t[i] * 100));
   });
   var custom = !!(parseFloat(SEL.size.custom.len) > 0 && parseFloat(SEL.size.custom.wid) > 0);
   sizeEls.forEach(function(b, i){ b.classList.toggle('is-chosen', !custom && i === SEL.size.preset); });
@@ -1632,7 +1647,7 @@ panel.addEventListener('keydown', function(e){
     var row = colorFocus >= 0 ? colorFocus : p.color.idx;
     p.color.idx = row;
     var right = (k === 'd' || k === 'D' || k === 'ArrowRight');
-    p.color.t = Math.max(0, Math.min(1, p.color.t + (right ? 0.04 : -0.04)));
+    p.color.t[row] = Math.max(0, Math.min(1, p.color.t[row] + (right ? 0.04 : -0.04)));
     refreshPanel();
     return;
   }
