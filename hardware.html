@@ -209,7 +209,15 @@
   /* The right menu's slots consume the factored accordion; only the
      mirror is page-side: rows right-aligned, indent on the RIGHT. */
   #hw-product-menu .bs-menu-slot { justify-items: end; }
-  #hw-product-menu .bs-sublist { justify-items: end; }
+  /* POP ROOM (Eric's ninth word: "when longer text pops out, they get
+     cut off") — the factored accordion clips at the flush labels' left
+     edge, so a label translated inward painted outside the box. The
+     sublist reserves the shift on its left; the clip now covers the
+     full pop. */
+  #hw-product-menu .bs-sublist {
+    justify-items: end;
+    padding-left: var(--side-menu-shift-x);
+  }
   /* THE POP-OUT (Eric's seventh word: the blue-dot children pop out
      like the red-dot side's) — the .bs-item grammar MIRRORED, which is
      what the frames drew all along: REST sub-items sit FLUSH at the
@@ -270,6 +278,11 @@
     display: flex; align-items: center; justify-content: flex-end;
     gap: calc(10px * var(--ui-scale));
   }
+  /* The reserve: the popped label slides INTO this space and lands
+     beside the numerals with the frames' own air (popped desktop 1572.9
+     vs numerals ending 1536) — never over them. Numerals hold their
+     flow space invisible, so selection never reflows the row. */
+  .hw-subrow .bs-subitem { margin-left: var(--side-menu-shift-x); }
   .hw-num {
     background: none; border: 0; padding: 0;
     color: var(--text-soft);
@@ -284,16 +297,21 @@
     pointer-events: none;
     transition: color .16s, opacity var(--side-menu-fade);
   }
-  .hw-subrow:hover .hw-num,
-  .hw-subrow:focus-within .hw-num,
+  /* NINTH WORD: hovering pops ONLY the menu item — the numerals do not
+     appear until the item has been SELECTED. */
   .hw-subrow.is-live .hw-num {
     opacity: .55;
     pointer-events: auto;
   }
-  .hw-subrow:hover .hw-num:hover,
-  .hw-num:focus-visible { color: #fff; opacity: 1; outline: none; }
-  .hw-subrow:hover .hw-num.is-live, .hw-subrow.is-live .hw-num.is-live,
-  .hw-num.is-live { color: var(--ink); font-weight: 600; opacity: 1; text-shadow: var(--glow-text); }
+  .hw-subrow.is-live .hw-num:hover,
+  .hw-subrow.is-live .hw-num:focus-visible { color: #fff; opacity: 1; outline: none; }
+  .hw-subrow.is-live .hw-num.is-live { color: var(--ink); font-weight: 600; opacity: 1; text-shadow: var(--glow-text); }
+  /* STAGE INDICATORS — the frames draw the stage strip on the selected
+     row (desktopIII: I · II · III with the part live; Eric's p3 is that
+     drawing): I/II render as inert dim glyphs, never controls. The
+     build-one I/II ghost question closes here. */
+  .hw-num--stage { pointer-events: none !important; }
+  .hw-subrow.is-live .hw-num--stage { opacity: .3; }
 
   /* ── The introduction plates — three DIAGONAL windows center-stage
      (ruled: build with the bs-window subsystem; lorem via the manifest;
@@ -958,7 +976,7 @@ var HW = {
   introSubs: ['hwIntroOverview', 'hwIntroDesign', 'hwIntroSpecs', 'hwIntroEco', 'hwIntroSupport'],
   customSubs: [
     { key: 'hwSubSize',     kind: 'size', parts: [] },
-    { key: 'hwSubDesktop',  kind: 'part', parts: ['III'] },
+    { key: 'hwSubDesktop',  kind: 'part', parts: ['III'], stages: ['I', 'II'] },
     { key: 'hwSubDesklegs', kind: 'part', parts: ['IV', 'V'] }
   ],
   // Finishes carry the METALLIC/ROUGHNESS PRESETS (Eric, Aug 28) — the
@@ -1127,6 +1145,13 @@ var headEls = [], subWrapEls = [], introSubEls = [], customSubEls = [], numEls =
         // active bold). Leaders to the physical parts wait for the GLB.
         var row = document.createElement('div');
         row.className = 'hw-subrow';
+        (sub.stages || []).forEach(function(g){
+          var sp = document.createElement('span');
+          sp.className = 'hw-num hw-num--stage';
+          sp.textContent = g;                    // inert stage glyphs (I, II)
+          sp.setAttribute('aria-hidden', 'true');
+          row.appendChild(sp);
+        });
         sub.parts.forEach(function(p){
           var np = document.createElement('button');
           np.type = 'button';
