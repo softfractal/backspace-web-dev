@@ -243,7 +243,7 @@
     from = sessionStorage.getItem('bs-nav-from');
     sessionStorage.removeItem('bs-nav-from');
   } catch (e) {}
-  window.__bsArrival = (from === 'home' || from === 'software');
+  window.__bsArrival = (from === 'home' || from === 'software' || from === 'support' || from === 'hardware');
   window.__bsArrivalFrom = window.__bsArrival ? from : null;
   // Fallback resolve only where the browser cannot run the shared
   // chrome's view-transition morph.

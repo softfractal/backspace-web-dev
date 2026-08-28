@@ -92,60 +92,13 @@
      1117) — 243/1117 -> 21.76vh. One token so the three cannot drift. */
   body[data-bs-page="support"] {
     --sup-top: 21.76vh;
-    /* NEW MARKER VOCABULARY (canon §9 entry owed — noted at close per
-       the seed). The frames' field/kicker markers are NOT the signal-red
-       menu dot: measured warm white ~#f2e7d5 at 5x5. The menu's own dot
-       measured #9d1f00 EXACTLY — the house token, untouched. Two marker
-       vocabularies by design; do not harmonize them. */
-    --sup-marker: #f2e7d5;
-    /* THE MARKER'S HALO — FITTED to the frame, not guessed (Eric's Aug 24
-       close-ups show it plainly; my first pass built a 7px shadow and was
-       far too tight). Measured radial falloff of the request-type marker
-       in 1-3, with EMPTY window regions as the control (they read 0.0-0.5
-       above fill, so the tail is real glow and not the translucent fill
-       compositing over the lit scene):
-         r 0-3 +95 · 6-9 +24 · 12-15 +19 · 18-21 +13 · 24-27 +7 ·
-         30-33 +4 · 36-39 +3 · reaching ~40px before it dies.
-       A blur of a 5px dot cannot make that plateau, so the ladder carries
-       SPREAD — the house's own dot-glow idiom (.bs-item::before is
-       0 0 12px 2px; .bs-round is 0 0 15px 1px). Fitted ladder tracks the
-       frame within ~1-6 luma from r=6 outward. Radii <=44px: rule 5's
-       96px cap is a FILTER-chain rule anyway, and box-shadows compose in
-       parallel like text-shadow rings — no texture inflation.
-       The dot's own colour is EXACT: the frame's core pixel reads
-       (242,231,213) = #f2e7d5. */
-    --sup-marker-glow:
-      0 0 calc(9px  * var(--ui-scale))                              rgba(242, 231, 213, .85),
-      0 0 calc(32px * var(--ui-scale)) calc(3px  * var(--ui-scale)) rgba(242, 231, 213, .42),
-      0 0 calc(44px * var(--ui-scale)) calc(14px * var(--ui-scale)) rgba(242, 231, 213, .16);
-    /* THE FIELD DIVIDER (RULED — Eric, Aug 24: "there is actually a
-       divider line in between form titles and the text input area").
-       It sits between every title and its value, spanning the field's
-       full column. NOTE ON SOURCING, honestly: the line is NOT resolvable
-       in the 1728px PNG export — the label->value gap profiles flat at
-       the fill level — so this is built from Eric's close-up plus the
-       house's own hairline token rather than measured off the frame.
-       --panel-line is what the chrome already uses for exactly this. */
-    --sup-rule: var(--panel-line);
-    /* THE RULE SITS IN THE MIDDLE (RULED — Eric, Aug 24, on the preview
-       close-up: "too close to CONTACT US and too far from the excerpt...
-       the divider should sit in middle between the upper and lower
-       elements, with equal paddings").
-       Equal INK-to-rule distance is NOT equal CSS padding: the two
-       neighbours carry different half-leading (the kicker is a 13px line
-       box on 11px caps; the prose is a 1.75 box on 12px WITH descenders;
-       the form's value is a 17px box on 13px caps). So the CSS values
-       differ on purpose, and they are MEASURED — verified in the browser
-       with canvas font metrics (actualBoundingBox*), not eyeballed.
-       Retune by re-running that measurement, never by nudging one side. */
-    --sup-rule-above: calc(14px * var(--ui-scale));
-    --sup-rule-below: calc(8px  * var(--ui-scale));
-    --sup-fld-above:  calc(7px  * var(--ui-scale));
-    --sup-fld-below:  calc(4px  * var(--ui-scale));
-    /* The picker needs its own value: its options ride a 27px line box
-       (the frame's option pitch), whose half-leading pushes the first
-       option's ink 3.7px further down than the prose's would go. */
-    --sup-opt-below:  calc(4px  * var(--ui-scale));
+    /* The marker, divider, field and option tokens this block used to
+       define were FACTORED to the shared pair (Aug 28, the form-subsystem
+       factoring): --bs-marker-warm + its fitted halo, --bs-rule/-above/
+       -below, --bs-fld-above/-below, --bs-opt-below, --bs-label and
+       --bs-dot-rest now carry /support's measured values as the house
+       defaults. The measurement law comments travel with them; this
+       file's git history and the initiation audit keep the full record. */
     /* The panel's own interior rhythm (component internals ride ui-scale,
        page placement rides frame fractions — the certified split). The
        frames draw 80px side pads in 1-2 and 52/86 in 1-3; harmonized to
@@ -153,12 +106,6 @@
     --sup-pad-x: calc(80px * var(--ui-scale));
     --sup-pad-t: calc(52px * var(--ui-scale));
     --sup-pad-b: calc(30px * var(--ui-scale));
-    --sup-label: #ffffff94;
-    /* Where a field's marker sits when the pointer is elsewhere. The
-       hovered field's dot takes the fitted halo at full; this is the
-       rank the others fall to, and it is the tunable if the resting
-       dots read too faint. */
-    --sup-dot-rest: .45;
   }
 
   /* ── The menu — SIX items, the home menu's own grammar ────────────────
@@ -207,244 +154,28 @@
      link (var(--font-ui), 14px×ui, 15px line, letter-spacing 0), so
      font-weight is the ENTIRE delta. The HOME menu is untouched —
      its 14/600 rest is certified law. */
-  /* ── THE SUB-LIST — a second level INSIDE the menu ──────────────────
-     Frames 1/2: clicking FAQ opens a list beneath it and pushes every
-     item below it DOWN. Each main item therefore owns a SLOT, and the
-     sub-list lives inside its parent's slot rather than as a sibling in
-     the menu grid — a collapsed sibling would still take the grid's
-     30px gap on both sides and leave a hole in the menu. Inside the
-     slot, a collapsed list contributes exactly nothing.
-     The slot is itself a grid so the item's negative hit-area margins
-     cannot collapse against it.
-     GEOMETRY IS PROVISIONAL. These frames arrived as 7.5MB SVGs whose
-     text is outlined, and the mechanism was the brief — the exact-value
-     pass against them is owed before this ships. */
-  .bs-menu-slot { display: grid; }
-  .bs-sublist-wrap {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows var(--pop-motion);
-  }
-  .bs-sublist-wrap.is-on { grid-template-rows: 1fr; }
-  .bs-sublist {
-    overflow: hidden;
-    display: grid;
-    gap: calc(16px * var(--ui-scale));
-  }
-  /* THE LAST ITEM'S DESCENDERS live inside this clip. The sub-items'
-     line box (14px) is TIGHTER than the face's natural box (measured:
-     ascent+descent = 12px at an 8.4px rendering — ink pokes 1.25px past
-     the box both ways). Mid-list that ink paints into the 16px gap; on
-     the LAST item it crossed the overflow edge and was cut (Eric,
-     Aug 25). The room is padding on the LAST CHILD, deliberately NOT on
-     the clipped list itself: border-box clamps a 0-height box at its own
-     padding, so list padding held every COLLAPSED sub-list open by a
-     phantom 5.6px (measured) and broke the closed-contributes-nothing
-     invariant. A child's padding collapses with the clip. */
-  .bs-sublist > :last-child { padding-bottom: calc(8px * var(--ui-scale)); }
-  /* The flex-centred label sits in the CONTENT box, so the padded last
-     item's text rides high while its ring's top:50% is padding-box —
-     re-centre the ring on the text by half the padding. */
-  .bs-sublist > :last-child.is-chosen::before {
-    top: calc(50% - 4px * var(--ui-scale));
-  }
-  .bs-sublist > :first-child { margin-top: calc(18px * var(--ui-scale)); }
-  .bs-subitem {
-    position: relative;
-    /* Indented to sit under the POPPED parent's label — the parent is
-       always popped while its list is open, so the two align. The box
-       HUGS that label rather than stretching across the menu column: a
-       stretched item made the whole empty gutter to its right a hover and
-       click target, which is the same fault the request-type options had.
-       The padding keeps the marker's gutter inside the target. */
-    padding-left: var(--side-menu-shift-x);
-    width: max-content; max-width: 100%;
-    justify-self: start;
-    display: flex; align-items: center;
-    background: none; border: 0;
-    color: var(--text-soft);
-    font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(12px * var(--ui-scale));
-    line-height: calc(14px * var(--ui-scale));
-    letter-spacing: 0; white-space: nowrap; text-align: left;
-    /* Rule-6 word tokens, BOTH states (Eric, Aug 25: the sub-items shone
-       far too dim — they had shipped on the HOME MENU's private 3-ring
-       hover recipe, which is the one surface the ruling excludes, and
-       sat outside normalizeWordGlow's scope so no compensation ever ran.
-       MEASURED at 34% of the community row's near-halo intensity; on the
-       icon-bar chain they land at 86%, the residual being the thinner
-       12px strokes shedding less light per pixel — rule 4's size-scaled
-       emission, same bracket the glyphs sit in. HOT is unified; reach
-       and total scale with the lamp. */
-    text-shadow: var(--glow-text-word);
-    cursor: var(--cursor-target);
-    /* LABELED PERF DEVIATION (Eric, Aug 25: hovering these lags the
-       page): text-shadow is NOT transitioned here — the glow SNAPS on.
-       The certified .2s shadow ease interpolates a 2-shadow rest list
-       against the 12-ring hover chain, so Chrome pads the lists and
-       repaints ALL TWELVE growing shadows — 96px and 184px rings
-       included — every frame for 200ms, and a swipe down the list runs
-       several such transitions at once inside this clip. Snapping makes
-       the hover ONE paint of the finished chain. Precedent: the icon
-       FILTER transition was measured DISCRETE and shipped that way
-       (software phase, on record). The landed intensity is untouched —
-       only the ramp is gone. Community's row keeps its certified ramp;
-       if Eric's eye wants the snap there too, it is the same one line.
-       Revert = restore `, text-shadow .2s ease`. */
-    transition: color .16s;
-  }
-  /* LABELED PERF DEVIATION #2 (Eric, Aug 25: still lagging after the
-     snap — so the ramp was not the bill, ONE PAINT of the chain was).
-     PROFILED at 1728x1117 with a 25-crossing/s sweep: the full 12-ring
-     chain ran 14.6ms/frame with spikes past 25ms; REMOVING THE 184px
-     RING ALONE returned it to 8.5ms with zero spikes, and dropping 96px
-     too bought nothing further (8.3). The 184px TEXT ring is the entire
-     lag — the same radius already killed once as a FILTER ring for the
-     same reason (software phase, 6.8x paint, on record); its text-shadow
-     exemption was about serial texture inflation, not about a 184px blur
-     kernel being free to rasterize.
-     THE GLOW COST OF THE TRIM IS NOISE, harness-measured: near-halo
-     52.5 -> 52.3 (-0.4%), peak unchanged 67, total -4.4% — all of it
-     far wash past 32px, which is REACH, NOT INTENSITY (law rule 2).
-     So this list is --glow-text-icons-word VERBATIM minus its 184px
-     ring — 7 base + the 4 comp rings, var()s resolving against this
-     element's own --wg-fh exactly as the token's do. The TOKEN is
-     untouched; community and the utility trays keep their certified
-     chain. A reach change strictly needs a reach ruling — Eric's lag
-     report is treated as that ruling for THIS surface; one line returns
-     the token if his eye disagrees. */
-  .bs-subitem.kb-hover, .bs-subitem:focus-visible {
-    color: #fff; outline: none;
-    text-shadow:
-      0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1),
-      0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95),
-      0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75),
-      0 0 96px rgba(255,255,255,0.5),
-      0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))),
-      0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))),
-      0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95))),
-      0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95)));
-  }
-  .bs-subitem.is-chosen { color: #fff; font-weight: 600; }
-  /* THE HOLLOW RING — the sub level's own marker, and a THIRD marker
-     vocabulary on this page: the main item's dot is SOLID signal red,
-     the form's field dot is warm white, and a chosen sub-item is an
-     OUTLINE ring in the same signal red. It sits in the same left
-     gutter as the parent's dot. Canon §9 entry owed. */
-  .bs-subitem.is-chosen::before {
-    content: ''; position: absolute; left: 0; top: 50%;
-    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
-    border: 1px solid var(--color-signal-red);
-    border-radius: 50%;
-    box-shadow: 0 0 calc(9px * var(--ui-scale)) rgba(157, 31, 0, .45);
-    transform: translateY(-50%);
-  }
+  /* ── THE SUB-LIST + THE SUB-ITEMS — FACTORED to the shared pair
+     (Aug 28): .bs-menu-slot / .bs-sublist-wrap / .bs-sublist /
+     .bs-subitem and the hollow-ring chosen marker are house grammar now
+     (the expand-downward model, ruled Aug 25). The descender-clip room,
+     the hugged hit targets, the snap-on glow and the 184px swept-surface
+     trim all moved verbatim; this page consumes them unchanged. */
 
-  /* ── THE PLATE STACK — the right side for every panel item ───────────
-     Frames 1-4: a column of translucent plates that runs off the frame's
-     right edge, each expanding DOWNWARD in place and pushing the plates
-     below it down. This is NOT bs-window — there is no corner triangle
-     anywhere in these frames and no bounded frame; the plates carry the
-     window's FILL token and nothing else of it. */
+  /* ── THE PLATE STACK — mechanics FACTORED to the shared .bs-stack /
+     .bs-plate family (Aug 28): the downward 0fr→1fr expansion, the
+     right-hand warm markers with the fitted halo and ranking grammar,
+     and the hover/open treatments are house grammar now. Placement stays
+     page-side, as everywhere.
+     A BOUNDED COLUMN (PROVISIONAL, read BY EYE): the plates occupy
+     roughly 34%-74% of the frame width; the source SVGs are gone and the
+     renders aspect-distorted, so these two numbers await the 1728×1117
+     PNG exports (the standing §6 block). */
   #bs-stack {
     position: fixed;
-    /* A BOUNDED COLUMN. It ran to the viewport's right edge (right: 0),
-       which no frame does — every one of them ends the plates with a
-       clear right margin, and the RETURN & REFUND frames put a third
-       column of copy beyond them. Read from the PNGs: the plates occupy
-       roughly 34%-74% of the frame width.
-       PROVISIONAL, and read BY EYE rather than measured: the source SVGs
-       are no longer on disk and the renders I still hold are aspect-
-       distorted, so these two numbers are the one thing here I could not
-       verify numerically. 1728x1117 PNG exports would settle them. */
     left: 34vw; right: 26vw;
     top: var(--sup-top);
     max-height: calc(94vh - var(--sup-top));
     z-index: 12;
-    display: grid;
-    grid-auto-rows: max-content;
-    gap: calc(10px * var(--ui-scale));
-    overflow: hidden auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: #ffffff5c transparent;
-    opacity: 0; visibility: hidden; pointer-events: none;
-    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
-  }
-  #bs-stack.is-on {
-    opacity: 1; visibility: visible; pointer-events: auto;
-    transition: opacity var(--pop-fade), visibility 0s;
-  }
-  .sup-row {
-    position: relative;
-    display: block; width: 100%;
-    border: 0; margin: 0;
-    background: var(--bsw-fill);
-    padding: calc(20px * var(--ui-scale)) calc(34px * var(--ui-scale));
-    text-align: left;
-    cursor: var(--cursor-target);
-    transition: background .16s;
-  }
-  .sup-row-title {
-    display: block;
-    color: var(--text-soft);
-    font-family: var(--font-sans); font-weight: 300;
-    font-size: calc(13px * var(--ui-scale));
-    line-height: calc(18px * var(--ui-scale));
-    letter-spacing: .01em;
-    transition: color .16s, text-shadow .2s ease;
-  }
-  /* THE PLATE'S MARKER — on the RIGHT (the company, Aug 25: "for them the
-     dots are on the right, reference the pngs"). Same warm-white marker
-     and the same fitted halo as the form's field dots, and the same
-     ranking grammar Eric already ratified there: dim at rest, full on the
-     plate under the pointer, full on the plate that is open. The vertical
-     offset is solved into --sup-dot-y from the TITLE's own font metrics,
-     exactly as the form's markers are. */
-  .sup-row::after {
-    content: ''; position: absolute;
-    right: calc(34px * var(--ui-scale));
-    top: var(--sup-dot-y, calc(29px * var(--ui-scale)));
-    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
-    background: var(--sup-marker); border-radius: 50%;
-    box-shadow: var(--sup-marker-glow);
-    transform: translateY(-50%);
-    opacity: var(--sup-dot-rest);
-    transition: opacity .2s ease;
-  }
-  .sup-row.kb-hover::after,
-  .sup-row:focus-visible::after,
-  .sup-row.is-open::after { opacity: 1; }
-  @media (prefers-reduced-motion: reduce) { .sup-row::after { transition: none; } }
-  .sup-row.kb-hover, .sup-row:focus-visible { outline: none; background: #fefefe24; }
-  .sup-row.kb-hover .sup-row-title, .sup-row:focus-visible .sup-row-title {
-    color: #fff; text-shadow: var(--glow-text);
-  }
-  .sup-row.is-open .sup-row-title {
-    color: var(--ink); font-weight: 600; text-shadow: var(--glow-text);
-  }
-  /* The downward expansion: 0fr -> 1fr animates to the content's OWN
-     height, which is the one way to travel to `auto` honestly. Rides the
-     house tempo — no local duration. */
-  .sup-row-body {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows var(--pop-motion);
-  }
-  .sup-row.is-open .sup-row-body { grid-template-rows: 1fr; }
-  /* Spans, not divs: the plate is a <button>, which may only carry
-     phrasing content. The CSS gives them their boxes instead. */
-  .sup-row-body > span { display: block; overflow: hidden; }
-  .sup-row-copy {
-    display: block;
-    margin: calc(14px * var(--ui-scale)) 0 0;
-    color: var(--text-soft);
-    font-family: var(--font-sans); font-weight: 300;
-    font-size: calc(12px * var(--ui-scale));
-    line-height: 1.75;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .bs-sublist-wrap, .sup-row-body { transition: none; }
   }
 
   #bs-support-menu .bs-item { font-weight: 300; }
@@ -489,7 +220,7 @@
     position: relative;
     margin: 0;
     text-align: right;
-    color: var(--sup-label);
+    color: var(--bs-label);
     font-family: var(--font-ui); font-weight: 300;
     font-size: calc(11px * var(--ui-scale));
     line-height: calc(13px * var(--ui-scale));
@@ -498,31 +229,31 @@
        other faces share the grammar so the rule does not appear and
        vanish as the ladder walks. (Eric named the FORM specifically;
        carrying it to the kicker is mine, and one line strikes it.) */
-    padding-bottom: var(--sup-rule-above);
-    border-bottom: 1px solid var(--sup-rule);
+    padding-bottom: var(--bs-rule-above);
+    border-bottom: 1px solid var(--bs-rule);
   }
   /* The marker sits at the CONTENT box's left edge, which is where the
      frames put it (1-2: dot x657-661 against a content box starting at
      657). It previously hung at calc(--sup-pad-x * -1), i.e. out at the
      window's own edge — wrong by the full 80px pad. */
-  /* top is MEASURED into --sup-dot-y (see alignMarkers in the script):
+  /* top is MEASURED into --bs-dot-y (see alignMarkers in the script):
      the dot's centre lands on the text's CAP MIDPOINT. The fallback is
      for a dead script only, and it is HALF THE LINE BOX — never 50%,
      which resolves against a padding box that now carries the divider's
      air and drops the dot ~6px (the measured bug this replaced). */
   .sup-mark::before {
     content: ''; position: absolute;
-    top: var(--sup-dot-y, calc(6.5px * var(--ui-scale)));
+    top: var(--bs-dot-y, calc(6.5px * var(--ui-scale)));
     left: 0;
     width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
-    background: var(--sup-marker); border-radius: 50%;
-    box-shadow: var(--sup-marker-glow);
+    background: var(--bs-marker-warm); border-radius: 50%;
+    box-shadow: var(--bs-marker-warm-glow);
     transform: translateY(-50%);
   }
   /* Prose runs LEFT — the frames' own split: labels right, prose left
      (the 1-3 textarea does exactly this). Readability decides. */
   .sup-prose {
-    margin: var(--sup-rule-below) 0 0;
+    margin: var(--bs-rule-below) 0 0;
     color: var(--text-soft);
     font-family: var(--font-sans); font-weight: 300;
     font-size: calc(12px * var(--ui-scale));
@@ -530,128 +261,17 @@
     letter-spacing: .02em;
   }
 
-  /* ── Request type — the option list ───────────────────────────────────
-     Frame 1-2 draws one option twice; that is an ARTIFACT, not a repeat
-     (seed). Shipped as one list, right-aligned bold on the frame's 27px
-     pitch. The set itself is a PLACEHOLDER pending Eric's manifest
-     confirm — it lives in STR keys, so the real list is a copy edit. */
-  .sup-options { margin-top: var(--sup-opt-below); display: grid; }
-  /* THE TARGET HUGS THE LABEL. These were width:100% blocks, so although
-     the text is right-aligned every option's hit box spanned the whole
-     content width — a click 400px to the LEFT of "warranty & repair", on
-     what plainly looks like empty window, selected it. That is the other
-     half of Eric's Aug 25 report, and it would have kept firing after
-     door #2 was retired. The box now sizes to its label and is pushed
-     right by the auto margin; the left padding keeps a generous vicinity
-     (the house's .bs-hit philosophy: bounded, not unbounded). */
-  .sup-option {
-    display: block;
-    width: max-content; max-width: 100%;
-    margin-left: auto;
-    padding: 0 0 0 calc(24px * var(--ui-scale));
-    border: 0; background: none;
-    text-align: right;
-    color: var(--ink);
-    font-family: var(--font-ui); font-weight: 600;
-    font-size: calc(13px * var(--ui-scale));
-    line-height: calc(27px * var(--ui-scale));   /* the frame's option pitch */
-    letter-spacing: 0;
-    text-shadow: var(--glow-text);
-    cursor: var(--cursor-target);
-    transition: color .16s, text-shadow .2s ease;
-  }
-  /* ONE visual channel for the cursor (house law): the bloom renders only
-     through .kb-hover, which mouseenter and the keyboard both drive. */
-  .sup-option.kb-hover, .sup-option:focus-visible {
-    color: #fff; outline: none;
-    text-shadow: var(--glow-text-hover);
-  }
-  .sup-option.is-chosen { color: #fff; }
+  /* ── Request type — the option list: FACTORED to the shared
+     .bs-options / .bs-option family (Aug 28). Right-aligned bold rows on
+     the frames' 27px pitch, targets hugging their labels; the set itself
+     stays a PLACEHOLDER in STR keys pending Eric's manifest confirm. */
 
-  /* ── The form ─────────────────────────────────────────────────────────
-     Frame 1-3: two columns, labels right-aligned above right-aligned
-     values, a marker dot per field at its column's left edge. The values
-     are real inputs with no chrome — the design draws typed text, not
-     boxes, so the field IS its value. Focus lights the marker and the
-     value's glow (the house's one focus channel). */
-  .sup-form { display: grid; gap: calc(30px * var(--ui-scale)); }
-  .sup-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    column-gap: calc(61px * var(--ui-scale));
-    row-gap: calc(30px * var(--ui-scale));
-  }
-  /* title -> divider -> value. The label is a stretched grid item, so its
-     own border IS the full-column rule; no extra element needed. */
-  .sup-field { position: relative; display: grid; gap: var(--sup-fld-below); }
-  .sup-field--wide { grid-column: 1 / -1; }
-  .sup-field > label {
-    text-align: right;
-    color: var(--sup-label);
-    font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
-    line-height: calc(13px * var(--ui-scale));
-    letter-spacing: .04em;
-    padding-bottom: var(--sup-fld-above);
-    border-bottom: 1px solid var(--sup-rule);
-  }
-  .sup-field::before {
-    content: ''; position: absolute; left: 0;
-    top: var(--sup-dot-y, calc(6.5px * var(--ui-scale)));   /* cap midpoint — measured */
-    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
-    background: var(--sup-marker); border-radius: 50%;
-    box-shadow: var(--sup-marker-glow);
-    transform: translateY(-50%);
-    /* THE MARKER ANSWERS THE POINTER (RULED — Eric, Aug 25): the dot on
-       the field under the mouse glows, every other dot sits dim.
-       The frames could not draw this — a static mock holds one level for
-       every dot — so the HOVER state takes the measured halo and rest
-       ranks BELOW it. That asymmetry is the only arrangement in which
-       the dots can indicate anything: the alternative (rest at full,
-       hover brighter) would push past the fitted calibration and still
-       leave the other dots undimmed.
-       0.2s ease is the house's own glow-transition timing (icon bar,
-       menu) — this is a hover answer, not a pop-out, so it does not
-       ride --pop-motion. */
-    opacity: var(--sup-dot-rest);
-    transition: opacity .2s ease;
-  }
-  /* :focus-within is the KEYBOARD TWIN — tabbing the form lights the
-     same dot the mouse would (house law: every hover state has one).
-     Native :hover is right HERE, unlike the menu and the option list:
-     form fields are not on the machine's focus variable, they are native
-     controls, and every other control inside this panel (.sup-chosen,
-     .sup-plate, .sup-door, .sup-submit) already answers natively. */
-  .sup-field:hover::before,
-  .sup-field:focus-within::before { opacity: 1; }
-  @media (prefers-reduced-motion: reduce) {
-    .sup-field::before { transition: none; }
-  }
-  .sup-input, .sup-area {
-    width: 100%;
-    background: none; border: 0; padding: 0;
-    color: var(--ink);
-    font-family: var(--font-ui); font-weight: 600;
-    font-size: calc(13px * var(--ui-scale));
-    line-height: calc(17px * var(--ui-scale));
-    letter-spacing: 0;
-    text-align: right;
-    text-shadow: var(--glow-text);
-    caret-color: var(--ink);
-    cursor: var(--cursor-target);
-    transition: text-shadow .2s ease;
-  }
-  .sup-input:focus, .sup-area:focus { outline: none; text-shadow: var(--glow-text-hover); }
-  .sup-input::placeholder, .sup-area::placeholder { color: #ffffff42; }
-  /* The long field wraps, so it reads LEFT — the frame's own choice. It
-     otherwise takes the SAME treatment as every other value (the face,
-     the weight, the ink, the glow): in the close-up its content is bold
-     white, not a lighter prose face. The field IS its value, here too.
-     Frame line spacing measures ~16px on ~11-12px text -> 1.4. */
-  .sup-area {
-    text-align: left; resize: none;
-    min-height: calc(96px * var(--ui-scale));
-    line-height: 1.45;
-  }
+  /* ── The form — FACTORED to the shared .bs-form / .bs-form-grid /
+     .bs-field / .bs-input / .bs-area family (Aug 28): the title→divider→
+     value grammar, the warm field markers with cap-midpoint alignment and
+     the pointer-answering rank all moved verbatim (Eric's Aug 24/25
+     rulings travel with them). */
+
   /* The chosen request type is a CONTROL: it returns to the picker (and
      it is the Esc ladder's own next rung down). */
   /* The chosen type READS OUT; it does not act. No pointer cursor and no
@@ -668,38 +288,8 @@
     text-shadow: var(--glow-text);
   }
   .sup-chosen:focus { outline: none; }
-  .sup-foot {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    gap: calc(24px * var(--ui-scale));
-    margin-top: calc(6px * var(--ui-scale));
-  }
-  .sup-note {
-    margin: 0; max-width: 62%;
-    color: var(--sup-label);
-    font-family: var(--font-sans); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
-    line-height: 1.5;
-  }
-  .sup-note.is-said { color: var(--ink); text-shadow: var(--glow-text); }
-  /* Submit — the one INVERTED control in the interface, exactly as the
-     frame draws it: light plate, dark ink. */
-  .sup-submit {
-    flex: none;
-    padding: calc(7px * var(--ui-scale)) calc(22px * var(--ui-scale));
-    border: 0; border-radius: 0;
-    background: #ededed;
-    color: #0b0b0a;
-    font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(12px * var(--ui-scale));
-    letter-spacing: .04em;
-    cursor: var(--cursor-target);
-    box-shadow: 0 0 calc(18px * var(--ui-scale)) rgba(255,255,255,.20);
-    transition: background .16s, box-shadow .2s ease;
-  }
-  .sup-submit:hover, .sup-submit:focus-visible, .sup-submit.kb-hover {
-    background: #fff; outline: none;
-    box-shadow: 0 0 calc(26px * var(--ui-scale)) rgba(255,255,255,.42);
-  }
+  /* .bs-foot / .bs-note / .bs-submit — factored with the form (Aug 28);
+     the inverted submit plate is the shared default. */
 
   /* ── The right rail — LOCK-SIDE FURNITURE ─────────────────────────────
      Eric's ruling: it does NOT exist during hover. Frame x[1379,1669] —
@@ -880,7 +470,7 @@
     from = sessionStorage.getItem('bs-nav-from');
     sessionStorage.removeItem('bs-nav-from');
   } catch (e) {}
-  window.__bsArrival = (from === 'home' || from === 'software' || from === 'community');
+  window.__bsArrival = (from === 'home' || from === 'software' || from === 'community' || from === 'hardware');
   window.__bsArrivalFrom = window.__bsArrival ? from : null;
   if (window.__bsArrival && !(window.CSS && CSS.supports && CSS.supports('view-transition-name: a'))){
     document.documentElement.classList.add('bs-arrive');
@@ -926,7 +516,7 @@
      Aug 24: no seed square rests on stage; preview invokes the window). -->
 <!-- THE PLATE STACK — every panel item's detail. Built from the manifest;
      no window, no triangle (the company, Aug 25, frames 1-4). -->
-<div id="bs-stack" role="region" aria-label="Details" aria-hidden="true"></div>
+<div id="bs-stack" class="bs-stack" role="region" aria-label="Details" aria-hidden="true"></div>
 
 <div id="bs-panel" class="bs-window is-hidden" role="region" aria-label="Support detail">
   <div class="sup-body" id="bs-panel-body">
@@ -934,12 +524,12 @@
     <!-- LOCKED, entry view: request type (frame 1-2). -->
     <div class="sup-view" id="sup-view-request" hidden>
       <p class="sup-kicker sup-mark" data-str="supReqType"></p>
-      <div class="sup-options" id="sup-options" role="listbox" aria-label="Request type"></div>
+      <div class="bs-options" id="sup-options" role="listbox" aria-label="Request type"></div>
     </div>
 
     <!-- LOCKED, form view (frame 1-3). -->
-    <form class="sup-view sup-form" id="sup-view-form" hidden novalidate>
-      <div class="sup-field sup-field--wide">
+    <form class="sup-view bs-form" id="sup-view-form" hidden novalidate>
+      <div class="bs-field bs-field--wide">
         <!-- A READOUT, not a control (Eric, Aug 25: clicking it must not
              take you back to the secondary). Not a <button> any more —
              a button that does nothing is worse than no button. It keeps
@@ -950,40 +540,40 @@
         <div class="sup-chosen" id="sup-f-type" tabindex="-1"
              aria-labelledby="sup-f-type-label"></div>
       </div>
-      <div class="sup-grid">
-        <div class="sup-field">
+      <div class="bs-form-grid">
+        <div class="bs-field">
           <label for="sup-f-name" data-str="supFldName"></label>
-          <input class="sup-input" id="sup-f-name" name="name" type="text" autocomplete="name" required>
+          <input class="bs-input" id="sup-f-name" name="name" type="text" autocomplete="name" required>
         </div>
-        <div class="sup-field">
+        <div class="bs-field">
           <!-- The frame reads "emile address" — a TYPO, never ported. -->
           <label for="sup-f-email" data-str="supFldEmail"></label>
-          <input class="sup-input" id="sup-f-email" name="email" type="email" autocomplete="email" required>
+          <input class="bs-input" id="sup-f-email" name="email" type="email" autocomplete="email" required>
         </div>
-        <div class="sup-field">
+        <div class="bs-field">
           <label for="sup-f-country" data-str="supFldCountry"></label>
-          <input class="sup-input" id="sup-f-country" name="country" type="text" inputmode="tel" value="+86">
+          <input class="bs-input" id="sup-f-country" name="country" type="text" inputmode="tel" value="+86">
         </div>
-        <div class="sup-field">
+        <div class="bs-field">
           <label for="sup-f-phone" data-str="supFldPhone"></label>
-          <input class="sup-input" id="sup-f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel">
+          <input class="bs-input" id="sup-f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel">
         </div>
-        <div class="sup-field">
+        <div class="bs-field">
           <label for="sup-f-subject" data-str="supFldSubject"></label>
-          <input class="sup-input" id="sup-f-subject" name="subject" type="text" required>
+          <input class="bs-input" id="sup-f-subject" name="subject" type="text" required>
         </div>
-        <div class="sup-field">
+        <div class="bs-field">
           <label for="sup-f-model" data-str="supFldModel"></label>
-          <input class="sup-input" id="sup-f-model" name="model" type="text">
+          <input class="bs-input" id="sup-f-model" name="model" type="text">
         </div>
-        <div class="sup-field sup-field--wide">
+        <div class="bs-field bs-field--wide">
           <label for="sup-f-requests" data-str="supFldRequests"></label>
-          <textarea class="sup-area" id="sup-f-requests" name="requests" rows="4" required></textarea>
+          <textarea class="bs-area" id="sup-f-requests" name="requests" rows="4" required></textarea>
         </div>
       </div>
-      <div class="sup-foot">
-        <p class="sup-note" id="sup-note" data-str="supFormNote" aria-live="polite"></p>
-        <button class="sup-submit" id="sup-submit" type="submit" data-str="supSubmit"></button>
+      <div class="bs-foot">
+        <p class="bs-note" id="sup-note" data-str="supFormNote" aria-live="polite"></p>
+        <button class="bs-submit" id="sup-submit" type="submit" data-str="supSubmit"></button>
       </div>
     </form>
 
@@ -1109,13 +699,8 @@ var primary  = document.getElementById('bs-primary');
 var fwdBtn   = primary.querySelector('.site-primary-nav__forward-button');
 var links    = Array.prototype.slice.call(primary.querySelectorAll('.site-primary-nav__link'));
 
-// ── i18n render — every visible string flows from a key ───────────────────
-function renderStrings(root){
-  var els = (root || document).querySelectorAll('[data-str]');
-  for (var i = 0; i < els.length; i++){
-    els[i].textContent = T(els[i].getAttribute('data-str'));
-  }
-}
+// ── i18n render — factored to the pair (C.renderStrings, Aug 28) ──────────
+var renderStrings = C.renderStrings;
 
 // ── STATE — one focus variable, two commit levels ─────────────────────────
 // focusIdx: THE cursor. Hover and the keyboard drive the same variable
@@ -1134,126 +719,50 @@ var rowIdx   = -1;
 var locked   = false;   // FORM item only — the form is showing
 var view     = 'excerpt';        // 'excerpt' | 'request' | 'form'
 var chosenType = null;           // STR key of the chosen request type
-var menuItems = [];
 
 function isLocked(){ return locked; }
 
-// ── Menu build — .bs-item consumed verbatim from the shared chrome ────────
-var subWraps = [];   // per item: the sub-list's animating wrapper, or null
-var subEls   = [];   // per item: its sub-item buttons, or null
-
-ITEMS.forEach(function(it, idx){
-  // Each item owns a SLOT. Its sub-list lives inside that slot, so a
-  // collapsed list adds nothing to the menu's rhythm (a sibling would
-  // still collect the grid's gap on both sides).
-  var slot = document.createElement('div');
-  slot.className = 'bs-menu-slot';
-
-  var b = document.createElement('button');
-  b.type = 'button';
-  b.className = 'bs-item';
-  b.id = 'bs-sup-' + idx;
-  var span = document.createElement('span');
-  span.className = 'bs-nav-label';
-  span.setAttribute('data-str', it.key);
-  b.appendChild(span);
-
-  // HOVER CARRIES THE CURSOR AND NOTHING ELSE (RULED — the company,
-  // Aug 25). It pops the item out, lights the dot and the glow, and
-  // opens no window. Leaving retracts it: sticky hover existed only to
-  // protect a window that hover had opened, and hover opens none now.
-  b.addEventListener('mouseenter', function(){
-    if (C.rail.isTouch()) return;
-    wake();
-    if (focusIdx !== idx) setFocus(idx);
-  });
-  b.addEventListener('mouseleave', function(){
-    if (C.rail.isTouch()) return;
-    if (focusIdx === idx) setFocus(-1);
-  });
-  // THE CLICK IS THE TRIGGER (RULED — the company, Aug 25). One click
-  // opens this item; clicking the OPEN item again moves it one level —
-  // down into the form for CONTACT US, back up otherwise.
-  // THE PAGE LOCK IS CANCELLED (Eric, Aug 25: "we don't need to lock any
-  // page anymore"): the menu never freezes and nothing here denies.
-  // Clicking ANY other item — at any depth, a half-open form included —
-  // simply switches to it. The form's own half-filled values survive the
-  // switch in the DOM, so coming back finds them.
-  b.addEventListener('click', function(){
-    wake();
+// ── Menu build — C.buildSlots, the factored sub-list accordion (Aug 28):
+// .bs-item consumed verbatim from the shared chrome; the slot/sub-list
+// structure and its certified event order are /support's own, now shared.
+// The callbacks below keep this page's semantics exactly: hover carries
+// the cursor and nothing else; the click is the trigger; door #1 is
+// level-aware; sub-clicks gate on the journal's clickOk window.
+var built = C.buildSlots(menuEl, ITEMS, {
+  itemId:  function(idx){ return 'bs-sup-' + idx; },
+  onFocus: function(idx){ if (focusIdx !== idx) setFocus(idx); },
+  onBlur:  function(idx){ if (focusIdx === idx) setFocus(-1); },
+  onClick: function(idx){
     setFocus(idx);                                   // the click also carries the cursor
     if (openIdx === idx){
       if (!clickOk()) return;
       // Door #1, level-aware: the form item commits down then retreats
-      // back; a panel item only ever retreats (its deeper levels — sub,
-      // plate — are chosen by their own controls, so there is nothing
-      // for the item itself to commit; goBack unwinds them one rung per
-      // press, exactly as Esc and the corner ‹ do).
+      // back; a panel item only ever retreats (goBack unwinds its deeper
+      // levels one rung per press, exactly as Esc and the corner ‹ do).
       if (isForm(idx) && !locked){ lock(); return; }
       goBack();
       return;
     }
     if (clickOk()) openFor(idx);                     // switching is never denied
-  });
-  slot.appendChild(b);
-
-  // The sub-list, if this item has one.
-  var ss = subsOf(idx);
-  if (ss){
-    var wrap = document.createElement('div');
-    wrap.className = 'bs-sublist-wrap';
-    var list = document.createElement('div');
-    list.className = 'bs-sublist';
-    var mine = [];
-    ss.forEach(function(sub, sIdx){
-      var sb = document.createElement('button');
-      sb.type = 'button';
-      sb.className = 'bs-subitem';
-      sb.setAttribute('data-str', sub.key);
-      sb.tabIndex = -1;
-      sb.addEventListener('mouseenter', function(){
-        if (!C.rail.isTouch()) sb.classList.add('kb-hover');
-      });
-      sb.addEventListener('mouseleave', function(){ sb.classList.remove('kb-hover'); });
-      sb.addEventListener('click', function(e){
-        e.stopPropagation();
-        wake();
-        if (clickOk()) chooseSub(idx, sIdx);
-      });
-      list.appendChild(sb);
-      mine.push(sb);
-    });
-    wrap.appendChild(list);
-    slot.appendChild(wrap);
-    subWraps.push(wrap);
-    subEls.push(mine);
-  } else {
-    subWraps.push(null);
-    subEls.push(null);
-  }
-
-  menuEl.appendChild(slot);
-  menuItems.push(b);
+  },
+  onSub: function(idx, sIdx){ if (clickOk()) chooseSub(idx, sIdx); }
 });
+var menuItems = built.items;
+var subWraps  = built.subWraps;   // per item: the animating wrapper, or null
+var subEls    = built.subEls;     // per item: its sub-item buttons, or null
 
 // Menu pitch — MEASURED (item top -> next item top), never hardcoded, so
 // the wheel trigger follows any spacing tune. The frames draw a UNIFORM
 // 45px pitch, so one measured pitch honestly describes the whole list.
 var menuPitch = 45;
-function measurePitch(){
-  if (menuItems.length > 1){
-    var a = menuItems[0].getBoundingClientRect(), b = menuItems[1].getBoundingClientRect();
-    var p = b.top - a.top;
-    if (p > 0) menuPitch = p;
-  }
-}
+function measurePitch(){ menuPitch = C.measureListPitch(menuItems, menuPitch); }
 
 // ── Request-type options ──────────────────────────────────────────────────
 var optionEls = [];
 REQ_TYPES.forEach(function(k){
   var b = document.createElement('button');
   b.type = 'button';
-  b.className = 'sup-option';
+  b.className = 'bs-option';
   b.setAttribute('role', 'option');
   b.setAttribute('data-str', k);
   b.setAttribute('data-req', k);
@@ -1392,46 +901,33 @@ function renderChosen(){
    (measured) below the text — a regression the divider introduced. The
    eye aligns a dot to the text's CAP MIDPOINT, so the machine solves
    that offset per element from REAL font metrics and writes it into
-   --sup-dot-y. Re-runs when the webfont lands and at every scale change,
+   --bs-dot-y. Re-runs when the webfont lands and at every scale change,
    because both move the metrics; the frames put the marker in this same
    band (1-3px above the x-height centre across every sampled label). */
-var _mctx = null;
-function capMidOf(el){
-  if (!_mctx) _mctx = document.createElement('canvas').getContext('2d');
-  var cs = getComputedStyle(el);
-  _mctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
-  var cap = _mctx.measureText('H');
-  var lh = parseFloat(cs.lineHeight);
-  var fa = cap.fontBoundingBoxAscent, fd = cap.fontBoundingBoxDescent;
-  var ca = cap.actualBoundingBoxAscent;
-  // Old engines report none of these — leave the CSS fallback in charge.
-  if (!isFinite(lh) || !isFinite(fa) || !isFinite(fd) || !isFinite(ca)) return null;
-  return (lh - (fa + fd)) / 2 + fa - ca / 2;     // line-box top -> cap midpoint
-}
 function alignMarkers(){
   var ks = document.querySelectorAll('.sup-kicker');
   for (var i = 0; i < ks.length; i++){
-    var y = capMidOf(ks[i]);
-    if (y !== null) ks[i].style.setProperty('--sup-dot-y', y.toFixed(2) + 'px');
+    var y = C.capMid(ks[i]);
+    if (y !== null) ks[i].style.setProperty('--bs-dot-y', y.toFixed(2) + 'px');
   }
-  var fs = document.querySelectorAll('.sup-field');
+  var fs = document.querySelectorAll('.bs-field');
   for (var j = 0; j < fs.length; j++){
     var lab = fs[j].querySelector('label');
     if (!lab) continue;
-    var yy = capMidOf(lab);
-    if (yy !== null) fs[j].style.setProperty('--sup-dot-y', yy.toFixed(2) + 'px');
+    var yy = C.capMid(lab);
+    if (yy !== null) fs[j].style.setProperty('--bs-dot-y', yy.toFixed(2) + 'px');
   }
   // The plates' right-hand markers ride the same solve, offset by the
   // plate's own top padding since the marker is placed against the ROW
   // while the metrics come from the TITLE inside it.
-  var rs = document.querySelectorAll('.sup-row');
+  var rs = document.querySelectorAll('.bs-plate');
   for (var k = 0; k < rs.length; k++){
-    var ttl = rs[k].querySelector('.sup-row-title');
+    var ttl = rs[k].querySelector('.bs-plate-title');
     if (!ttl) continue;
-    var mid = capMidOf(ttl);
+    var mid = C.capMid(ttl);
     if (mid === null) continue;
     var padTop = parseFloat(getComputedStyle(rs[k]).paddingTop) || 0;
-    rs[k].style.setProperty('--sup-dot-y', (padTop + mid).toFixed(2) + 'px');
+    rs[k].style.setProperty('--bs-dot-y', (padTop + mid).toFixed(2) + 'px');
   }
 }
 
@@ -1440,44 +936,15 @@ function alignMarkers(){
 // expands DOWNWARD in place; one at a time, which is what the frames draw.
 var stackEl = document.getElementById('bs-stack');
 var rowEls  = [];
+// Built through C.buildPlates — the factored plate stack (Aug 28); the
+// manifest shape and the one-open-at-a-time grammar are unchanged.
 function buildStack(){
   var rows = rowsFor(openIdx, subIdx);
-  stackEl.innerHTML = '';
-  rowEls = [];
   rowIdx = -1;
-  if (!rows) return;
-  rows.forEach(function(r, i){
-    // Phrasing content only — a <button> may not carry <div>/<p>, so the
-    // plate is spans throughout and the CSS gives them their boxes.
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'sup-row';
-    btn.setAttribute('aria-expanded', 'false');
-    var title = document.createElement('span');
-    title.className = 'sup-row-title';
-    title.setAttribute('data-str', r.key);
-    var body = document.createElement('span');
-    body.className = 'sup-row-body';
-    var clip = document.createElement('span');       // the overflow clip
-    var copy = document.createElement('span');
-    copy.className = 'sup-row-copy';
-    copy.setAttribute('data-str', r.body);
-    clip.appendChild(copy);
-    body.appendChild(clip);
-    btn.appendChild(title);
-    btn.appendChild(body);
-    btn.addEventListener('mouseenter', function(){
-      if (!C.rail.isTouch()) btn.classList.add('kb-hover');
-    });
-    btn.addEventListener('mouseleave', function(){ btn.classList.remove('kb-hover'); });
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      wake();
-      if (clickOk()) toggleRow(i);
-    });
-    stackEl.appendChild(btn);
-    rowEls.push(btn);
+  rowEls = C.buildPlates(stackEl, rows, {
+    onToggle: function(i){ if (clickOk()) toggleRow(i); }
   });
+  if (!rows) return;
   renderStrings(stackEl);
   alignMarkers();      // the plates are new DOM — solve their markers too
 }
@@ -1640,46 +1107,36 @@ function unlock(){
 // window and must be cleared on its own step. (The cursor's rung and
 // idle coincide — nothing else holds state at rest, the /community
 // precedent.) Instrumented under ?dev.
-var lastRung = null;
-function goBack(){
-  if (isLocked()){
-    var a = document.activeElement;
-    // 1. a focused field hands back to the window level.
-    if (a && panel.contains(a) && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')){
-      lastRung = 'field';
-      a.blur();
-      // Deliberately do NOT park focus on the panel body. Chrome makes a
-      // scroller focusable, and focus sitting there meant the panel's own
-      // keydown swallowed every later key — measured: after Esc out of a
-      // field, W/S no longer walked the menu at PREVIEW, breaking the
-      // ratified parity rule. Blurring hands the keys back to the machine.
-      return;
-    }
-    // 2. LOCKED retreats to OPEN (which, for the real item, IS the
-    //    request-type face).
-    lastRung = 'locked';
-    unlock();
-    return;
-  }
-  // 3. a PANEL item unwinds its own two levels before the item closes:
-  //    the expanded plate first, then the chosen sub-item.
-  if (rowIdx >= 0){ lastRung = 'plate'; rowIdx = -1; render(); return; }
-  if (subIdx >= 0){
-    lastRung = 'sub';
-    subIdx = -1;
-    buildStack();
-    render();
-    return;
-  }
-  // 4. OPEN retracts the item. The cursor SURVIVES it — it was never the
-  //    thing that opened it.
-  if (openIdx >= 0){ lastRung = 'window'; closeItem(); return; }
-  // 5. the cursor clears.
-  if (focusIdx >= 0){ lastRung = 'cursor'; setFocus(-1); return; }
-  // 6. rest -> the page boundary (a TRUE history pop; cold boot is silent).
-  lastRung = 'boundary';
-  if (arrival) popBoundary();
-}
+// The rung list IS the ladder — walked by C.makeLadder (the factored
+// instrumented walker, Aug 28): first live rung steps, one per press.
+var ladder = C.makeLadder([
+  { name: 'field',
+    when: function(){
+      if (!isLocked()) return false;
+      var a = document.activeElement;
+      return !!(a && panel.contains(a) && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA'));
+    },
+    // Blur only — parking focus on the panel's scroller swallows the
+    // machine's keys (measured; the record is in this file's history).
+    step: function(){ document.activeElement.blur(); } },
+  { name: 'locked', when: isLocked, step: unlock },
+  { name: 'plate',
+    when: function(){ return rowIdx >= 0; },
+    step: function(){ rowIdx = -1; render(); } },
+  { name: 'sub',
+    when: function(){ return subIdx >= 0; },
+    step: function(){ subIdx = -1; buildStack(); render(); } },
+  { name: 'window',
+    when: function(){ return openIdx >= 0; },
+    step: closeItem },
+  { name: 'cursor',
+    when: function(){ return focusIdx >= 0; },
+    step: function(){ setFocus(-1); } },
+  { name: 'boundary',
+    when: function(){ return true; },
+    step: function(){ if (arrival) popBoundary(); } }
+]);
+function goBack(){ ladder.back(); }
 
 // ── The panel owns its keys while locked ──────────────────────────────────
 // The #bs-icons exemption pattern: the machine stays blind to keys inside
@@ -1802,23 +1259,17 @@ vForm.addEventListener('submit', function(e){
   wake();
   var bad = null;
   if (!chosenType) bad = chosenEl;
-  if (!bad){
-    var required = [
-      document.getElementById('sup-f-name'),
-      document.getElementById('sup-f-email'),
-      document.getElementById('sup-f-subject'),
-      document.getElementById('sup-f-requests')
-    ];
-    for (var i = 0; i < required.length; i++){
-      var f = required[i];
-      var v = (f.value || '').trim();
-      var okEmail = (f.type !== 'email') || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-      if (!v || !okEmail){ bad = f; break; }
-    }
-  }
+  // The factored house validation grammar (C.validateFields, Aug 28) —
+  // same required set, same email test, first offender back.
+  if (!bad) bad = C.validateFields([
+    document.getElementById('sup-f-name'),
+    document.getElementById('sup-f-email'),
+    document.getElementById('sup-f-subject'),
+    document.getElementById('sup-f-requests')
+  ]);
   if (bad){
     setNote('supInvalid', false);
-    denyOn(bad.closest('.sup-field') || bad);
+    denyOn(bad.closest('.bs-field') || bad);
     try { bad.focus({ preventScroll: true }); } catch (err) {}
     return;
   }
@@ -1987,7 +1438,7 @@ C.init({
     },
     devState:       function(){
       return { focusIdx: focusIdx, openIdx: openIdx, subIdx: subIdx, rowIdx: rowIdx,
-               locked: locked, view: view, rung: lastRung,
+               locked: locked, view: view, rung: ladder.last(),
                chosenType: chosenType, menuPitch: menuPitch, arrival: arrival,
                railOn: railEl.classList.contains('is-on') };
     }
