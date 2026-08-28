@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#040402">
+<title>BACKSPACE — Hardware</title>
+<!--
+  backspace — /hardware (page five), phase one: the OASIS catalog. The
+  founder's directive made this page the reason the site exists: class
+  select on the left, the stage in the center, the customization column
+  on the right. Cart tray and checkout are PHASE 2 by Eric's Aug 28 word.
+
+  GEOMETRY AUTHORITY: the six B-1 frames as extracted by the GM
+  (product_frames_geometry.csv / product_frames_values.md) through the
+  proportional layer (reports/product_frames_proportional.md): place →
+  vw/vh fractions, chrome → px × --ui-scale, solved values → runtime.
+  The 0.9 note applies: --ui-scale is 1920-based, so frame-measured
+  chrome renders 0.9× at the frames' own 1728×1117 — shipped, certified
+  behavior on all four siblings; nothing here retunes it.
+
+  ERIC'S AUG 28 RULINGS BUILT IN:
+  · blue dot #125277 = right/product-menu active — RATIFIED into the
+    vocabulary (may extend house-wide; this page is its first consumer).
+  · the window draw on THIS page is the revived v2 DIAGONAL mechanic
+    (.bs-window--diag): the design team drew the second BR triangle
+    because they designed against v2. /support keeps its waterfall.
+  · the stage carries a live TEXTURE BALL as the product placeholder —
+    a WebGL PBR sphere consuming the selection state through the
+    STAGE-BINDING SEAM (applySelectionToStage). The eventual desk GLB
+    (color ramp + procedural nodes in its texture map) replaces the
+    ball BEHIND the seam; the interaction layer never changes.
+  · color is the one live SLIDE BAR (the per-color scrubbers of Eric's
+    p1 reference: tick strips, A/D on the active row); metallic and
+    roughness arrive as PRESETS — carried by the FINISH choice, whose
+    manifest rows hold {metal, rough}. Structures live now.
+  · the custom size input is BUILT LIVE and drives the ball's scale.
+    The ops free-size gate stands for COMMERCE wiring, not for the
+    visual (nothing sells in phase one — the cart denies).
+  · the eight unreal classes PREVIEW as coming-soon (the locked-classes
+    game pattern): selecting one re-targets the stage to the notice;
+    desk is the only real product and the resting selection.
+  · type is LIVE FACES at ui-scaled sizes matched to the outlined
+    frames' estimates (÷0.9 derivation) — sizes grow with the window.
+    Per-rung values are PROVISIONAL pending the §5.1 design confirm.
+
+  THE MACHINE on this page: the class menu is the primary W/S surface
+  (the shared .bs-item grammar verbatim — red dot, shift, 300/600).
+  The right product menu is click-to-open (Enter's twin via Tab focus),
+  blue-dot grammar, expand-downward sub-lists in the factored slots.
+  Choosing a CUSTOM sub selects a part and draws the options panel
+  (diagonal window, right-anchored 3.30vw); inside it W/S walks the
+  color rows and A/D scrubs the active row — axes never double-book.
+  The Esc ladder (C.makeLadder): field → panel+sub → header → cursor →
+  boundary. NO page locks. Idle attract restores the resting state but
+  never sweeps a half-filled custom-size input (something to lose).
+
+  FACTORED MACHINERY CONSUMED (the Aug 28 trio — this page is the
+  second consumer that fired the trigger): C.buildSlots (class menu),
+  the .bs-menu-slot/.bs-sublist/.bs-subitem accordion CSS (right menu),
+  C.makeLadder, the .bs-field form grammar + C.validateFields (custom
+  size), C.capMid + --bs-dot-y (every marker), C.measureListPitch.
+
+  DO-NOT-PORT (values companion §6), honored: lowercase "cart", the
+  static $3499/$4141 (the price slot renders "—" to a marked seam —
+  price source rides the phase-2 cart session), the mocked-in cursor,
+  the frames' embedded desk renders. The BR triangle is NOT on the list
+  anymore — it came back with the diagonal ruling.
+-->
+<link rel="stylesheet" href="shared/bs-chrome.css">
+<style>
+  /* ── Page tokens — the proportional layer's canonical values ────────── */
+  body[data-bs-page="hardware"] {
+    /* Class menu: the 3.76vw rail (the shipped rail — the frames re-draw
+       it exactly); OASIS header top 246.4/1117. */
+    --hw-left-top: 22.06vh;
+    /* Right menu: INTRODUCTION top 242.4/1117 (matches /support's
+       21.76vh to 0.7px — ported as drawn, NOT harmonized); text rail
+       inset 64/1728, the near-mirror of the left rail. */
+    --hw-right-top: 21.70vh;
+    /* The options panel (diagonal bs-window), right-anchored: right
+       edge = the tray's right rail = ONE 3.30vw rail (x1671). */
+    --hw-panel-right: 3.30vw;
+    --hw-panel-top: 38.94vh;
+    --hw-panel-w: 26.33vw;
+    --hw-panel-maxh: 37.69vh;
+    /* Introduction plates: 19.04 / 39.58 / 60.19vw · top 31.51vh ·
+       w 19.27vw · aspect locked 333/309 (proposal, on the record). */
+    --hw-plate-top: 31.51vh;
+    --hw-plate-w: 19.27vw;
+  }
+
+  /* ── The stage — the flexing center. The BALL canvas fills it; the
+     coming-soon notice replaces it for unreal classes. ────────────────── */
+  #hw-ball {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    z-index: 1;                     /* above the bg, below every control */
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity var(--pop-fade);
+  }
+  #hw-ball.is-off { opacity: 0; }
+  #hw-coming {
+    position: fixed;
+    left: 26vw; right: 32vw;        /* the stage's own midfield */
+    top: 44vh;
+    z-index: 2;
+    text-align: center;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  #hw-coming.is-on {
+    opacity: 1; visibility: visible;
+    transition: opacity var(--pop-fade), visibility 0s;
+  }
+  #hw-coming .hw-coming-head {
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(22px * var(--ui-scale));
+    letter-spacing: .14em;
+    text-shadow: var(--glow-text);
+  }
+  #hw-coming .hw-coming-sub {
+    margin-top: calc(10px * var(--ui-scale));
+    color: var(--text-soft);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    line-height: 1.6;
+  }
+
+  /* ── The class menu (left) — the RPG class select. .bs-item consumed
+     VERBATIM (the shared grammar IS the frame's: red dot at the rail,
+     the 33px×ui shift, 300 rest / 600 active); placement page-side. ──── */
+  #hw-class-head {
+    position: fixed;
+    top: var(--hw-left-top);
+    left: max(clamp(34px, 3.8vw, 68px), 3.76vw);
+    z-index: 16;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(17px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
+    line-height: calc(18px * var(--ui-scale));
+    letter-spacing: .08em;
+    text-shadow: var(--glow-text);
+  }
+  #hw-class-menu {
+    position: fixed;
+    /* Header ink 246.4 → first row 291.5: 45 frame-px of header-to-row
+       air; the header's own 18px line leaves 27px×ui of margin. */
+    top: calc(var(--hw-left-top) + 45px * var(--ui-scale));
+    left: max(clamp(34px, 3.8vw, 68px), 3.76vw);
+    z-index: 16;
+    display: grid;
+    /* Frame pitch 30 (baseline-uniform, nine rows): 15px×ui line boxes
+       + 15px×ui gap. The wheel walks the MEASURED pitch regardless. */
+    gap: calc(15px * var(--ui-scale));
+    color: var(--text-soft);
+  }
+  #hw-class-menu .bs-item { font-weight: 300; }
+  #hw-class-menu .bs-item.kb-hover,
+  #hw-class-menu .bs-item:focus-visible,
+  #hw-class-menu .bs-item.active { font-weight: 600; }
+
+  /* ── The product menu (right) — INTRODUCTION / CUSTOM, blue-dot
+     grammar, the factored accordion mirrored to a right rail. The
+     headers hold the rail when open (the frames draw no shift and no
+     dot on them — weight alone marks the open header). ────────────────── */
+  #hw-product-menu {
+    position: fixed;
+    top: var(--hw-right-top);
+    right: max(clamp(34px, 3.8vw, 68px), 3.70vw);
+    z-index: 16;
+    display: grid;
+    /* INTRODUCTION 242.4 → CUSTOM 293.4 collapsed: 51 frame-px header
+       pitch; 18px×ui line boxes leave 33px×ui of gap. */
+    gap: calc(33px * var(--ui-scale));
+    color: var(--text-soft);
+    justify-items: end;
+  }
+  .hw-head {
+    background: none; border: 0; padding: 0;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(17px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
+    line-height: calc(18px * var(--ui-scale));
+    letter-spacing: .08em;
+    text-align: right; white-space: nowrap;
+    text-shadow: var(--glow-text-word);
+    cursor: var(--cursor-target);
+    transition: color .16s;
+  }
+  .hw-head.kb-hover, .hw-head:focus-visible {
+    color: #fff; outline: none;
+    text-shadow: var(--glow-text-hover);
+  }
+  .hw-head.is-open { color: var(--ink); font-weight: 600; }
+  /* The right menu's slots consume the factored accordion; only the
+     mirror is page-side: rows right-aligned, indent on the RIGHT. */
+  #hw-product-menu .bs-menu-slot { justify-items: end; }
+  #hw-product-menu .bs-sublist { justify-items: end; }
+  #hw-product-menu .bs-subitem {
+    padding-left: 0;
+    padding-right: var(--side-menu-shift-x);
+    justify-self: end;
+    text-align: right;
+    font-size: calc(14px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
+    line-height: calc(16px * var(--ui-scale));
+  }
+  /* THE BLUE DOT — the product menu's ACTIVE marker (Eric, Aug 28,
+     ratified): solid #125277, 5×5×ui, flush to the right rail, y on the
+     cap midpoint (--bs-dot-y, solved). The ACTIVE sub-item indents
+     INWARD off the rail — the left menu's shift, mirrored — which is
+     exactly what the frames draw (right edge 1664 → 1629.6). */
+  #hw-product-menu .bs-subitem.is-live {
+    color: #fff; font-weight: 600;
+  }
+  #hw-product-menu .bs-subitem.is-live::after {
+    content: ''; position: absolute;
+    right: 0;
+    top: var(--bs-dot-y, 50%);
+    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+    background: var(--bs-marker-blue); border-radius: 50%;
+    /* The blue dot carries the field-marker glow ladder at the blue's
+       own hue — same fitted spread, re-tinted (PROVISIONAL: the frames
+       draw no measurable halo at 5px; parity with the warm marker's
+       ladder is the consistent reading, one line strikes it). */
+    box-shadow:
+      0 0 calc(9px  * var(--ui-scale))                              rgba(18, 82, 119, .85),
+      0 0 calc(32px * var(--ui-scale)) calc(3px  * var(--ui-scale)) rgba(18, 82, 119, .42);
+    transform: translateY(-50%);
+  }
+  /* The chosen-ring stays available in this menu for CHOSEN semantics
+     (none in phase one — the ring belongs to the panel's options). */
+
+  /* The custom rows: numeral selector LEFT of the sub-nav item, active
+     bold, callout leaders deferred to the GLB phase (a ball has no
+     parts to point at — on the record). Numerals are separate controls:
+     a <button> may not nest in a <button>. */
+  .hw-subrow {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: calc(10px * var(--ui-scale));
+  }
+  .hw-num {
+    background: none; border: 0; padding: 0;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    line-height: calc(14px * var(--ui-scale));
+    letter-spacing: .06em;
+    cursor: var(--cursor-target);
+    opacity: .55;
+    transition: color .16s, opacity .16s;
+  }
+  .hw-num:hover, .hw-num:focus-visible { color: #fff; opacity: 1; outline: none; }
+  .hw-num.is-live { color: var(--ink); font-weight: 600; opacity: 1; text-shadow: var(--glow-text); }
+
+  /* ── The introduction plates — three DIAGONAL windows center-stage
+     (ruled: build with the bs-window subsystem; lorem via the manifest;
+     picture/video + text presumed — the media slot is the dark box). ─── */
+  .hw-plate {
+    position: fixed;
+    top: var(--hw-plate-top);
+    width: var(--hw-plate-w);
+    aspect-ratio: 333 / 309;        /* the frames' shape, locked (proposal) */
+    z-index: 12;
+    color: var(--text-soft);
+  }
+  #hw-plate-1 { left: 19.04vw; }
+  #hw-plate-2 { left: 39.58vw; }
+  #hw-plate-3 { left: 60.19vw; }
+  .hw-plate-body {
+    position: absolute; inset: 0;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: calc(10px * var(--ui-scale));
+    padding: calc(14px * var(--ui-scale));
+  }
+  .hw-plate-media {
+    background: #00000066;          /* the picture/video slot, dark at rest */
+    min-height: 0;
+  }
+  .hw-plate-copy {
+    color: var(--text-soft);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    line-height: 1.6;
+    max-height: calc(72px * var(--ui-scale));
+    overflow: hidden;
+  }
+
+  /* ── The options panel — THE diagonal window, right-anchored on the
+     shared 3.30vw rail. Height is measured from content, capped at the
+     frame's 37.69vh; the interior scrolls natively (wheelNative). ─────── */
+  #hw-panel {
+    position: fixed;
+    right: var(--hw-panel-right);
+    top: var(--hw-panel-top);
+    width: var(--hw-panel-w);
+    min-width: calc(320px * var(--ui-scale));  /* usability floor (proposal) */
+    height: calc(180px * var(--ui-scale));     /* boot value; the machine measures */
+    z-index: 18;
+    color: var(--text-soft);
+  }
+  #hw-panel .hw-body {
+    position: absolute; inset: 0;
+    /* Frame interior: content inset ~14-22 of 455 wide; 18px×ui the
+       consistent reading (panel internals ride ui-scale). */
+    padding: calc(18px * var(--ui-scale)) calc(18px * var(--ui-scale)) calc(46px * var(--ui-scale));
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #ffffff5c transparent;
+  }
+  #hw-panel .hw-body::-webkit-scrollbar { width: calc(5px * var(--ui-scale)); }
+  #hw-panel .hw-body::-webkit-scrollbar-thumb { background: #ffffff5c; }
+  #hw-panel .hw-body::-webkit-scrollbar-track { background: transparent; }
+
+  /* Section head — the p1 reference's grammar: lowercase head, hairline
+     rule below spanning the panel. */
+  .hw-sec {
+    display: block;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(14px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
+    line-height: calc(18px * var(--ui-scale));
+    letter-spacing: .02em;
+    padding-bottom: calc(8px * var(--ui-scale));
+    border-bottom: 1px solid var(--bs-rule);
+    margin: calc(16px * var(--ui-scale)) 0 calc(10px * var(--ui-scale));
+  }
+  .hw-sec:first-child { margin-top: 0; }
+
+  /* Materials: family column + finish column (the frames' own split). */
+  .hw-mat-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    column-gap: calc(24px * var(--ui-scale));
+    align-items: start;
+  }
+  .hw-optlist { display: grid; gap: calc(6px * var(--ui-scale)); }
+  .hw-opt {
+    position: relative;
+    background: none; border: 0;
+    padding: 0 0 0 calc(14px * var(--ui-scale));  /* the ring's gutter */
+    width: max-content; max-width: 100%;
+    text-align: left;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(13px * var(--ui-scale));
+    line-height: calc(19px * var(--ui-scale));
+    letter-spacing: 0;
+    text-shadow: var(--glow-text-word);
+    cursor: var(--cursor-target);
+    transition: color .16s;
+  }
+  .hw-opt.kb-hover, .hw-opt:hover, .hw-opt:focus-visible {
+    color: #fff; outline: none;
+    text-shadow: var(--glow-text);
+  }
+  .hw-opt.is-chosen { color: #fff; font-weight: 600; }
+  /* THE OUTLINE RING — chosen options carry the signal-red ring (the
+     vocabulary's third member; the shared sub-item recipe, verbatim). */
+  .hw-opt.is-chosen::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+    border: 1px solid var(--color-signal-red);
+    border-radius: 50%;
+    box-shadow: 0 0 calc(9px * var(--ui-scale)) rgba(157, 31, 0, .45);
+    transform: translateY(-50%);
+  }
+
+  /* Color rows — Eric's p1 reference: label left, TICK SCRUBBER filling
+     the row's right; the active row is bold+lit; A/D scrubs it. The
+     strip is layered gradients: dim short ticks full-width, bright
+     taller ticks clipped to the value fraction. */
+  .hw-colrow {
+    display: grid;
+    grid-template-columns: minmax(calc(96px * var(--ui-scale)), auto) 1fr;
+    align-items: center;
+    column-gap: calc(14px * var(--ui-scale));
+    min-height: calc(24px * var(--ui-scale));
+  }
+  .hw-scrub {
+    position: relative;
+    height: calc(11px * var(--ui-scale));
+    cursor: var(--cursor-target);
+    /* the resting tick bed */
+    background: repeating-linear-gradient(90deg,
+      #fefefe2e 0, #fefefe2e 1px, transparent 1px, transparent 5px);
+    background-size: 100% calc(7px * var(--ui-scale));
+    background-position: 0 50%;
+    background-repeat: no-repeat;
+  }
+  .hw-scrub-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 50%;                      /* JS writes the fraction */
+    overflow: hidden;
+    background: repeating-linear-gradient(90deg,
+      #fefefeb8 0, #fefefeb8 1px, transparent 1px, transparent 5px);
+    pointer-events: none;
+  }
+  .hw-colrow.is-chosen .hw-scrub-fill {
+    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .22);
+  }
+
+  /* Size view — presets (label + dims readout) then the custom inputs:
+     the form subsystem's second consumer, .bs-field verbatim with the
+     values reading LEFT (dimension entry, not address entry). */
+  .hw-sizerow {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: calc(18px * var(--ui-scale));
+    width: 100%; max-width: none;
+  }
+  .hw-sizedims {
+    color: var(--bs-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+  .hw-custom-grid {
+    display: grid; grid-template-columns: 1fr 1fr auto;
+    column-gap: calc(18px * var(--ui-scale));
+    align-items: end;
+  }
+  .hw-custom-grid .bs-input { text-align: left; }
+  .hw-unit {
+    display: flex; gap: calc(6px * var(--ui-scale));
+  }
+  .hw-unit button {
+    background: none; border: 0; padding: 0 calc(4px * var(--ui-scale));
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    line-height: calc(17px * var(--ui-scale));
+    letter-spacing: .06em;
+    cursor: var(--cursor-target);
+    transition: color .16s;
+  }
+  .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; }
+  .hw-unit button.is-live { color: var(--ink); font-weight: 600; text-shadow: var(--glow-text); }
+
+  /* The add row — rendered per the frames, DENIED per the ruling (cart
+     UI is phase 2). The price slot is a MARKED SEAM: no price source is
+     ruled; the static $3,499 is the on-record bug and never returns. */
+  .hw-addrow {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: calc(30px * var(--ui-scale));
+    display: flex; align-items: stretch;
+    z-index: 1;
+  }
+  .hw-addrow .hw-add-chip {
+    flex: none;
+    width: calc(30px * var(--ui-scale));
+    display: grid; place-items: center;
+    background: #ededed; color: #0b0b0a;
+    border: 0; padding: 0;
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(13px * var(--ui-scale));
+    cursor: var(--cursor-target);
+  }
+  .hw-addrow .hw-add-price {
+    flex: 1;
+    display: flex; align-items: center;
+    padding: 0 calc(12px * var(--ui-scale));
+    background: #4a4a4a5c;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+  .hw-addrow .hw-add-go {
+    flex: none;
+    padding: 0 calc(14px * var(--ui-scale));
+    background: #ededed; color: #0b0b0a;
+    border: 0;
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .04em;
+    cursor: var(--cursor-target);
+    transition: background .16s;
+  }
+  .hw-addrow .hw-add-go:hover, .hw-addrow .hw-add-go:focus-visible {
+    background: #fff; outline: none;
+  }
+
+  /* THE REDRAW'S SILENT FRAME — the /support discipline for the diag
+     variant: collapse instantly (host clip + traveler + content all
+     silenced for exactly one frame), then draw out on the tempo. */
+  #hw-panel.hw-nofx,
+  #hw-panel.hw-nofx::before,
+  #hw-panel.hw-nofx::after,
+  #hw-panel.hw-nofx > * { transition: none; animation: none; }
+
+  /* Commit-arrival resolve for browsers WITHOUT view transitions. */
+  @keyframes bs-arrive { from { opacity: 0; } }
+  html.bs-arrive #bs-corner,
+  html.bs-arrive #bs-wordmark { animation: bs-arrive var(--pop-fade); }
+  @media (prefers-reduced-motion: reduce) {
+    html.bs-arrive #bs-corner,
+    html.bs-arrive #bs-wordmark { animation: none; }
+  }
+
+  /* PROVISIONAL narrow-portrait rules — collision prevention only;
+     mobile grammar is Eric's later design. */
+  @media (max-width: 900px) {
+    #hw-class-head, #hw-class-menu { left: 6vw; }
+    #hw-product-menu { right: 6vw; }
+    #hw-panel { right: 6vw; left: 6vw; width: 88vw; min-width: 0; top: 46vh; }
+    .hw-plate { display: none; }    /* the plates cannot coexist at phone width */
+    #hw-coming { left: 6vw; right: 6vw; }
+  }
+</style>
+</head>
+<body data-bs-page="hardware">
+
+<script>
+// Pre-paint arrival read — the sibling set now includes every section.
+(function(){
+  var from = null;
+  try {
+    from = sessionStorage.getItem('bs-nav-from');
+    sessionStorage.removeItem('bs-nav-from');
+  } catch (e) {}
+  window.__bsArrival = (from === 'home' || from === 'software' || from === 'community' || from === 'support');
+  window.__bsArrivalFrom = window.__bsArrival ? from : null;
+  if (window.__bsArrival && !(window.CSS && CSS.supports && CSS.supports('view-transition-name: a'))){
+    document.documentElement.classList.add('bs-arrive');
+  }
+})();
+</script>
+
+<!-- The stage: the texture ball (the scene seam's phase-one occupant). -->
+<div id="bs-stage"></div>
+<canvas id="hw-ball" aria-hidden="true"></canvas>
+<div id="hw-coming" aria-live="polite">
+  <div class="hw-coming-head" data-str="hwComingSoon"></div>
+  <div class="hw-coming-sub" data-str="hwComingSoonSub"></div>
+</div>
+
+<a id="bs-wordmark-link" href="home.html" aria-label="backspace — home">
+  <img id="bs-wordmark" src="assets/bs_wordmark.svg" alt="backspace">
+</a>
+
+<!-- The away iteration — HARDWARE is committed: full ink weight-600, no
+     dot, aria-current; clicking it DENIES with the shake. -->
+<div id="bs-corner" class="site-header__nav site-header__nav--primary" aria-label="Section navigation">
+  <div class="bs-hit"><button id="bs-back" class="site-round-button site-header__back-button" type="button" aria-label="Home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button></div>
+  <div class="bs-hit"><nav id="bs-primary" class="site-primary-nav" aria-label="Primary" aria-expanded="false">
+    <button class="site-primary-nav__forward-button" type="button" aria-label="Open section navigation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <button class="site-primary-nav__link site-primary-nav__link--hardware is-active is-active-nav" type="button" aria-current="page" data-section="hardware">HARDWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--software" type="button" data-section="software">SOFTWARE</button>
+    <button class="site-primary-nav__link site-primary-nav__link--community" type="button" data-section="community">COMMUNITY</button>
+    <button class="site-primary-nav__link site-primary-nav__link--support" type="button" data-section="support">SUPPORT</button>
+  </nav></div>
+</div>
+
+<!-- Utility cluster — injected by the shared chrome. -->
+<div id="bs-icons"></div>
+
+<!-- The class menu: OASIS, nine classes, the shared .bs-item grammar. -->
+<div id="hw-class-head" data-str="hwOasis"></div>
+<nav id="hw-class-menu" aria-label="OASIS classes"></nav>
+
+<!-- The product menu: built page-side on the factored accordion CSS
+     (the custom rows carry numeral selectors, which cannot nest in the
+     sub-item buttons). -->
+<nav id="hw-product-menu" aria-label="Product menu"></nav>
+
+<!-- Introduction plates — three diagonal windows. -->
+<div id="hw-plate-1" class="hw-plate bs-window bs-window--diag is-hidden" role="region" aria-label="Introduction">
+  <div class="hw-plate-body"><div class="hw-plate-media"></div><div class="hw-plate-copy" data-str="hwPlateLorem"></div></div>
+</div>
+<div id="hw-plate-2" class="hw-plate bs-window bs-window--diag is-hidden" role="region" aria-label="Introduction">
+  <div class="hw-plate-body"><div class="hw-plate-media"></div><div class="hw-plate-copy" data-str="hwPlateLorem"></div></div>
+</div>
+<div id="hw-plate-3" class="hw-plate bs-window bs-window--diag is-hidden" role="region" aria-label="Introduction">
+  <div class="hw-plate-body"><div class="hw-plate-media"></div><div class="hw-plate-copy" data-str="hwPlateLorem"></div></div>
+</div>
+
+<!-- The options panel — THE diagonal window. -->
+<div id="hw-panel" class="bs-window bs-window--diag is-hidden" role="region" aria-label="Customization">
+  <div class="hw-body" id="hw-panel-body"></div>
+  <div class="hw-addrow" aria-hidden="false">
+    <button class="hw-add-chip" id="hw-add-chip" type="button" aria-label="Cart">+</button>
+    <!-- PRICE SEAM: renders from the manifest per configuration when the
+         price-source ruling lands (phase 2 with the cart). Never static. -->
+    <div class="hw-add-price" id="hw-price">—</div>
+    <button class="hw-add-go" id="hw-add-go" type="button" data-str="hwAddToCart"></button>
+  </div>
+</div>
+
+<input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
+
+<script src="shared/bs-chrome.js"></script>
+<script>
+(function(){
+'use strict';
+var C = window.BSChrome;
+var T = C.T, SoundBus = C.SoundBus;
+var wake = C.wake, denyOn = C.denyOn, clickOk = C.clickOk, hapticTick = C.hapticTick;
+
+var arrival     = window.__bsArrival === true;
+var arrivalFrom = window.__bsArrivalFrom;
+var renderStrings = C.renderStrings;
+
+// ── THE CONTENT MANIFEST — structure as data, every string an STR key.
+// Real products, families, finishes, colors, sizes and prices are
+// manifest edits; nothing below is hardcoded copy. The desk is the only
+// real class today (OASIS75 the likely second — a keyboard, per the
+// commerce realm; one `real: true` flips it live).
+var HW = {
+  classes: [
+    { key: 'hwClassDesk',      real: true  },
+    { key: 'hwClassModule',    real: false },
+    { key: 'hwClassKeyboard',  real: false },
+    { key: 'hwClassMouse',     real: false },
+    { key: 'hwClassLight',     real: false },
+    { key: 'hwClassPowerbank', real: false },
+    { key: 'hwClassWatercup',  real: false },
+    { key: 'hwClassHeadset',   real: false },
+    { key: 'hwClassSpeakers',  real: false }
+  ],
+  introSubs: ['hwIntroOverview', 'hwIntroDesign', 'hwIntroSpecs', 'hwIntroEco', 'hwIntroSupport'],
+  customSubs: [
+    { key: 'hwSubSize',     kind: 'size', parts: [] },
+    { key: 'hwSubDesktop',  kind: 'part', parts: ['III'] },
+    { key: 'hwSubDesklegs', kind: 'part', parts: ['IV', 'V'] }
+  ],
+  // Finishes carry the METALLIC/ROUGHNESS PRESETS (Eric, Aug 28) — the
+  // structure the GLB's procedural nodes will consume at the same seam.
+  families: [
+    { key: 'hwMatSteel',    finishes: [
+        { key: 'hwFinBrushed', metal: 1.0, rough: 0.40 },
+        { key: 'hwFinPVD',     metal: 1.0, rough: 0.14 },
+        { key: 'hwFinPowder',  metal: 0.06, rough: 0.62 } ] },
+    { key: 'hwMatAluminum', finishes: [
+        { key: 'hwFinBrushed', metal: 1.0, rough: 0.34 },
+        { key: 'hwFinPVD',     metal: 1.0, rough: 0.12 },
+        { key: 'hwFinPowder',  metal: 0.06, rough: 0.58 } ] },
+    { key: 'hwMatWalnut',   finishes: [
+        { key: 'hwFinNatural', metal: 0.0, rough: 0.68 },
+        { key: 'hwFinLacquer', metal: 0.0, rough: 0.42 } ] }
+  ],
+  // Color rows (the p1 reference set): each is a RAMP — the scrub value
+  // t mixes a→b, which is the color-ramp structure the GLB inherits.
+  colors: [
+    { key: 'hwColSilver', a: [0.28, 0.30, 0.33], b: [0.87, 0.89, 0.91] },
+    { key: 'hwColBW',     a: [0.04, 0.04, 0.04], b: [0.95, 0.95, 0.95] },
+    { key: 'hwColRed',    a: [0.24, 0.02, 0.01], b: [0.85, 0.16, 0.09] },
+    { key: 'hwColOrange', a: [0.30, 0.10, 0.01], b: [0.95, 0.45, 0.08] },
+    { key: 'hwColYellow', a: [0.33, 0.24, 0.02], b: [0.96, 0.78, 0.12] },
+    { key: 'hwColGreen',  a: [0.02, 0.15, 0.06], b: [0.25, 0.72, 0.35] }
+  ],
+  sizes: [
+    { key: 'hwSizeCompact',  scale: 0.82, cm: [100, 50] },
+    { key: 'hwSizeStandard', scale: 1.00, cm: [140, 70] },
+    { key: 'hwSizeWide',     scale: 1.14, cm: [180, 80] },
+    { key: 'hwSizeStudio',   scale: 1.30, cm: [220, 90] }
+  ],
+  // The free-size range — manifest data behind the ops gate: the VISUAL
+  // ships (Eric, Aug 28: the input drives the ball's scale); the
+  // manufacturing promise waits for ops before commerce wires.
+  customRange: { len: [80, 300], wid: [40, 120] }
+};
+
+// ── SELECTION STATE — fully modeled, every visual backend binds at the
+// seam below without touching the interaction layer (seed §2).
+var SEL = {
+  classIdx: 0,                       // desk
+  part: null,                        // 'III' | 'IV' | 'V' — the open part
+  parts: {
+    'III': { family: 0, finish: 0, color: { idx: 1, t: 0.62 } },
+    'IV':  { family: 0, finish: 0, color: { idx: 0, t: 0.50 } },
+    'V':   { family: 0, finish: 0, color: { idx: 0, t: 0.50 } }
+  },
+  size: { preset: 1, custom: { len: '', wid: '' }, unit: 'cm' }
+};
+
+// ── Level state — one focus variable; NO page locks (level state only).
+var focusIdx   = -1;   // THE cursor, on the class menu (the primary surface)
+var rightFocus = -1;   // the right menu's hover twin — mutually exclusive
+var openHead   = -1;   // 0 = INTRODUCTION, 1 = CUSTOM, -1 closed
+var introSub   = -1;   // active introduction sub (blue dot)
+var customSub  = -1;   // active custom sub (blue dot)
+var colorFocus = -1;   // the panel's W/S cursor over color rows
+var panelView  = null; // 'part' | 'size'
+
+// ── DOM ───────────────────────────────────────────────────────────────────
+var classMenuEl   = document.getElementById('hw-class-menu');
+var productMenuEl = document.getElementById('hw-product-menu');
+var panel     = document.getElementById('hw-panel');
+var panelBody = document.getElementById('hw-panel-body');
+var plates    = [1, 2, 3].map(function(n){ return document.getElementById('hw-plate-' + n); });
+var comingEl  = document.getElementById('hw-coming');
+var ballEl    = document.getElementById('hw-ball');
+var priceEl   = document.getElementById('hw-price');
+var cornerEl  = document.getElementById('bs-corner');
+var backBtn   = document.getElementById('bs-back');
+var primary   = document.getElementById('bs-primary');
+var fwdBtn    = primary.querySelector('.site-primary-nav__forward-button');
+var links     = Array.prototype.slice.call(primary.querySelectorAll('.site-primary-nav__link'));
+
+document.getElementById('bs-wordmark-link').setAttribute('href', C.ROUTES.home);
+
+function realClass(i){ return HW.classes[i] && HW.classes[i].real; }
+function partState(){ return SEL.part ? SEL.parts[SEL.part] : null; }
+
+// ── The class menu — C.buildSlots (the factored accordion's second
+// consumer; no subs here — the classes are leaves). ──────────────────────
+var built = C.buildSlots(classMenuEl, HW.classes, {
+  itemId:  function(idx){ return 'hw-class-' + idx; },
+  onFocus: function(idx){ if (focusIdx !== idx) setFocus(idx); },
+  onBlur:  function(idx){ if (focusIdx === idx) setFocus(-1); },
+  onClick: function(idx){
+    setFocus(idx);
+    if (SEL.classIdx === idx) return;          // already the selection — nothing to do
+    if (clickOk()) chooseClass(idx);
+  },
+  onSub: function(){}
+});
+var classItems = built.items;
+
+var menuPitch = 30;
+function measurePitch(){ menuPitch = C.measureListPitch(classItems, menuPitch); }
+
+// ── The product menu — page-built on the factored accordion CSS (the
+// custom rows hold numeral controls, which cannot nest in a button). ─────
+var headEls = [], subWrapEls = [], introSubEls = [], customSubEls = [], numEls = {};
+(function buildProductMenu(){
+  var defs = [
+    { key: 'hwIntroduction', subs: HW.introSubs.map(function(k){ return { key: k }; }) },
+    { key: 'hwCustom',       subs: HW.customSubs }
+  ];
+  defs.forEach(function(def, h){
+    var slot = document.createElement('div');
+    slot.className = 'bs-menu-slot';
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'hw-head';
+    b.setAttribute('data-str', def.key);
+    b.addEventListener('mouseenter', function(){
+      if (C.rail.isTouch()) return;
+      wake(); setRightFocus(h);
+    });
+    b.addEventListener('mouseleave', function(){
+      if (C.rail.isTouch()) return;
+      if (rightFocus === h) setRightFocus(-1);
+    });
+    b.addEventListener('click', function(){
+      wake();
+      if (!clickOk()) return;
+      if (openHead === h){ goBack(); return; }   // door #1: the open head retreats
+      openFor(h);
+    });
+    slot.appendChild(b);
+    headEls.push(b);
+
+    var wrap = document.createElement('div');
+    wrap.className = 'bs-sublist-wrap';
+    var list = document.createElement('div');
+    list.className = 'bs-sublist';
+    def.subs.forEach(function(sub, sIdx){
+      var subBtn = document.createElement('button');
+      subBtn.type = 'button';
+      subBtn.className = 'bs-subitem';
+      subBtn.setAttribute('data-str', sub.key);
+      subBtn.tabIndex = -1;
+      subBtn.addEventListener('mouseenter', function(){
+        if (!C.rail.isTouch()) subBtn.classList.add('kb-hover');
+      });
+      subBtn.addEventListener('mouseleave', function(){ subBtn.classList.remove('kb-hover'); });
+      subBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        wake();
+        if (!clickOk()) return;
+        if (h === 0) chooseIntroSub(sIdx);
+        else chooseCustomSub(sIdx, null);
+      });
+      if (h === 1 && sub.parts.length){
+        // The numeral selector renders LEFT of the sub-nav item (frames;
+        // active bold). Leaders to the physical parts wait for the GLB.
+        var row = document.createElement('div');
+        row.className = 'hw-subrow';
+        sub.parts.forEach(function(p){
+          var np = document.createElement('button');
+          np.type = 'button';
+          np.className = 'hw-num';
+          np.textContent = p;                    // roman numerals — untranslated
+          np.tabIndex = -1;
+          np.setAttribute('aria-label', 'Part ' + p);
+          np.addEventListener('click', function(e){
+            e.stopPropagation();
+            wake();
+            if (clickOk()) chooseCustomSub(sIdx, p);
+          });
+          row.appendChild(np);
+          numEls[p] = np;
+        });
+        row.appendChild(subBtn);
+        list.appendChild(row);
+      } else {
+        list.appendChild(subBtn);
+      }
+      (h === 0 ? introSubEls : customSubEls).push(subBtn);
+    });
+    wrap.appendChild(list);
+    slot.appendChild(wrap);
+    subWrapEls.push(wrap);
+    productMenuEl.appendChild(slot);
+  });
+})();
+
+function setRightFocus(i){
+  if (i === rightFocus) return;
+  // One cursor: the right menu, the class menu and the icon rail clear
+  // each other (the rail↔menu discipline extended).
+  if (i >= 0){
+    if (focusIdx >= 0) setFocus(-1);
+    if (C.rail.index() >= 0) C.rail.focus(-1);
+  }
+  rightFocus = i;
+  render();
+}
+
+// ── The ball — the stage-binding seam's phase-one backend ────────────────
+var Ball = (function(){
+  var gl = null, prog = null, canvas = ballEl, nTri = 0;
+  var U = {};
+  var cur = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1 };
+  var tgt = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1 };
+  var running = false, visible = true, rot = 0, lastT = 0;
+
+  function buildSphere(rows, cols){
+    var pos = [], idx = [];
+    for (var r = 0; r <= rows; r++){
+      var phi = Math.PI * r / rows;
+      for (var c2 = 0; c2 <= cols; c2++){
+        var th = 2 * Math.PI * c2 / cols;
+        var x = Math.sin(phi) * Math.cos(th), y = Math.cos(phi), z = Math.sin(phi) * Math.sin(th);
+        pos.push(x, y, z);
+      }
+    }
+    for (var r2 = 0; r2 < rows; r2++){
+      for (var c3 = 0; c3 < cols; c3++){
+        var a = r2 * (cols + 1) + c3, b2 = a + cols + 1;
+        idx.push(a, b2, a + 1, b2, b2 + 1, a + 1);
+      }
+    }
+    return { pos: new Float32Array(pos), idx: new Uint16Array(idx) };
+  }
+
+  var VS = [
+    'attribute vec3 aPos;',
+    'uniform vec2 uRes; uniform vec2 uCenter; uniform float uRadius; uniform float uRot;',
+    'varying vec3 vN; varying vec3 vP;',
+    'void main(){',
+    '  float cr = cos(uRot), sr = sin(uRot);',
+    '  vec3 p = vec3(aPos.x*cr + aPos.z*sr, aPos.y, -aPos.x*sr + aPos.z*cr);',
+    '  vN = p; vP = p;',
+    '  vec2 px = uCenter + p.xy * uRadius * vec2(1.0, -1.0);',
+    '  vec2 ndc = (px / uRes) * 2.0 - 1.0;',
+    '  gl_Position = vec4(ndc.x, -ndc.y, -p.z * 0.001, 1.0);',   // front hemisphere depth-wins
+    '}'
+  ].join('\n');
+  var FS = [
+    // A studio read for the material ball: key + fill, a vertical
+    // gradient environment with an overhead softbox sampled along the
+    // view reflection, fresnel-weighted — metals reflect the room in
+    // their own tint, dielectrics carry lit albedo + white spec. The
+    // GLB phase brings real IBL; this is the placeholder's honest lie.
+    'precision mediump float;',
+    'varying vec3 vN; varying vec3 vP;',
+    'uniform vec3 uColor; uniform float uMetal; uniform float uRough;',
+    'void main(){',
+    '  vec3 N = normalize(vN);',
+    '  vec3 V = vec3(0.0, 0.0, 1.0);',
+    '  vec3 R = reflect(-V, N);',
+    '  float NdV = max(dot(N, V), 0.0);',
+    '  vec3 albedo = uColor;',
+    '  vec3 L1 = normalize(vec3(0.55, 0.70, 0.50));',
+    '  vec3 L2 = normalize(vec3(-0.65, 0.10, 0.40));',
+    '  float d1 = max(dot(N, L1), 0.0);',
+    '  float d2 = max(dot(N, L2), 0.0);',
+    '  vec3 diff = mix(albedo, vec3(0.0), uMetal) * (d1 * 1.0 + d2 * 0.25 + 0.10);',
+    '  float gloss = exp2(11.0 * (1.0 - uRough));',
+    '  vec3 H1 = normalize(L1 + V);',
+    '  vec3 H2 = normalize(L2 + V);',
+    '  float s1 = pow(max(dot(N, H1), 0.0), gloss);',
+    '  float s2 = pow(max(dot(N, H2), 0.0), gloss * 0.5);',
+    '  float sNorm = min((gloss + 2.0) * 0.02, 3.0);',
+    '  vec3 F0 = mix(vec3(0.04), albedo, uMetal);',
+    '  vec3 F = F0 + (vec3(1.0) - F0) * pow(1.0 - NdV, 4.0);',
+    '  float ry = R.y * 0.5 + 0.5;',
+    '  vec3 env = mix(vec3(0.05, 0.05, 0.058), vec3(0.34, 0.34, 0.38), smoothstep(0.15, 0.85, ry))',
+    '           + vec3(0.32) * pow(max(R.y, 0.0), 3.0);',
+    '  vec3 spec = F * (s1 * 1.1 + s2 * 0.35) * sNorm * (1.0 - uRough * 0.4);',
+    '  vec3 refl = env * F * (1.0 - uRough * 0.72);',
+    '  vec3 col = diff + spec + refl;',
+    '  gl_FragColor = vec4(col, 1.0);',
+    '}'
+  ].join('\n');
+
+  function boot(){
+    gl = canvas.getContext('webgl', { antialias: true, alpha: true });
+    if (!gl) return false;                       // no WebGL: the stage stays blank black
+    function sh(type, src){
+      var h = gl.createShader(type);
+      gl.shaderSource(h, src); gl.compileShader(h);
+      return h;
+    }
+    prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
+    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
+    gl.useProgram(prog);
+    var mesh = buildSphere(40, 56);
+    nTri = mesh.idx.length;
+    var vb = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vb);
+    gl.bufferData(gl.ARRAY_BUFFER, mesh.pos, gl.STATIC_DRAW);
+    var ib = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.idx, gl.STATIC_DRAW);
+    var aPos = gl.getAttribLocation(prog, 'aPos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+    ['uRes', 'uCenter', 'uRadius', 'uRot', 'uColor', 'uMetal', 'uRough'].forEach(function(n){
+      U[n] = gl.getUniformLocation(prog, n);
+    });
+    gl.enable(gl.DEPTH_TEST);
+    gl.clearColor(0, 0, 0, 0);
+    resize();
+    running = true;
+    requestAnimationFrame(tick);
+    return true;
+  }
+  function resize(){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width  = Math.round(canvas.clientWidth  * dpr);
+    canvas.height = Math.round(canvas.clientHeight * dpr);
+    if (gl) gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  function drawFrame(dt){
+    rot += dt * 0.25;                            // the slow presentation turn
+    // Targets ease in — material changes read as a settle, not a snap
+    // (content snaps, SURFACES fade; a material is surface).
+    var k = 1 - Math.exp(-dt * 7);
+    for (var i = 0; i < 3; i++) cur.color[i] += (tgt.color[i] - cur.color[i]) * k;
+    cur.metal += (tgt.metal - cur.metal) * k;
+    cur.rough += (tgt.rough - cur.rough) * k;
+    cur.scale += (tgt.scale - cur.scale) * k;
+    var w = canvas.width, h = canvas.height;
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.uniform2f(U.uRes, w, h);
+    // The stage's midfield: between the class rail and the panel rail,
+    // biased to the frames' own product placement (~47vw, 55vh).
+    gl.uniform2f(U.uCenter, w * 0.47, h * 0.55);
+    gl.uniform1f(U.uRadius, Math.min(w, h) * 0.21 * cur.scale);
+    gl.uniform1f(U.uRot, rot);
+    gl.uniform3f(U.uColor, cur.color[0], cur.color[1], cur.color[2]);
+    gl.uniform1f(U.uMetal, cur.metal);
+    gl.uniform1f(U.uRough, cur.rough);
+    gl.drawElements(gl.TRIANGLES, nTri, gl.UNSIGNED_SHORT, 0);
+  }
+  function tick(t){
+    if (!running) return;
+    requestAnimationFrame(tick);
+    if (document.hidden || !visible) { lastT = t; return; }
+    var dt = Math.min((t - lastT) / 1000, 0.1); lastT = t;
+    drawFrame(dt);
+  }
+  window.addEventListener('resize', resize);
+  return {
+    boot: boot,
+    set: function(o){
+      if (o.color)  tgt.color = o.color.slice();
+      if (o.metal  != null) tgt.metal = o.metal;
+      if (o.rough  != null) tgt.rough = o.rough;
+      if (o.scale  != null) tgt.scale = o.scale;
+    },
+    show: function(on){ visible = on; ballEl.classList.toggle('is-off', !on); },
+    // ?dev instrumentation: force one frame (headless/hidden captures
+    // never see rAF — the softfractal LOGGING-build precedent).
+    frame: function(){ if (gl){ for (var i = 0; i < 40; i++) drawFrame(0.05); } }
+  };
+})();
+
+// ══ THE STAGE-BINDING SEAM ═══════════════════════════════════════════════
+// Every material/size choice flows through HERE and only here. Phase one
+// binds the texture ball; the desk GLB (color ramp + procedural texture
+// nodes) rebinds at this exact function — the interaction layer, the
+// state model and the manifest never change.
+function applySelectionToStage(){
+  var p = SEL.parts[SEL.part || 'III'];        // the ball previews one part's material
+  var fam = HW.families[p.family];
+  var fin = fam.finishes[p.finish] || fam.finishes[0];
+  var col = HW.colors[p.color.idx];
+  var t = p.color.t;
+  var rgb = [0, 1, 2].map(function(i){ return col.a[i] + (col.b[i] - col.a[i]) * t; });
+  var scale;
+  var cl = parseFloat(SEL.size.custom.len), cw = parseFloat(SEL.size.custom.wid);
+  if (cl > 0 && cw > 0){
+    // The custom inputs drive the ball's size (Eric, Aug 28): the
+    // footprint's diagonal against the standard preset's.
+    var unit = SEL.size.unit === 'in' ? 2.54 : 1;
+    var std = HW.sizes[1].cm;
+    scale = Math.sqrt((cl * unit * cl * unit + cw * unit * cw * unit) /
+                      (std[0] * std[0] + std[1] * std[1]));
+    scale = Math.max(0.5, Math.min(1.6, scale));
+  } else {
+    scale = HW.sizes[SEL.size.preset].scale;
+  }
+  Ball.set({ color: rgb, metal: fin.metal, rough: fin.rough, scale: scale });
+}
+
+// ── The options panel — measured height, diagonal redraw discipline ─────
+function measurePanel(){
+  var cs = getComputedStyle(panelBody);
+  var pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+  var h = panelBody.scrollHeight;              // includes padding via border-box? measured live
+  h = panelBody.firstChild ? panelBody.scrollHeight : pad;
+  var cap = window.innerHeight * 37.69 / 100;
+  return Math.ceil(Math.min(h, cap));
+}
+function sizePanel(){ panel.style.height = measurePanel() + 'px'; }
+function drawPanel(){
+  panel.classList.add('hw-nofx');
+  panel.classList.remove('is-open');
+  panel.classList.remove('is-hidden');
+  void panel.offsetWidth;
+  buildPanelContent();
+  sizePanel();
+  void panel.offsetWidth;
+  panel.classList.remove('hw-nofx');
+  void panel.offsetWidth;
+  panel.classList.add('is-open');
+}
+function hidePanel(){ panel.classList.add('is-hidden'); }
+
+// ── Panel content — built from the manifest per (part | size) ───────────
+var colRowEls = [], colScrubEls = [], famEls = [], finEls = [], sizeEls = [], unitEls = {};
+var lenInput = null, widInput = null;
+function el(tag, cls, str){
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (str) e.setAttribute('data-str', str);
+  return e;
+}
+function buildPanelContent(){
+  panelBody.innerHTML = '';
+  colRowEls = []; colScrubEls = []; famEls = []; finEls = []; sizeEls = [];
+  unitEls = {}; lenInput = null; widInput = null;
+  colorFocus = -1;
+  if (panelView === 'part'){
+    var p = partState();
+    // materials — family column + finish column (the frames' split).
+    panelBody.appendChild(el('span', 'hw-sec', 'hwSecMaterials'));
+    var grid = el('div', 'hw-mat-grid');
+    var famList = el('div', 'hw-optlist');
+    HW.families.forEach(function(f, fi){
+      var b = el('button', 'hw-opt', f.key);
+      b.type = 'button';
+      b.addEventListener('click', function(){
+        wake();
+        if (!clickOk()) return;
+        p.family = fi;
+        if (p.finish >= HW.families[fi].finishes.length) p.finish = 0;
+        SoundBus.play('commit'); hapticTick();
+        refreshPanel();
+      });
+      famList.appendChild(b); famEls.push(b);
+    });
+    var finList = el('div', 'hw-optlist');
+    HW.families[p.family].finishes.forEach(function(f, fi){
+      var b = el('button', 'hw-opt', f.key);
+      b.type = 'button';
+      b.addEventListener('click', function(){
+        wake();
+        if (!clickOk()) return;
+        p.finish = fi;                            // the metal/rough PRESET
+        SoundBus.play('commit'); hapticTick();
+        refreshPanel();
+      });
+      finList.appendChild(b); finEls.push(b);
+    });
+    grid.appendChild(famList); grid.appendChild(finList);
+    panelBody.appendChild(grid);
+    // color — the p1 reference: rows with tick scrubbers.
+    panelBody.appendChild(el('span', 'hw-sec', 'hwSecColor'));
+    var colList = el('div', 'hw-optlist');
+    HW.colors.forEach(function(c, ci){
+      var row = el('div', 'hw-colrow');
+      var b = el('button', 'hw-opt', c.key);
+      b.type = 'button';
+      b.addEventListener('mouseenter', function(){ if (!C.rail.isTouch()) setColorFocus(ci); });
+      b.addEventListener('mouseleave', function(){ if (colorFocus === ci) setColorFocus(-1); });
+      b.addEventListener('click', function(){
+        wake();
+        if (!clickOk()) return;
+        chooseColor(ci);
+      });
+      var scrub = el('div', 'hw-scrub');
+      scrub.setAttribute('role', 'slider');
+      scrub.setAttribute('aria-label', T(c.key));
+      scrub.setAttribute('aria-valuemin', '0');
+      scrub.setAttribute('aria-valuemax', '100');
+      var fill = el('div', 'hw-scrub-fill');
+      scrub.appendChild(fill);
+      // Scrubbing CHOOSES the row and sets its value — one gesture, the
+      // volume slider's own pointer grammar.
+      var dragging = false;
+      function fromPointer(e){
+        var r = scrub.getBoundingClientRect();
+        if (r.width <= 0) return;
+        var t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+        p.color.idx = ci; p.color.t = t;
+        refreshPanel();
+      }
+      scrub.addEventListener('pointerdown', function(e){
+        e.preventDefault();
+        dragging = true;
+        try { scrub.setPointerCapture(e.pointerId); } catch (err) {}
+        wake();
+        fromPointer(e);
+      });
+      scrub.addEventListener('pointermove', function(e){ if (dragging) fromPointer(e); });
+      var end = function(){ dragging = false; };
+      scrub.addEventListener('pointerup', end);
+      scrub.addEventListener('pointercancel', end);
+      row.appendChild(b); row.appendChild(scrub);
+      colList.appendChild(row);
+      colRowEls.push(row); colScrubEls.push(fill);
+    });
+    panelBody.appendChild(colList);
+  } else if (panelView === 'size'){
+    panelBody.appendChild(el('span', 'hw-sec', 'hwSecSize'));
+    var list = el('div', 'hw-optlist');
+    HW.sizes.forEach(function(sz, si){
+      var row = el('div', 'hw-sizerow');
+      var b = el('button', 'hw-opt', sz.key);
+      b.type = 'button';
+      b.addEventListener('click', function(){
+        wake();
+        if (!clickOk()) return;
+        SEL.size.preset = si;
+        SEL.size.custom.len = ''; SEL.size.custom.wid = '';
+        if (lenInput){ lenInput.value = ''; widInput.value = ''; }
+        SoundBus.play('commit'); hapticTick();
+        refreshPanel();
+      });
+      var dims = el('span', 'hw-sizedims');
+      dims.textContent = sz.cm[0] + ' × ' + sz.cm[1] + ' cm';
+      row.appendChild(b); row.appendChild(dims);
+      list.appendChild(row);
+      sizeEls.push(b);
+    });
+    panelBody.appendChild(list);
+    // custom size — the form subsystem's second consumer.
+    panelBody.appendChild(el('span', 'hw-sec', 'hwSecCustomSize'));
+    var grid2 = el('div', 'hw-custom-grid');
+    [['hwFldLength', 'len'], ['hwFldWidth', 'wid']].forEach(function(fld){
+      var f = el('div', 'bs-field');
+      var lab = el('label', null, fld[0]);
+      lab.htmlFor = 'hw-f-' + fld[1];
+      var inp = document.createElement('input');
+      inp.className = 'bs-input';
+      inp.id = 'hw-f-' + fld[1];
+      inp.type = 'text';
+      inp.inputMode = 'decimal';
+      inp.autocomplete = 'off';
+      inp.value = SEL.size.custom[fld[1]];
+      inp.addEventListener('input', function(){
+        SEL.size.custom[fld[1]] = inp.value;
+        applySelectionToStage();                 // the size drives the ball live
+      });
+      f.appendChild(lab); f.appendChild(inp);
+      grid2.appendChild(f);
+      if (fld[1] === 'len') lenInput = inp; else widInput = inp;
+    });
+    var unit = el('div', 'hw-unit');
+    ['cm', 'in'].forEach(function(u){
+      var b = el('button', null, u === 'cm' ? 'hwUnitCM' : 'hwUnitIN');
+      b.type = 'button';
+      b.addEventListener('click', function(){
+        wake();
+        SEL.size.unit = u;
+        SoundBus.play('detent'); hapticTick();
+        refreshPanel();
+      });
+      unit.appendChild(b);
+      unitEls[u] = b;
+    });
+    grid2.appendChild(unit);
+    panelBody.appendChild(grid2);
+  }
+  renderStrings(panelBody);
+  alignPanelMarkers();
+  refreshPanel();
+}
+function alignPanelMarkers(){
+  var fs = panelBody.querySelectorAll('.bs-field');
+  for (var j = 0; j < fs.length; j++){
+    var lab = fs[j].querySelector('label');
+    if (!lab) continue;
+    var yy = C.capMid(lab);
+    if (yy !== null) fs[j].style.setProperty('--bs-dot-y', yy.toFixed(2) + 'px');
+  }
+  var subs = productMenuEl.querySelectorAll('.bs-subitem');
+  for (var k = 0; k < subs.length; k++){
+    var y = C.capMid(subs[k]);
+    if (y !== null) subs[k].style.setProperty('--bs-dot-y', y.toFixed(2) + 'px');
+  }
+}
+// Re-render the panel's STATE classes without rebuilding its DOM.
+function refreshPanel(){
+  var p = partState() || SEL.parts['III'];
+  famEls.forEach(function(b, i){ b.classList.toggle('is-chosen', i === p.family); });
+  finEls.forEach(function(b, i){ b.classList.toggle('is-chosen', i === p.finish); });
+  colRowEls.forEach(function(row, i){
+    var chosen = (i === p.color.idx);
+    row.classList.toggle('is-chosen', chosen);
+    var opt = row.querySelector('.hw-opt');
+    opt.classList.toggle('is-chosen', chosen);
+    opt.classList.toggle('kb-hover', i === colorFocus);
+    colScrubEls[i].style.width = (chosen ? Math.round(p.color.t * 100) : 0) + '%';
+    row.querySelector('.hw-scrub').setAttribute('aria-valuenow', chosen ? Math.round(p.color.t * 100) : 0);
+  });
+  var custom = !!(parseFloat(SEL.size.custom.len) > 0 && parseFloat(SEL.size.custom.wid) > 0);
+  sizeEls.forEach(function(b, i){ b.classList.toggle('is-chosen', !custom && i === SEL.size.preset); });
+  if (unitEls.cm){
+    unitEls.cm.classList.toggle('is-live', SEL.size.unit === 'cm');
+    unitEls.in.classList.toggle('is-live', SEL.size.unit === 'in');
+  }
+  applySelectionToStage();
+}
+function setColorFocus(i){
+  colorFocus = i;
+  colRowEls.forEach(function(row, n){
+    row.querySelector('.hw-opt').classList.toggle('kb-hover', n === i);
+  });
+}
+function chooseColor(ci){
+  var p = partState();
+  if (!p) return;
+  p.color.idx = ci;
+  SoundBus.play('commit'); hapticTick();
+  refreshPanel();
+}
+
+// ── Level moves ──────────────────────────────────────────────────────────
+function chooseClass(idx){
+  SEL.classIdx = idx;
+  // Re-targeting the class folds the right column back to rest — the
+  // walkthrough ruling: the right menu describes THE selected product.
+  openHead = -1; introSub = -1; customSub = -1; SEL.part = null; panelView = null;
+  hidePanel(); hidePlates();
+  SoundBus.play('commit'); hapticTick();
+  render();
+}
+function openFor(h){
+  openHead = h;
+  introSub = -1; customSub = -1;
+  SEL.part = null; panelView = null;
+  hidePanel(); hidePlates();
+  SoundBus.play('commit'); hapticTick();
+  render();
+}
+function chooseIntroSub(sIdx){
+  if (openHead !== 0) return;
+  introSub = sIdx;
+  SoundBus.play('commit'); hapticTick();
+  showPlates();
+  render();
+}
+function chooseCustomSub(sIdx, partOverride){
+  if (openHead !== 1) return;
+  customSub = sIdx;
+  var def = HW.customSubs[sIdx];
+  if (def.kind === 'size'){
+    SEL.part = null;
+    panelView = 'size';
+  } else {
+    SEL.part = partOverride || def.parts[0];
+    panelView = 'part';
+  }
+  SoundBus.play('commit'); hapticTick();
+  hidePlates();
+  drawPanel();
+  render();
+}
+function showPlates(){
+  plates.forEach(function(pl){
+    pl.classList.remove('is-hidden');
+    void pl.offsetWidth;
+    pl.classList.add('is-open');
+  });
+}
+function hidePlates(){
+  plates.forEach(function(pl){
+    pl.classList.add('is-hidden');
+    pl.classList.remove('is-open');
+  });
+}
+function closePanelLevel(){
+  SEL.part = null; panelView = null; customSub = -1; introSub = -1;
+  hidePanel(); hidePlates();
+  render();
+}
+function closeHead(){
+  openHead = -1;
+  introSub = -1; customSub = -1; SEL.part = null; panelView = null;
+  var a = document.activeElement;
+  if (a && (panel.contains(a) || productMenuEl.contains(a)) && a.blur) a.blur();
+  hidePanel(); hidePlates();
+  render();
+}
+
+// ── THE ESC LADDER — C.makeLadder, one honest level per press ───────────
+var ladder = C.makeLadder([
+  { name: 'field',
+    when: function(){
+      var a = document.activeElement;
+      return !!(a && panel.contains(a) && a.tagName === 'INPUT');
+    },
+    step: function(){ document.activeElement.blur(); } },
+  { name: 'panel',
+    when: function(){ return panelView !== null || introSub >= 0; },
+    step: closePanelLevel },
+  { name: 'header',
+    when: function(){ return openHead >= 0; },
+    step: closeHead },
+  { name: 'cursor',
+    when: function(){ return focusIdx >= 0; },
+    step: function(){ setFocus(-1); } },
+  { name: 'boundary',
+    when: function(){ return true; },
+    step: function(){ if (arrival) popBoundary(); } }
+]);
+function goBack(){ ladder.back(); }
+
+// ── Render from state ────────────────────────────────────────────────────
+function render(){
+  classItems.forEach(function(b, i){
+    b.classList.toggle('kb-hover', i === focusIdx);
+    b.classList.toggle('active', i === SEL.classIdx);
+  });
+  headEls.forEach(function(b, h){
+    b.classList.toggle('kb-hover', h === rightFocus && openHead !== h);
+    b.classList.toggle('is-open', h === openHead);
+  });
+  var isReal = realClass(SEL.classIdx);
+  // The right menu exists only for a REAL product; unreal classes
+  // preview the coming-soon stage (the locked-classes game pattern).
+  productMenuEl.style.visibility = isReal ? '' : 'hidden';
+  comingEl.classList.toggle('is-on', !isReal);
+  Ball.show(isReal);
+  backBtn.setAttribute('aria-label', openHead >= 0 ? T('navBack') : T('navHome'));
+  subWrapEls.forEach(function(w, h){
+    var on = (h === openHead);
+    w.classList.toggle('is-on', on);
+  });
+  introSubEls.forEach(function(b, i){
+    b.classList.toggle('is-live', openHead === 0 && i === introSub);
+    b.tabIndex = openHead === 0 ? 0 : -1;
+  });
+  customSubEls.forEach(function(b, i){
+    b.classList.toggle('is-live', openHead === 1 && i === customSub);
+    b.tabIndex = openHead === 1 ? 0 : -1;
+  });
+  Object.keys(numEls).forEach(function(p){
+    numEls[p].classList.toggle('is-live', SEL.part === p);
+    numEls[p].tabIndex = openHead === 1 ? 0 : -1;
+  });
+  var panelOn = panelView !== null;
+  panelBody.querySelectorAll('button, input').forEach(function(e2){ e2.tabIndex = panelOn ? 0 : -1; });
+}
+
+function setFocus(i){
+  if (i === focusIdx) return;
+  if (i >= 0){
+    if (C.rail.index() >= 0) C.rail.focus(-1);
+    if (rightFocus >= 0){ rightFocus = -1; }
+  }
+  focusIdx = i;
+  if (i >= 0){ SoundBus.play('detent'); hapticTick(); }
+  render();
+}
+function focusStep(dir){
+  var next;
+  if (focusIdx < 0) next = dir > 0 ? 0 : HW.classes.length - 1;
+  else {
+    next = focusIdx + dir;
+    if (next < 0 || next >= HW.classes.length) return false;   // ends clamp
+  }
+  setFocus(next);
+  return true;
+}
+
+// ── The panel owns its keys while it stands — W/S walks the color rows,
+// A/D scrubs the active row (the slotted-row ruling; axes never
+// double-book), Esc walks THE ladder. ───────────────────────────────────
+panel.addEventListener('keydown', function(e){
+  if (panelView === null) return;
+  e.stopPropagation();
+  var k = e.key;
+  if (k === 'Escape'){ e.preventDefault(); wake(); goBack(); return; }
+  if (panelView !== 'part') return;
+  if (k === 'w' || k === 'W' || k === 'ArrowUp' || k === 's' || k === 'S' || k === 'ArrowDown'){
+    e.preventDefault(); wake();
+    var down = (k === 's' || k === 'S' || k === 'ArrowDown');
+    var n = colorFocus < 0 ? (down ? 0 : HW.colors.length - 1) : colorFocus + (down ? 1 : -1);
+    if (n < 0 || n >= HW.colors.length) return;              // ends clamp silently
+    setColorFocus(n);
+    SoundBus.play('detent'); hapticTick();
+    return;
+  }
+  if (k === 'a' || k === 'A' || k === 'ArrowLeft' || k === 'd' || k === 'D' || k === 'ArrowRight'){
+    e.preventDefault(); wake();
+    var p = partState();
+    if (!p) return;
+    var row = colorFocus >= 0 ? colorFocus : p.color.idx;
+    p.color.idx = row;
+    var right = (k === 'd' || k === 'D' || k === 'ArrowRight');
+    p.color.t = Math.max(0, Math.min(1, p.color.t + (right ? 0.04 : -0.04)));
+    refreshPanel();
+    return;
+  }
+  if (k === 'Enter' && colorFocus >= 0){
+    e.preventDefault(); wake();
+    chooseColor(colorFocus);
+  }
+});
+
+// The add row DENIES — cart UI is phase 2 (Eric, Aug 28); nothing
+// pretends to purchase. The chip and the go button shake alike.
+['hw-add-chip', 'hw-add-go'].forEach(function(id){
+  var b = document.getElementById(id);
+  b.addEventListener('click', function(e){
+    e.stopPropagation();
+    wake();
+    denyOn(b);
+  });
+});
+
+// ── Corner nav — witness grammar; the ‹ is level-aware ──────────────────
+var pillPrimary = C.bindPill(primary, fwdBtn);
+pillPrimary.onOpenChange = function(open){
+  links.forEach(function(l){ l.tabIndex = open ? 0 : -1; });
+  primary.setAttribute('aria-expanded', String(open));
+};
+pillPrimary.onOpenChange(false);
+
+var _leaving = false;
+function leaveHome(){
+  if (_leaving || !clickOk()) return;
+  _leaving = true;
+  if (arrival && arrivalFrom === 'home'){
+    setTimeout(function(){
+      if (_leaving && !document.hidden){ _leaving = false; location.assign(C.ROUTES.home); }
+    }, 350);
+    history.back();
+    return;
+  }
+  location.assign(C.ROUTES.home);
+}
+function popBoundary(){
+  if (_leaving) return;
+  _leaving = true;
+  setTimeout(function(){
+    if (_leaving && !document.hidden){ _leaving = false; location.assign(C.ROUTES.home); }
+  }, 350);
+  history.back();
+}
+function cornerBack(){
+  if (openHead >= 0 || panelView !== null){ if (clickOk()) goBack(); return; }
+  leaveHome();
+}
+(backBtn.closest('.bs-hit') || backBtn).addEventListener('click', function(){ wake(); cornerBack(); });
+
+// HARDWARE is the current section — it DENIES with the shake.
+links.forEach(function(link){
+  link.addEventListener('click', function(e){
+    e.stopPropagation();
+    wake();
+    var sec = link.getAttribute('data-section');
+    if (sec !== 'hardware' && C.ROUTES[sec]){
+      if (clickOk()) C.nav.commit(sec);
+      return;
+    }
+    denyOn(link);
+  });
+});
+primary.addEventListener('click', function(e){
+  if (e.target.closest('.site-primary-nav__link')) return;
+  wake();
+  if (pillPrimary.touchOpenConsumed()) return;
+  if (C.rail.lockIndex() === RAIL_PILL) C.rail.unlock();
+  else C.rail.lock(RAIL_PILL);
+});
+
+// ── Mount ────────────────────────────────────────────────────────────────
+var RAIL_BACK = 0, RAIL_PILL = 1;
+C.init({
+  page: 'hardware',
+  leadingControls: [
+    { headEl: backBtn, pill: null, activate: cornerBack },
+    { headEl: primary, pill: pillPrimary, trayAxis: 'x',
+      trayItems: function(){ return links; } }
+  ],
+  touchSurfaces: [document.getElementById('bs-stage'), classMenuEl],
+  sweepRoots: [cornerEl, classMenuEl, productMenuEl, panel].concat(plates),
+  hooks: {
+    isLocked:       function(){ return false; },   // NO page locks (law)
+    goBack:         goBack,
+    escapeFromRail: function(){ setFocus(0); },
+    enterAtPrimary: function(){
+      // Enter is the click's twin: it claims the cursor cold, then
+      // selects the cursored class (door #1 has no deeper level here —
+      // a class is a selection, not a window).
+      if (focusIdx < 0){ setFocus(0); return; }
+      if (SEL.classIdx !== focusIdx){ chooseClass(focusIdx); return; }
+    },
+    verticalStep:   function(down){
+      if (!down && focusIdx === 0){ setFocus(-1); C.rail.focus(0); return; }
+      focusStep(down ? 1 : -1);
+    },
+    railVertical:   function(down){
+      if (down){ C.rail.focus(-1); setFocus(0); }
+    },
+    horizontalCold: function(){ /* A/D drive the rail (and the panel's own keys) */ },
+    wheelNative:    function(e){
+      if (!panelBody.contains(e.target)) return false;
+      return panelBody.scrollHeight > panelBody.clientHeight + 1;
+    },
+    wheelStep:      focusStep,
+    wheelPitch:     function(){ return menuPitch; },
+    clearPrimary:   function(){ if (focusIdx >= 0) setFocus(-1); },
+    idleReset:      function(){
+      // Attract restores the resting state — desk selected, everything
+      // closed — but NEVER sweeps a half-filled custom-size input (the
+      // one state on this page with something to lose).
+      var dirty = (SEL.size.custom.len || SEL.size.custom.wid) &&
+                  panelView === 'size';
+      setFocus(-1); C.rail.focus(-1);
+      if (dirty) return;
+      if (SEL.classIdx !== 0) chooseClass(0);
+      else closeHead();
+    },
+    onLangChange:   function(T2){
+      links.forEach(function(l){ l.textContent = T2(l.getAttribute('data-section')); });
+      renderStrings();
+      if (panelView !== null) buildPanelContent();
+      document.title = T2('hardwareTitle');
+    },
+    onFontsReady:   function(){
+      measurePitch();
+      alignPanelMarkers();
+      if (panelView !== null) sizePanel();
+    },
+    devState:       function(){
+      window.__hwBall = Ball;   // ?dev only — devState is only wired under ?dev
+      return { focusIdx: focusIdx, rightFocus: rightFocus, openHead: openHead,
+               introSub: introSub, customSub: customSub, part: SEL.part,
+               panelView: panelView, classIdx: SEL.classIdx, rung: ladder.last(),
+               colorFocus: colorFocus, sel: JSON.parse(JSON.stringify(SEL)),
+               menuPitch: menuPitch, arrival: arrival };
+    }
+  }
+});
+
+// ── Boot — interactive at first paint; the ball lights the stage ────────
+renderStrings();
+links.forEach(function(l){ l.textContent = T(l.getAttribute('data-section')); });
+C.normalizeWordGlow();     // the right menu's sub-items joined rule-6 scope at build
+measurePitch();
+alignPanelMarkers();
+Ball.boot();
+applySelectionToStage();
+render();
+
+window.addEventListener('resize', function(){
+  alignPanelMarkers();
+  if (panelView !== null) sizePanel();
+});
+window.addEventListener('pageshow', function(e){
+  if (e.persisted){
+    _leaving = false;
+    closeHead();
+    setFocus(-1);
+    C.rail.focus(-1);
+  }
+});
+
+})();
+</script>
+</body>
+</html>
