@@ -46,7 +46,7 @@ preview:
 python3 tools/build-preview.py
 ```
 
-That writes three single-file pages (~590 KB each) to
+That writes one self-contained file per page (~600 KB each) to
 `../../build/backspace-preview/` with every font, graphic and script
 inlined as data URIs. Zip that folder and send it; the recipient
 double-clicks any page — no server, no folder structure, no internet.
