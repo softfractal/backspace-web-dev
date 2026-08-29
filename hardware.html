@@ -795,18 +795,29 @@
   .hw-tray-rail--l   { left: max(clamp(34px, 3.8vw, 68px), 3.76vw); }
   .hw-tray-rail--r   { right: 3.30vw; }
   .hw-tray-rail--div { left: 70.78vw; }
+  /* THE OPEN LABEL (Eric, Aug 29, off the design's p2): the word rode
+     too close to the rule — the design centers it HIGH in the rail-to-
+     rule window (cap center ≈ 30% down, ~16px of air above the line),
+     so the label anchors at 85.29vh and self-centers. And the open row
+     wears the away-nav's you-are-here treatment: ink, 600, the house
+     word glow (static tokens — the label is outside rule 6's fitted
+     scope). The band only exists expanded, so no .is-open scoping:
+     styling the label IS styling the open state, and the close fade
+     carries the glow out with it. */
   .hw-tray-label {
-    position: absolute; left: 5.50vw; top: 85.45vh;
-    color: var(--text-soft);
+    position: absolute; left: 5.50vw; top: 85.29vh;
+    transform: translateY(-50%);
+    color: var(--ink);
     background: none; border: 0; padding: 0;
-    font-family: var(--font-ui); font-weight: 300;
+    font-family: var(--font-ui); font-weight: 600;
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .08em;
+    text-shadow: var(--glow-text);
     cursor: var(--cursor-target);
     transition: color .16s;
   }
   .hw-tray-label:hover, .hw-tray-label:focus-visible {
-    color: #fff; outline: none; text-shadow: var(--glow-text);
+    color: #fff; outline: none; text-shadow: var(--glow-text-hover);
   }
   /* UNLIMITED items (Eric's sixth word): the slot row is a horizontal
      SCROLLER spanning the rail-to-divider region; the wheel belongs to
