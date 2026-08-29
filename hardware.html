@@ -140,8 +140,11 @@
     z-index: 16;
     color: var(--ink);
     font-family: var(--font-ui); font-weight: 600;
-    font-size: calc(17px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
-    line-height: calc(18px * var(--ui-scale));
+    /* ELEVENTH WORD (Eric, Aug 29): OASIS joins the heads' rung — all
+       three titles now share 12.75px×ui. The 45px×ui header→row offset
+       anchors from the title's top, so the menu rhythm holds. */
+    font-size: calc(12.75px * var(--ui-scale));
+    line-height: calc(13.5px * var(--ui-scale));
     letter-spacing: .08em;
     text-shadow: var(--glow-text);
   }
