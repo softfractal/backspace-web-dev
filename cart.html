@@ -666,6 +666,22 @@ document.getElementById('bs-wordmark-link').setAttribute('href', C.ROUTES.home);
 
 // ── The preview ball — the shared stage module's second consumer ───────
 var Ball = BSBall(document.getElementById('ct-ball'));
+// The snapshot ball + photo backfill (mirrors /hardware): legacy items
+// without photos heal here too, whichever page loads first.
+var snapBall = null;
+function snapshotOf(params){
+  if (!snapBall){
+    var c = document.createElement('canvas');
+    c.style.cssText = 'position:fixed;left:-9999px;top:0;width:320px;height:180px;';
+    c.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(c);
+    snapBall = BSBall(c);
+    if (!snapBall.boot()){ return null; }
+    snapBall.stage({ cx: 0.5, cy: 0.52, rad: 0.36 });
+    snapBall.show(false);
+  }
+  return snapBall.snap(params);
+}
 function rampRGB(colorSel){
   var col = HW.colors[colorSel.idx];
   var t = colorSel.t[colorSel.idx];
@@ -1037,6 +1053,16 @@ document.getElementById('ct-promo-in').setAttribute('placeholder', T('cartPromo'
 C.normalizeWordGlow();
 Ball.boot();
 Ball.stage({ cx: 0.5, cy: 0.55, rad: 0.36 });    // centered in the preview frame
+(function backfillPhotos(){
+  var dirty = false;
+  ITEMS.forEach(function(it){
+    if (!it.img && it.sel){
+      it.img = snapshotOf(stageParamsFor(it.sel));
+      if (it.img) dirty = true;
+    }
+  });
+  if (dirty) save();
+})();
 render();
 
 window.addEventListener('pageshow', function(e){

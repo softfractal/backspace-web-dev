@@ -2174,6 +2174,20 @@ Ball.boot();
 applySelectionToStage();
 renderTray();
 render();
+// PHOTO BACKFILL (Eric, Aug 29: "nothing seems to be implemented to the
+// cart row" — his items predate the snapshots, so only new adds carried
+// photos). Any stored item without one gets its render now, once, and
+// the store heals for every surface.
+(function backfillPhotos(){
+  var dirty = false;
+  CART.forEach(function(it){
+    if (!it.img && it.sel){
+      it.img = snapshotOf(stageParamsFor(it.sel.parts, it.sel.size, null));
+      if (it.img) dirty = true;
+    }
+  });
+  if (dirty){ saveCart(); renderTray(); }
+})();
 
 window.addEventListener('resize', function(){
   alignPanelMarkers();
