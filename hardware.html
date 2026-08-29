@@ -842,10 +842,31 @@
   }
   .hw-slot.is-filled:hover .hw-slot-img,
   .hw-slot.is-filled:focus-visible .hw-slot-img { filter: brightness(1.28); }
+  /* THE SLOT MINUS (Eric, Aug 29: the row's thumbnails carry it too —
+     supersedes the cart-page-only scoping): every filled slot removes
+     from its top-right corner, quiet at rest, lit under its own
+     pointer. A role-button span — a real <button> may not nest inside
+     the slot button. */
+  .hw-slot-minus {
+    position: absolute; top: 0; right: 0;
+    width: calc(18px * var(--ui-scale)); height: calc(18px * var(--ui-scale));
+    display: grid; place-items: center;
+    color: var(--text-soft);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(14px * var(--ui-scale)); line-height: 1;
+    cursor: var(--cursor-target);
+    z-index: 2;
+    opacity: .6;
+    transition: color .16s, opacity .16s;
+  }
+  .hw-slot-minus:hover, .hw-slot-minus:focus-visible {
+    color: #fff; opacity: 1; outline: none; text-shadow: var(--glow-text);
+  }
   /* THE TRIANGLE CHECKBOX (Eric's sixth word + the B-2 note: 实心 =
      checked, 空心 = unchecked): replaces the square tick AND the old
      remove-on-click. Checked items are the ones that check out; the X
-     that deletes lives on the cart page's summary cards. */
+     that deletes lives on the cart page's summary cards — and now the
+     slot minus above. */
   .hw-slot-tri {
     position: absolute; top: 0; left: 0;
     width: calc(11px * var(--ui-scale)); height: calc(11px * var(--ui-scale));
@@ -1467,6 +1488,28 @@ function renderTray(){
         b.insertBefore(photo, b.firstChild);     // behind the triangle + name
       }
       b.appendChild(name);
+      (function(idx2){
+        var minus = document.createElement('span');
+        minus.className = 'hw-slot-minus';
+        minus.textContent = '−';
+        minus.setAttribute('role', 'button');
+        minus.setAttribute('tabindex', '0');
+        minus.setAttribute('aria-label', 'Remove from cart');
+        function removeIt(e){
+          e.stopPropagation();
+          wake();
+          if (!clickOk()) return;
+          CART.splice(idx2, 1);
+          saveCart();
+          SoundBus.play('detent'); hapticTick();
+          renderTray();
+        }
+        minus.addEventListener('click', removeIt);
+        minus.addEventListener('keydown', function(e){
+          if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); removeIt(e); }
+        });
+        b.appendChild(minus);
+      })(i);
       b.setAttribute('aria-label', T(item.classKey) + ' — toggle for checkout, preview');
       (function(it){
         // THE TENTH WORD (Eric, Aug 29: the tiny triangle alone was

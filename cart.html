@@ -792,16 +792,22 @@ function render(){
         }
         b.appendChild(name);
         if (idx === selIdx){
-          // the focused product's remove control (sixteenth word)
-          var minus = document.createElement('button');
-          minus.type = 'button';
+          // the focused product's remove control (sixteenth word) — a
+          // role-button span: a real <button> may not nest in the thumb.
+          var minus = document.createElement('span');
           minus.className = 'ct-thumb-minus';
           minus.textContent = '−';
+          minus.setAttribute('role', 'button');
+          minus.setAttribute('tabindex', '0');
           minus.setAttribute('aria-label', 'Remove from cart');
-          minus.addEventListener('click', function(e){
+          var removeIt = function(e){
             e.stopPropagation();
             wake();
             if (clickOk()) removeItem(idx);
+          };
+          minus.addEventListener('click', removeIt);
+          minus.addEventListener('keydown', function(e){
+            if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); removeIt(e); }
           });
           b.appendChild(minus);
         }
