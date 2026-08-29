@@ -154,10 +154,11 @@
     letter-spacing: .02em;
     pointer-events: none;
   }
-  .ct-thumb-chip {
-    position: absolute; right: calc(9px * var(--ui-scale)); bottom: calc(9px * var(--ui-scale));
-    width: calc(10px * var(--ui-scale)); height: calc(10px * var(--ui-scale));
-    border: 1px solid var(--panel-line);
+  /* The color chips retired (thirteenth word) — thumbnails carry the
+     actual preview photo snapped when the item was added. */
+  .ct-thumb-img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
     pointer-events: none;
   }
 
@@ -741,10 +742,13 @@ function render(){
         var name = document.createElement('span');
         name.className = 'ct-thumb-name';
         name.textContent = T(item.classKey);
-        var chip = document.createElement('span');
-        chip.className = 'ct-thumb-chip';
-        chip.style.background = item.css;
-        b.appendChild(name); b.appendChild(chip);
+        if (item.img){
+          var photo = document.createElement('span');
+          photo.className = 'ct-thumb-img';
+          photo.style.backgroundImage = 'url(' + item.img + ')';
+          b.insertBefore(photo, b.firstChild);   // behind the triangle + name
+        }
+        b.appendChild(name);
         b.setAttribute('aria-label', T(item.classKey) + ' — toggle for checkout, preview');
         // THE TENTH WORD (Eric, Aug 29): the frame itself checks and
         // unchecks — and still drives the big preview + detail column
@@ -831,7 +835,13 @@ function render(){
     card.appendChild(makeTri(item, 'ct-tri'));
     var img = document.createElement('span');
     img.className = 'ct-card-chipimg';
-    img.style.background = item.css;
+    if (item.img){
+      img.style.backgroundImage = 'url(' + item.img + ')';
+      img.style.backgroundSize = 'cover';
+      img.style.backgroundPosition = 'center';
+    } else {
+      img.style.background = '#00000066';       // photo slot, dark until one exists
+    }
     var title = document.createElement('span');
     title.className = 'ct-card-title';
     title.textContent = T('cartItemDeskTitle');

@@ -583,29 +583,36 @@
     font-size: calc(13px * var(--ui-scale));
     cursor: var(--cursor-target);
   }
-  .hw-addrow .hw-add-price {
+  /* THE THREE ZONES, corrected (thirteenth word): + ADDS · the gray
+     bar SAYS "add to cart" (and adds too — a label that invites the
+     click) · the white box at the right SHOWS THE PRICE (display only,
+     the "—" seam until the price source is ruled; the frames' $3,499
+     never returns as a static). */
+  .hw-addrow .hw-add-bar {
     flex: 1;
     display: flex; align-items: center;
     padding: 0 calc(12px * var(--ui-scale));
     background: #4a4a4a5c;
-    color: var(--text-soft);
-    font-family: var(--font-ui); font-weight: 300;
+    border: 0;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
     font-size: calc(12px * var(--ui-scale));
     letter-spacing: .04em;
-  }
-  .hw-addrow .hw-add-go {
-    flex: none;
-    padding: 0 calc(14px * var(--ui-scale));
-    background: #ededed; color: #0b0b0a;
-    border: 0;
-    font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
-    letter-spacing: .04em;
+    text-align: left;
     cursor: var(--cursor-target);
     transition: background .16s;
   }
-  .hw-addrow .hw-add-go:hover, .hw-addrow .hw-add-go:focus-visible {
-    background: #fff; outline: none;
+  .hw-addrow .hw-add-bar:hover, .hw-addrow .hw-add-bar:focus-visible {
+    background: #5c5c5c5c; outline: none;
+  }
+  .hw-addrow .hw-add-price {
+    flex: none;
+    display: flex; align-items: center;
+    padding: 0 calc(14px * var(--ui-scale));
+    background: #ededed; color: #040402;
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .04em;
   }
 
   /* ── THE CART ROW — ruled INTO phase one (Eric, Aug 28, second word:
@@ -663,19 +670,72 @@
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .08em;
   }
+  /* THE EXPANSION CHOREOGRAPHY (thirteenth word, Eric, Aug 29): the
+     strip's translucent box FADES · the line GROWS horizontally at the
+     strip's own height · then PULLS UP to the band rule's 87.11vh while
+     the two rails DRAW · and the full row's contents reveal. One clock,
+     keyframe percentage splits — the waterfall's own discipline; tempo
+     tokens only, zero local durations. The close stays a plain fade
+     (the house's closing grammar). */
   #hw-tray-band {
     position: absolute; inset: 0;
     pointer-events: none;
     opacity: 0; visibility: hidden;
-    transform: translateY(calc(24px * var(--ui-scale)));
-    transition: opacity var(--pop-fade), transform var(--pop-motion),
-                visibility 0s var(--pop-fade-duration);
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
   }
   #hw-tray.is-open #hw-tray-band {
-    opacity: 1; visibility: visible; transform: none;
-    transition: opacity var(--pop-fade), transform var(--pop-motion), visibility 0s;
+    opacity: 1; visibility: visible;
+    transition: opacity 0s, visibility 0s;   /* the children carry the entrance */
   }
   #hw-tray-band > * { pointer-events: auto; }
+  @keyframes hw-rule-in {
+    0% {
+      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.62);
+      animation-timing-function: var(--expand-curve);
+    }
+    45% {
+      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(1);
+      animation-timing-function: var(--expand-curve);
+    }
+    100% { transform: translateY(0) scaleX(1); }
+  }
+  #hw-tray.is-open .hw-tray-rule { animation: hw-rule-in var(--pop-duration) both; }
+  @keyframes hw-rail-in {
+    0%, 45% { transform: scaleY(0); }
+    100%    { transform: scaleY(1); }
+  }
+  #hw-tray.is-open .hw-tray-rail--l,
+  #hw-tray.is-open .hw-tray-rail--r {
+    /* the rails draw out from where the rising rule crosses them:
+       (87.11 − 84.51) / 13.61 of their own height */
+    transform-origin: 50% 19.1%;
+    animation: hw-rail-in var(--pop-duration) var(--expand-curve) both;
+  }
+  /* the contents wait for the line to land — the waterfall's own
+     content grammar (delays drink from the token, never local). */
+  #hw-tray-band .hw-tray-label,
+  #hw-tray-band #hw-slots,
+  #hw-tray-band .hw-tray-price,
+  #hw-tray-band .hw-tray-rail--div {
+    opacity: 0;
+    transition: opacity var(--pop-fade);
+  }
+  #hw-tray.is-open #hw-tray-band .hw-tray-label,
+  #hw-tray.is-open #hw-tray-band #hw-slots,
+  #hw-tray.is-open #hw-tray-band .hw-tray-price,
+  #hw-tray.is-open #hw-tray-band .hw-tray-rail--div {
+    opacity: 1;
+    transition-delay: var(--pop-duration);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #hw-tray.is-open .hw-tray-rule,
+    #hw-tray.is-open .hw-tray-rail--l,
+    #hw-tray.is-open .hw-tray-rail--r { animation: none; }
+    #hw-tray.is-open #hw-tray-band .hw-tray-label,
+    #hw-tray.is-open #hw-tray-band #hw-slots,
+    #hw-tray.is-open #hw-tray-band .hw-tray-price,
+    #hw-tray.is-open #hw-tray-band .hw-tray-rail--div { transition-delay: 0s; }
+  }
   .hw-tray-rule, .hw-tray-rail {
     position: absolute; background: var(--panel-line); pointer-events: none;
   }
@@ -753,10 +813,12 @@
     letter-spacing: .02em;
     pointer-events: none;
   }
-  .hw-slot-chip {
-    position: absolute; right: calc(9px * var(--ui-scale)); bottom: calc(9px * var(--ui-scale));
-    width: calc(10px * var(--ui-scale)); height: calc(10px * var(--ui-scale));
-    border: 1px solid var(--panel-line);
+  /* The color chips retired (thirteenth word: "they don't serve any
+     purpose") — the slot carries an actual PREVIEW PHOTO, snapped from
+     the ball at add time. */
+  .hw-slot-img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
     pointer-events: none;
   }
   .hw-tray-price {
@@ -889,30 +951,31 @@
 <nav id="hw-product-menu" aria-label="Product menu"></nav>
 
 <!-- Introduction plates — three diagonal windows. -->
-<div id="hw-plate-1" class="hw-plate bs-window bs-window--diag is-hidden" role="region" aria-label="Introduction">
+<div id="hw-plate-1" class="hw-plate bs-window is-hidden" role="region" aria-label="Introduction">
   <div class="hw-plate-body"><div class="hw-plate-media"></div></div>
 </div>
-<div id="hw-plate-2" class="hw-plate bs-window bs-window--diag is-hidden" role="region" aria-label="Introduction">
+<div id="hw-plate-2" class="hw-plate bs-window is-hidden" role="region" aria-label="Introduction">
   <div class="hw-plate-body"><div class="hw-plate-media"></div></div>
 </div>
-<div id="hw-plate-3" class="hw-plate bs-window bs-window--diag is-hidden" role="region" aria-label="Introduction">
+<div id="hw-plate-3" class="hw-plate bs-window is-hidden" role="region" aria-label="Introduction">
   <div class="hw-plate-body"><div class="hw-plate-media"></div></div>
 </div>
 
-<!-- The options panel — THE diagonal window, growing UPWARD out of the
-     add row below it. -->
-<div id="hw-panel" class="bs-window bs-window--diag is-hidden" role="region" aria-label="Customization">
+<!-- The options panel — THE WATERFALL window (thirteenth word: the
+     company holds to the single-triangle look; the diagonal variant
+     parks again), bottom-anchored, growing UPWARD out of the add row. -->
+<div id="hw-panel" class="bs-window is-hidden" role="region" aria-label="Customization">
   <div class="hw-body" id="hw-panel-body"></div>
 </div>
 
 <!-- THE ADD ROW — fixed page furniture at the frames' berth (77.35vh);
      always present for a real product, panel open or not. -->
 <div id="hw-addrow" class="hw-addrow" aria-label="Add to cart">
-  <button class="hw-add-chip" id="hw-add-chip" type="button" aria-label="Cart">+</button>
+  <button class="hw-add-chip" id="hw-add-chip" type="button" aria-label="Add to cart">+</button>
+  <button class="hw-add-bar" id="hw-add-bar" type="button" data-str="hwAddToCart"></button>
   <!-- PRICE SEAM: renders from the manifest per configuration when the
-       price-source ruling lands (phase 2 with the cart). Never static. -->
-  <div class="hw-add-price" id="hw-price">—</div>
-  <button class="hw-add-go" id="hw-add-go" type="button" data-str="hwAddToCart"></button>
+       price-source ruling lands. Never static. -->
+  <div class="hw-add-price" id="hw-price" aria-label="Price">—</div>
 </div>
 
 <!-- THE CART ROW — always on stage (page anatomy, every frame draws it).
@@ -1200,6 +1263,22 @@ function setRightFocus(i){
 // ── The ball — the shared stage module (factored Aug 28, second
 // consumer /cart); the stage-binding seam below is unchanged. ──────────────
 var Ball = BSBall(ballEl);
+// The SNAPSHOT ball (thirteenth word): a small offstage instance that
+// renders each added configuration once and hands back its photo.
+var snapBall = null;
+function snapshotOf(params){
+  if (!snapBall){
+    var c = document.createElement('canvas');
+    c.style.cssText = 'position:fixed;left:-9999px;top:0;width:320px;height:180px;';
+    c.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(c);
+    snapBall = BSBall(c);
+    if (!snapBall.boot()){ return null; }
+    snapBall.stage({ cx: 0.5, cy: 0.52, rad: 0.36 });
+    snapBall.show(false);                        // never on stage, never ticking
+  }
+  return snapBall.snap(params);
+}
 
 // ══ THE STAGE-BINDING SEAM ═══════════════════════════════════════════════
 // Every material/size choice flows through HERE and only here. Phase one
@@ -1309,11 +1388,13 @@ function renderTray(){
       var name = document.createElement('span');
       name.className = 'hw-slot-name';
       name.textContent = T(item.classKey);
-      var chip = document.createElement('span');
-      chip.className = 'hw-slot-chip';
-      chip.style.background = item.css;
+      if (item.img){
+        var photo = document.createElement('span');
+        photo.className = 'hw-slot-img';
+        photo.style.backgroundImage = 'url(' + item.img + ')';
+        b.insertBefore(photo, b.firstChild);     // behind the triangle + name
+      }
       b.appendChild(name);
-      b.appendChild(chip);
       b.setAttribute('aria-label', T(item.classKey) + ' — toggle for checkout, preview');
       (function(it){
         // THE TENTH WORD (Eric, Aug 29: the tiny triangle alone was
@@ -1351,10 +1432,12 @@ function renderTray(){
 }
 function addToCart(from){
   if (!realClass(SEL.classIdx)) return;          // unreal classes never sell
+  var params = stageParamsFor(SEL.parts, SEL.size, SEL.part);
   CART.push({
     id: 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     classKey: HW.classes[SEL.classIdx].key,
     css: cssRGB(rampRGB(SEL.parts['III'].color)),   // the desktop face fronts the config
+    img: snapshotOf(params),                     // the thumbnail's actual photo
     sel: JSON.parse(JSON.stringify({ parts: SEL.parts, size: SEL.size })),
     qty: 1,
     checked: true                                 // adding = intent to buy
@@ -1848,9 +1931,9 @@ panel.addEventListener('keydown', function(e){
   }
 });
 
-// THE ADD ROW COMMITS (Eric's second Aug 28 word) — the chip and the go
-// button both add the live configuration; a full tray denies loudly.
-['hw-add-chip', 'hw-add-go'].forEach(function(id){
+// THE ADD ROW COMMITS — the + chip and the "add to cart" bar both add
+// the live configuration; the white price box is display only.
+['hw-add-chip', 'hw-add-bar'].forEach(function(id){
   var b = document.getElementById(id);
   b.addEventListener('click', function(e){
     e.stopPropagation();
