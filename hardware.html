@@ -849,7 +849,7 @@
      the slot button. */
   .hw-slot-minus {
     position: absolute; top: 0; right: 0;
-    width: calc(18px * var(--ui-scale)); height: calc(18px * var(--ui-scale));
+    width: calc(28px * var(--ui-scale)); height: calc(28px * var(--ui-scale));
     color: var(--text-soft);
     cursor: var(--cursor-target);
     z-index: 2;
@@ -858,14 +858,15 @@
   }
   /* The dash is DRAWN, not typeset (Eric, Aug 29: the glyph read
      off-center — a dash's ink is wide and short, so a centered box
-     leaves more air above than beside). Equal insets by construction:
-     5px×ui to the top, 5px×ui to the right — the triangle's corner
-     grammar mirrored. */
+     leaves more air above than beside). Equal insets by construction,
+     DOUBLED on Eric's next word (Aug 29): 10px×ui to the top, 10px×ui
+     to the right; the hit box grows 18→28 so the ink keeps its
+     symmetric surround (inset + ink + inset). */
   .hw-slot-minus::after {
     content: '';
     position: absolute;
-    top: calc(5px * var(--ui-scale));
-    right: calc(5px * var(--ui-scale));
+    top: calc(10px * var(--ui-scale));
+    right: calc(10px * var(--ui-scale));
     width: calc(8px * var(--ui-scale));
     height: max(1px, calc(1.2px * var(--ui-scale)));
     background: currentColor;

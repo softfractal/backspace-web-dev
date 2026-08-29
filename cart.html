@@ -158,18 +158,19 @@
      summary card's X. */
   .ct-thumb-minus {
     position: absolute; top: 0; right: 0;
-    width: calc(18px * var(--ui-scale)); height: calc(18px * var(--ui-scale));
+    width: calc(28px * var(--ui-scale)); height: calc(28px * var(--ui-scale));
     color: var(--text-soft);
     cursor: var(--cursor-target);
     z-index: 2;
     transition: color .16s;
   }
-  /* Drawn dash, equal 5px×ui insets top and right (Eric, Aug 29). */
+  /* Drawn dash, equal insets top and right — doubled to 10px×ui on
+     Eric's word (Aug 29); hit box 18→28 keeps the symmetric surround. */
   .ct-thumb-minus::after {
     content: '';
     position: absolute;
-    top: calc(5px * var(--ui-scale));
-    right: calc(5px * var(--ui-scale));
+    top: calc(10px * var(--ui-scale));
+    right: calc(10px * var(--ui-scale));
     width: calc(8px * var(--ui-scale));
     height: max(1px, calc(1.2px * var(--ui-scale)));
     background: currentColor;
