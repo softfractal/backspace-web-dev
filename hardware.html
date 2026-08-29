@@ -850,17 +850,32 @@
   .hw-slot-minus {
     position: absolute; top: 0; right: 0;
     width: calc(18px * var(--ui-scale)); height: calc(18px * var(--ui-scale));
-    display: grid; place-items: center;
     color: var(--text-soft);
-    font-family: var(--font-sans); font-weight: 300;
-    font-size: calc(14px * var(--ui-scale)); line-height: 1;
     cursor: var(--cursor-target);
     z-index: 2;
     opacity: .6;
     transition: color .16s, opacity .16s;
   }
+  /* The dash is DRAWN, not typeset (Eric, Aug 29: the glyph read
+     off-center — a dash's ink is wide and short, so a centered box
+     leaves more air above than beside). Equal insets by construction:
+     5px×ui to the top, 5px×ui to the right — the triangle's corner
+     grammar mirrored. */
+  .hw-slot-minus::after {
+    content: '';
+    position: absolute;
+    top: calc(5px * var(--ui-scale));
+    right: calc(5px * var(--ui-scale));
+    width: calc(8px * var(--ui-scale));
+    height: max(1px, calc(1.2px * var(--ui-scale)));
+    background: currentColor;
+    transition: box-shadow .2s ease;
+  }
   .hw-slot-minus:hover, .hw-slot-minus:focus-visible {
-    color: #fff; opacity: 1; outline: none; text-shadow: var(--glow-text);
+    color: #fff; opacity: 1; outline: none;
+  }
+  .hw-slot-minus:hover::after, .hw-slot-minus:focus-visible::after {
+    box-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255, 255, 255, .65);
   }
   /* THE TRIANGLE CHECKBOX (Eric's sixth word + the B-2 note: 实心 =
      checked, 空心 = unchecked): replaces the square tick AND the old
@@ -1490,8 +1505,7 @@ function renderTray(){
       b.appendChild(name);
       (function(idx2){
         var minus = document.createElement('span');
-        minus.className = 'hw-slot-minus';
-        minus.textContent = '−';
+        minus.className = 'hw-slot-minus';   // the dash is drawn by the CSS
         minus.setAttribute('role', 'button');
         minus.setAttribute('tabindex', '0');
         minus.setAttribute('aria-label', 'Remove from cart');

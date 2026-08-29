@@ -159,17 +159,27 @@
   .ct-thumb-minus {
     position: absolute; top: 0; right: 0;
     width: calc(18px * var(--ui-scale)); height: calc(18px * var(--ui-scale));
-    display: grid; place-items: center;
-    background: none; border: 0; padding: 0;
     color: var(--text-soft);
-    font-family: var(--font-sans); font-weight: 300;
-    font-size: calc(14px * var(--ui-scale)); line-height: 1;
     cursor: var(--cursor-target);
     z-index: 2;
     transition: color .16s;
   }
+  /* Drawn dash, equal 5px×ui insets top and right (Eric, Aug 29). */
+  .ct-thumb-minus::after {
+    content: '';
+    position: absolute;
+    top: calc(5px * var(--ui-scale));
+    right: calc(5px * var(--ui-scale));
+    width: calc(8px * var(--ui-scale));
+    height: max(1px, calc(1.2px * var(--ui-scale)));
+    background: currentColor;
+    transition: box-shadow .2s ease;
+  }
   .ct-thumb-minus:hover, .ct-thumb-minus:focus-visible {
-    color: #fff; outline: none; text-shadow: var(--glow-text);
+    color: #fff; outline: none;
+  }
+  .ct-thumb-minus:hover::after, .ct-thumb-minus:focus-visible::after {
+    box-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255, 255, 255, .65);
   }
   .ct-thumb-name {
     position: absolute; left: calc(9px * var(--ui-scale)); bottom: calc(7px * var(--ui-scale));
@@ -795,8 +805,7 @@ function render(){
           // the focused product's remove control (sixteenth word) — a
           // role-button span: a real <button> may not nest in the thumb.
           var minus = document.createElement('span');
-          minus.className = 'ct-thumb-minus';
-          minus.textContent = '−';
+          minus.className = 'ct-thumb-minus';   // the dash is drawn by the CSS
           minus.setAttribute('role', 'button');
           minus.setAttribute('tabindex', '0');
           minus.setAttribute('aria-label', 'Remove from cart');
