@@ -727,14 +727,61 @@
     opacity: 1;
     transition-delay: var(--pop-duration);
   }
+  /* THE COLLAPSE MIRRORS IT (fourteenth word, Eric, Aug 29): contents
+     fade first · then the rule descends while the rails undraw · the
+     line shrinks back to the strip's width · the strip fades in on cue.
+     Driven by .is-closing (JS holds it for exactly the choreography's
+     token-derived length, then releases to the hidden base state — by
+     which time the strip's own rule stands where the animated one
+     lands, so the hand-off is seamless). */
+  #hw-tray.is-closing #hw-tray-band {
+    opacity: 1; visibility: visible;
+    transition: none;
+  }
+  #hw-tray.is-closing #hw-tray-band > * { pointer-events: none; }
+  @keyframes hw-rule-out {
+    0% {
+      transform: translateY(0) scaleX(1);
+      animation-timing-function: var(--expand-curve);
+    }
+    55% {
+      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(1);
+      animation-timing-function: var(--expand-curve);
+    }
+    100% { transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.62); }
+  }
+  #hw-tray.is-closing .hw-tray-rule {
+    animation: hw-rule-out var(--pop-duration) var(--pop-fade-duration) both;
+  }
+  @keyframes hw-rail-out {
+    0%        { transform: scaleY(1); }
+    55%, 100% { transform: scaleY(0); }
+  }
+  #hw-tray.is-closing .hw-tray-rail--l,
+  #hw-tray.is-closing .hw-tray-rail--r {
+    transform-origin: 50% 19.1%;
+    animation: hw-rail-out var(--pop-duration) var(--expand-curve) var(--pop-fade-duration) both;
+  }
+  /* the strip returns only after the line has come home */
+  #hw-tray.is-closing #hw-tray-strip {
+    transition-delay: calc(var(--pop-fade-duration) + var(--pop-duration));
+  }
   @media (prefers-reduced-motion: reduce) {
     #hw-tray.is-open .hw-tray-rule,
     #hw-tray.is-open .hw-tray-rail--l,
-    #hw-tray.is-open .hw-tray-rail--r { animation: none; }
+    #hw-tray.is-open .hw-tray-rail--r,
+    #hw-tray.is-closing .hw-tray-rule,
+    #hw-tray.is-closing .hw-tray-rail--l,
+    #hw-tray.is-closing .hw-tray-rail--r { animation: none; }
     #hw-tray.is-open #hw-tray-band .hw-tray-label,
     #hw-tray.is-open #hw-tray-band #hw-slots,
     #hw-tray.is-open #hw-tray-band .hw-tray-price,
     #hw-tray.is-open #hw-tray-band .hw-tray-rail--div { transition-delay: 0s; }
+    #hw-tray.is-closing #hw-tray-band {
+      opacity: 0; visibility: hidden;
+      transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+    }
+    #hw-tray.is-closing #hw-tray-strip { transition-delay: 0s; }
   }
   .hw-tray-rule, .hw-tray-rail {
     position: absolute; background: var(--panel-line); pointer-events: none;
@@ -1336,9 +1383,23 @@ var slotsEl  = document.getElementById('hw-slots');
 var totalEl  = document.getElementById('hw-total');
 var trayOpen = false;
 function saveCart(){ C.cartStore.save(CART); }
+var _trayCloseT = null;
 function setTrayOpen(on){
   trayOpen = !!on;
-  trayEl.classList.toggle('is-open', trayOpen);
+  clearTimeout(_trayCloseT);
+  if (trayOpen){
+    trayEl.classList.remove('is-closing');
+    trayEl.classList.add('is-open');
+  } else if (trayEl.classList.contains('is-open')){
+    trayEl.classList.remove('is-open');
+    trayEl.classList.add('is-closing');
+    // hold the closing state for the choreography's own length —
+    // derived from the tempo tokens, never a local duration.
+    var cs = getComputedStyle(document.documentElement);
+    var dur = (parseFloat(cs.getPropertyValue('--pop-duration')) || 0.5) * 1000;
+    var fade = (parseFloat(cs.getPropertyValue('--pop-fade-duration')) || 0.41) * 1000;
+    _trayCloseT = setTimeout(function(){ trayEl.classList.remove('is-closing'); }, dur + fade + 60);
+  }
   stripEl.setAttribute('aria-expanded', String(trayOpen));
 }
 stripEl.addEventListener('click', function(){ wake(); if (clickOk()) setTrayOpen(true); });
