@@ -681,7 +681,11 @@
     position: absolute; inset: 0;
     pointer-events: none;
     opacity: 0; visibility: hidden;
-    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+    /* NO base fade (the fifteenth word's flash fix): the reverse
+       choreography IS the close — when .is-closing releases, the
+       un-animated rule/rails stand at full expansion again, so the band
+       must vanish INSTANTLY at that moment, never fade through it. */
+    transition: none;
   }
   #hw-tray.is-open #hw-tray-band {
     opacity: 1; visibility: visible;
@@ -1398,7 +1402,8 @@ function setTrayOpen(on){
     var cs = getComputedStyle(document.documentElement);
     var dur = (parseFloat(cs.getPropertyValue('--pop-duration')) || 0.5) * 1000;
     var fade = (parseFloat(cs.getPropertyValue('--pop-fade-duration')) || 0.41) * 1000;
-    _trayCloseT = setTimeout(function(){ trayEl.classList.remove('is-closing'); }, dur + fade + 60);
+    // contents fade + line reverse + the strip's own return, then release
+    _trayCloseT = setTimeout(function(){ trayEl.classList.remove('is-closing'); }, fade + dur + fade + 60);
   }
   stripEl.setAttribute('aria-expanded', String(trayOpen));
 }
