@@ -142,10 +142,35 @@
     transition: background .16s;
   }
   .ct-thumb.is-filled { cursor: var(--cursor-target); }
+  /* PHOTO HOVER (sixteenth word): the opaque render hid the old
+     background lift — the grey backdrop stays underneath, and hovering
+     now lifts THROUGH the photo: the image brightens and the frame
+     glows. Photo-less boxes keep the plain lift. */
   .ct-thumb.is-filled:hover, .ct-thumb.is-filled:focus-visible {
     background: #5c5c5c5c; outline: none;
+    box-shadow: 0 0 calc(14px * var(--ui-scale)) rgba(255, 255, 255, .16);
   }
+  .ct-thumb.is-filled:hover .ct-thumb-img,
+  .ct-thumb.is-filled:focus-visible .ct-thumb-img { filter: brightness(1.28); }
   .ct-thumb.is-live { background: #5c5c5c7a; }   /* the previewed one */
+  /* THE MINUS (sixteenth word): the FOCUSED thumbnail carries a remove
+     control at its top right — thumbnail-level deletion joins the
+     summary card's X. */
+  .ct-thumb-minus {
+    position: absolute; top: 0; right: 0;
+    width: calc(18px * var(--ui-scale)); height: calc(18px * var(--ui-scale));
+    display: grid; place-items: center;
+    background: none; border: 0; padding: 0;
+    color: var(--text-soft);
+    font-family: var(--font-sans); font-weight: 300;
+    font-size: calc(14px * var(--ui-scale)); line-height: 1;
+    cursor: var(--cursor-target);
+    z-index: 2;
+    transition: color .16s;
+  }
+  .ct-thumb-minus:hover, .ct-thumb-minus:focus-visible {
+    color: #fff; outline: none; text-shadow: var(--glow-text);
+  }
   .ct-thumb-name {
     position: absolute; left: calc(9px * var(--ui-scale)); bottom: calc(7px * var(--ui-scale));
     color: var(--text-soft);
@@ -160,6 +185,7 @@
     position: absolute; inset: 0;
     background-size: cover; background-position: center;
     pointer-events: none;
+    transition: filter .2s ease;
   }
 
   /* ── The detail column (845..1189) ──────────────────────────────────── */
@@ -749,6 +775,20 @@ function render(){
           b.insertBefore(photo, b.firstChild);   // behind the triangle + name
         }
         b.appendChild(name);
+        if (idx === selIdx){
+          // the focused product's remove control (sixteenth word)
+          var minus = document.createElement('button');
+          minus.type = 'button';
+          minus.className = 'ct-thumb-minus';
+          minus.textContent = '−';
+          minus.setAttribute('aria-label', 'Remove from cart');
+          minus.addEventListener('click', function(e){
+            e.stopPropagation();
+            wake();
+            if (clickOk()) removeItem(idx);
+          });
+          b.appendChild(minus);
+        }
         b.setAttribute('aria-label', T(item.classKey) + ' — toggle for checkout, preview');
         // THE TENTH WORD (Eric, Aug 29): the frame itself checks and
         // unchecks — and still drives the big preview + detail column

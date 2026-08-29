@@ -834,9 +834,14 @@
     transition: background .16s;
   }
   .hw-slot.is-filled { cursor: var(--cursor-target); }   /* body click = preview */
+  /* Photo hover lifts THROUGH the render (sixteenth word — the grey
+     backdrop stays underneath; the image brightens, the frame glows). */
   .hw-slot.is-filled:hover, .hw-slot.is-filled:focus-visible {
     background: #5c5c5c5c; outline: none;
+    box-shadow: 0 0 calc(14px * var(--ui-scale)) rgba(255, 255, 255, .16);
   }
+  .hw-slot.is-filled:hover .hw-slot-img,
+  .hw-slot.is-filled:focus-visible .hw-slot-img { filter: brightness(1.28); }
   /* THE TRIANGLE CHECKBOX (Eric's sixth word + the B-2 note: 实心 =
      checked, 空心 = unchecked): replaces the square tick AND the old
      remove-on-click. Checked items are the ones that check out; the X
@@ -871,6 +876,7 @@
     position: absolute; inset: 0;
     background-size: cover; background-position: center;
     pointer-events: none;
+    transition: filter .2s ease;
   }
   .hw-tray-price {
     position: absolute; left: 74.07vw; right: 6.66vw; top: 89.79vh;
