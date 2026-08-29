@@ -1235,7 +1235,6 @@ function applySelectionToStage(){
 // next selection change re-binds it.
 function previewItem(item){
   Ball.set(stageParamsFor(item.sel.parts, item.sel.size, null));
-  SoundBus.play('detent'); hapticTick();
 }
 
 // ── THE CART ROW — Eric's second word built it; the SIXTH word made it
@@ -1311,12 +1310,20 @@ function renderTray(){
       chip.style.background = item.css;
       b.appendChild(name);
       b.appendChild(chip);
-      b.setAttribute('aria-label', T(item.classKey) + ' — preview');
+      b.setAttribute('aria-label', T(item.classKey) + ' — toggle for checkout, preview');
       (function(it){
+        // THE TENTH WORD (Eric, Aug 29: the tiny triangle alone was
+        // counterintuitive): the slot BODY toggles the check — and still
+        // previews the configuration on the ball, one click, both.
         b.addEventListener('click', function(e){
           e.stopPropagation();
           wake();
-          previewItem(it);                       // the body click PREVIEWS
+          if (!clickOk()) return;
+          it.checked = !it.checked;
+          saveCart();
+          SoundBus.play(it.checked ? 'commit' : 'detent'); hapticTick();
+          previewItem(it);
+          renderTray();
         });
       })(item);
     } else {

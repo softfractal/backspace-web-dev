@@ -745,11 +745,19 @@ function render(){
         chip.className = 'ct-thumb-chip';
         chip.style.background = item.css;
         b.appendChild(name); b.appendChild(chip);
-        b.setAttribute('aria-label', T(item.classKey));
+        b.setAttribute('aria-label', T(item.classKey) + ' — toggle for checkout, preview');
+        // THE TENTH WORD (Eric, Aug 29): the frame itself checks and
+        // unchecks — and still drives the big preview + detail column
+        // (the note's small-frame -> big-frame rule), one click, both.
         b.addEventListener('click', function(e){
           e.stopPropagation();
           wake();
-          selectItem(idx);                       // the note's rule: small frame -> big frame
+          if (!clickOk()) return;
+          item.checked = !item.checked;
+          selIdx = idx;
+          save();
+          SoundBus.play(item.checked ? 'commit' : 'detent'); hapticTick();
+          render();
         });
       }
       gridEl.appendChild(b);
