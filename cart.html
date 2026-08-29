@@ -1070,6 +1070,16 @@ window.addEventListener('pageshow', function(e){
     _leaving = false;
     ITEMS = C.cartStore.load();                  // /hardware may have changed the truth
     if (selIdx >= ITEMS.length) selIdx = ITEMS.length - 1;
+    if (selIdx < 0 && ITEMS.length) selIdx = 0;
+    render();
+  }
+});
+// Cross-tab, same truth.
+window.addEventListener('storage', function(e){
+  if (e.key === C.cartStore.key){
+    ITEMS = C.cartStore.load();
+    if (selIdx >= ITEMS.length) selIdx = ITEMS.length - 1;
+    if (selIdx < 0 && ITEMS.length) selIdx = 0;
     render();
   }
 });

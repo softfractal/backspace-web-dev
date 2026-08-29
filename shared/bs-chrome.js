@@ -1265,7 +1265,8 @@ var cartStore = {
   },
   save: function(items){
     try { localStorage.setItem(CART_STORE_KEY, JSON.stringify({ v: 1, items: items })); } catch (e) {}
-  }
+  },
+  key: CART_STORE_KEY   // pages follow the one truth on restore + cross-tab
 };
 
 // ── Shared measurement primitives (the measured-never-hardcoded law) ─────

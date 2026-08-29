@@ -2200,6 +2200,18 @@ window.addEventListener('pageshow', function(e){
     closeHead();
     setFocus(-1);
     C.rail.focus(-1);
+    // THE ROW WAS ONE ITERATION BEHIND (Eric, Aug 29): a back-forward
+    // return from /cart restored this page with the OLD cart in hand.
+    // Re-read the one truth on every restore.
+    CART = C.cartStore.load();
+    renderTray();
+  }
+});
+// Cross-tab, same truth: another tab's cart writes re-render this row.
+window.addEventListener('storage', function(e){
+  if (e.key === C.cartStore.key){
+    CART = C.cartStore.load();
+    renderTray();
   }
 });
 
