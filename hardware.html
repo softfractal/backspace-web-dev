@@ -2224,9 +2224,12 @@ render();
 (function backfillPhotos(){
   var dirty = false;
   CART.forEach(function(it){
-    if (!it.img && it.sel){
-      it.img = snapshotOf(stageParamsFor(it.sel.parts, it.sel.size, null));
-      if (it.img) dirty = true;
+    // missing photos AND the black-background jpeg era both re-snap —
+    // the grey plate must read through (alpha PNGs, Aug 29).
+    var stale = !it.img || it.img.slice(0, 15) === 'data:image/jpeg';
+    if (stale && it.sel){
+      var img = snapshotOf(stageParamsFor(it.sel.parts, it.sel.size, null));
+      if (img){ it.img = img; dirty = true; }
     }
   });
   if (dirty){ saveCart(); renderTray(); }

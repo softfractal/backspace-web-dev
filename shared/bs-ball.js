@@ -183,11 +183,13 @@ window.BSBall = function(canvas){
     // ?dev instrumentation: force one frame (headless/hidden captures
     // never see rAF — the softfractal LOGGING-build precedent).
     frame: function(){ if (gl){ for (var i = 0; i < 40; i++) drawFrame(0.05); } },
-    // SNAPSHOT (thirteenth word, Aug 29): render a configuration
-    // instantly and hand back a JPEG data URL — the cart thumbnails'
-    // photo source. Same-task readback keeps the buffer valid without
-    // preserveDrawingBuffer; jpeg composites the alpha onto black,
-    // which IS the stage. Returns null where WebGL is absent.
+    // SNAPSHOT (thirteenth word, Aug 29; alpha since the same day's
+    // grey-plate ruling): render a configuration instantly and hand
+    // back a PNG data URL WITH TRANSPARENCY — the product floats, so
+    // the slot's translucent grey plate reads through underneath and
+    // the box never blends into the stage. Same-task readback keeps
+    // the buffer valid without preserveDrawingBuffer. Returns null
+    // where WebGL is absent.
     snap: function(o){
       if (!gl) return null;
       if (o.color){ cur.color = o.color.slice(); tgt.color = o.color.slice(); }
@@ -196,7 +198,7 @@ window.BSBall = function(canvas){
       if (o.scale  != null){ cur.scale = tgt.scale = o.scale; }
       rot = 0.6;                                 // one consistent presentation angle
       drawFrame(0);
-      try { return canvas.toDataURL('image/jpeg', 0.75); } catch (e) { return null; }
+      try { return canvas.toDataURL('image/png'); } catch (e) { return null; }
     }
   };
 };

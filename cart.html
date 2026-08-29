@@ -1062,9 +1062,10 @@ Ball.stage({ cx: 0.5, cy: 0.55, rad: 0.36 });    // centered in the preview fram
 (function backfillPhotos(){
   var dirty = false;
   ITEMS.forEach(function(it){
-    if (!it.img && it.sel){
-      it.img = snapshotOf(stageParamsFor(it.sel));
-      if (it.img) dirty = true;
+    var stale = !it.img || it.img.slice(0, 15) === 'data:image/jpeg';
+    if (stale && it.sel){
+      var img = snapshotOf(stageParamsFor(it.sel));
+      if (img){ it.img = img; dirty = true; }
     }
   });
   if (dirty) save();
