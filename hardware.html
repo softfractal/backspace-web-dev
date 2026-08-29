@@ -62,8 +62,10 @@
   size), C.capMid + --bs-dot-y (every marker), C.measureListPitch.
 
   DO-NOT-PORT (values companion §6), honored: lowercase "cart", the
-  static $3499/$4141 (the price slot renders "—" to a marked seam —
-  price source rides the phase-2 cart session), the mocked-in cursor,
+  static $3499/$4141 (the price slot runs on the RULED FAKE $1
+  placeholder — Eric, Aug 29 — never the frames' statics; the real
+  per-configuration source rides the phase-2 cart session), the
+  mocked-in cursor,
   the frames' embedded desk renders. The BR triangle is NOT on the list
   anymore — it came back with the diagonal ruling.
 -->
@@ -583,27 +585,21 @@
     font-size: calc(13px * var(--ui-scale));
     cursor: var(--cursor-target);
   }
-  /* THE THREE ZONES, corrected (thirteenth word): + ADDS · the gray
-     bar SAYS "add to cart" (and adds too — a label that invites the
-     click) · the white box at the right SHOWS THE PRICE (display only,
-     the "—" seam until the price source is ruled; the frames' $3,499
-     never returns as a static). */
+  /* THE THREE ZONES, re-corrected (Eric, Aug 29: "add to cart is
+     actually the plus icon, not the add to cart button text itself"):
+     ONLY the + ADDS · the gray bar just SAYS "add to cart" — a caption
+     for the plus, not a control (no cursor, no lift, no handler) · the
+     white box SHOWS THE PRICE — the ruled fake $1, see the manifest. */
   .hw-addrow .hw-add-bar {
     flex: 1;
     display: flex; align-items: center;
     padding: 0 calc(12px * var(--ui-scale));
     background: #4a4a4a5c;
-    border: 0;
     color: var(--ink);
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(12px * var(--ui-scale));
     letter-spacing: .04em;
     text-align: left;
-    cursor: var(--cursor-target);
-    transition: background .16s;
-  }
-  .hw-addrow .hw-add-bar:hover, .hw-addrow .hw-add-bar:focus-visible {
-    background: #5c5c5c5c; outline: none;
   }
   .hw-addrow .hw-add-price {
     flex: none;
@@ -1077,9 +1073,10 @@
      always present for a real product, panel open or not. -->
 <div id="hw-addrow" class="hw-addrow" aria-label="Add to cart">
   <button class="hw-add-chip" id="hw-add-chip" type="button" aria-label="Add to cart">+</button>
-  <button class="hw-add-bar" id="hw-add-bar" type="button" data-str="hwAddToCart"></button>
-  <!-- PRICE SEAM: renders from the manifest per configuration when the
-       price-source ruling lands. Never static. -->
+  <div class="hw-add-bar" id="hw-add-bar" data-str="hwAddToCart" aria-hidden="true"></div>
+  <!-- PRICE SEAM: fed by the ruled $1 placeholder (Eric, Aug 29); the
+       per-configuration manifest source replaces it at the phase-2
+       ruling. Never a ported static. -->
   <div class="hw-add-price" id="hw-price" aria-label="Price">—</div>
 </div>
 
@@ -1133,6 +1130,12 @@ var renderStrings = C.renderStrings;
 // manifest edits; nothing below is hardcoded copy. The desk is the only
 // real class today (OASIS75 the likely second — a keyboard, per the
 // commerce realm; one `real: true` flips it live).
+// THE PLACEHOLDER PRICE (Eric, Aug 29): the texture ball sells for a
+// FAKE, explicitly ruled $1 — a stand-in so the money plumbing walks,
+// NOT a ported static. The real per-configuration source still rides
+// the phase-2 ruling; totals sum CHECKED items only (the triangle
+// grammar: checked = the final order).
+var PLACEHOLDER_PRICE_USD = 1;
 var HW = {
   classes: [
     { key: 'hwClassDesk',      real: true  },
@@ -1567,9 +1570,12 @@ function renderTray(){
     }
     slotsEl.appendChild(b);
   }
-  // ══ PRICE SEAM ══ the total sums CHECKED items' manifest prices per
-  // configuration once the price-source ruling lands — never static.
-  totalEl.textContent = '—';
+  // ══ PRICE SEAM, now fed ══ every item is the $1 placeholder (Eric,
+  // Aug 29): the total is Σ checked qty × $1. The per-configuration
+  // manifest source still replaces this at the phase-2 ruling.
+  var sum = 0;
+  CART.forEach(function(it){ if (it.checked) sum += (it.qty || 1) * PLACEHOLDER_PRICE_USD; });
+  totalEl.textContent = '$' + sum;
 }
 function addToCart(from){
   if (!realClass(SEL.classIdx)) return;          // unreal classes never sell
@@ -1991,6 +1997,7 @@ function render(){
   productMenuEl.style.visibility = isReal ? '' : 'hidden';
   comingEl.classList.toggle('is-on', !isReal);
   document.getElementById('hw-addrow').classList.toggle('is-off', !isReal);
+  priceEl.textContent = isReal ? '$' + PLACEHOLDER_PRICE_USD : '—';
   Ball.show(isReal);
   backBtn.setAttribute('aria-label', openHead >= 0 ? T('navBack') : T('navHome'));
   subWrapEls.forEach(function(w, h){
@@ -2072,16 +2079,17 @@ panel.addEventListener('keydown', function(e){
   }
 });
 
-// THE ADD ROW COMMITS — the + chip and the "add to cart" bar both add
-// the live configuration; the white price box is display only.
-['hw-add-chip', 'hw-add-bar'].forEach(function(id){
-  var b = document.getElementById(id);
+// THE ADD ROW COMMITS — ONLY the + chip adds (Eric, Aug 29: "add to
+// cart is actually the plus icon"); the gray bar is a caption and the
+// white price box is display only.
+(function(){
+  var b = document.getElementById('hw-add-chip');
   b.addEventListener('click', function(e){
     e.stopPropagation();
     wake();
     if (clickOk()) addToCart(b);
   });
-});
+})();
 // VIEW CART commits — the cart page landed (Eric's sixth word) and
 // ROUTES.cart carries it; CHECKOUT stays a deny seam until the commerce
 // wiring ruling (phase 2+).

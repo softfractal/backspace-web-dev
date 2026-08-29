@@ -24,9 +24,10 @@
   · the X on a summary card is where DELETION lives;
   · qty steppers on the cards; promo/apply, totals, checkout below.
 
-  SEAMS, honest: every money figure renders "—" (the frames' $4141 /
-  $2499 are the on-record do-not-port statics; the price source is
-  unruled). checkout / apply / kickstarter DENY with the shake —
+  SEAMS, honest: item money runs on the RULED FAKE $1 placeholder
+  (Eric, Aug 29) — the frames' $4141 / $2499 stay the on-record
+  do-not-port statics; shipping and tax render "—" (those sources are
+  still unruled). checkout / apply / kickstarter DENY with the shake —
   commerce wiring and the third-party overlay question are phase 2+.
   The item-switch rows in the detail column are a LABELED INTERPRETATION
   of the note's "click button -> expand below" (design confirm owed).
@@ -597,7 +598,7 @@
       <button id="ct-apply" class="ct-bar-btn" type="button" data-str="cartApply"></button>
     </div>
     <div class="ct-bar"><span data-str="cartTotal"></span><span id="ct-total-amt">—</span></div>
-    <div class="ct-subline"><span data-str="cartSubtotal"></span><span>—</span></div>
+    <div class="ct-subline"><span data-str="cartSubtotal"></span><span id="ct-subtotal-amt">—</span></div>
     <div class="ct-subline"><span data-str="cartShipping"></span><span>—</span></div>
     <div class="ct-subline"><span data-str="cartTax"></span><span>—</span></div>
     <button id="ct-checkout" type="button" data-str="cartCheckout"></button>
@@ -622,6 +623,10 @@ var renderStrings = C.renderStrings;
 // The same catalog shape the product page binds — the manifest slice the
 // cart needs to read configurations back out (structure as data; the
 // real catalog swaps at the keys).
+// THE PLACEHOLDER PRICE (Eric, Aug 29): the texture ball's ruled FAKE
+// $1 — the product page's own constant, mirrored; never a ported
+// static. Shipping/tax stay unruled seams.
+var PLACEHOLDER_PRICE_USD = 1;
 var HW = {
   families: [
     { key: 'hwMatSteel',    finishes: [
@@ -877,6 +882,9 @@ function render(){
 
   // detail
   titleEl.textContent = sel ? T('cartItemDeskTitle') : '—';
+  // the focused item's estimated price — the ruled $1 placeholder
+  document.getElementById('ct-est-price').textContent =
+    sel ? '$' + PLACEHOLDER_PRICE_USD : '—';
   specsEl.innerHTML = '';
   if (sel){
     var lines = [
@@ -954,13 +962,18 @@ function render(){
     step.appendChild(minus); step.appendChild(nEl); step.appendChild(plus);
     var price = document.createElement('span');
     price.className = 'ct-card-price';
-    price.textContent = '—';                     // PRICE SEAM
+    price.textContent = '$' + PLACEHOLDER_PRICE_USD;   // the ruled $1 (unit)
     card.appendChild(img); card.appendChild(title); card.appendChild(sub);
     card.appendChild(x); card.appendChild(step); card.appendChild(price);
     cardsEl.appendChild(card);
   });
-  // ══ PRICE SEAMS ══ total/subtotal/shipping/tax stay "—" until the
-  // price-source ruling lands; never static, never faked.
+  // ══ PRICE SEAMS, the item side now fed ══ every item is the $1
+  // placeholder (Eric, Aug 29): subtotal/total = Σ checked qty × $1.
+  // Shipping and tax stay "—" — those sources are still unruled.
+  var sum = 0;
+  checked.forEach(function(it){ sum += (it.qty || 1) * PLACEHOLDER_PRICE_USD; });
+  document.getElementById('ct-total-amt').textContent = '$' + sum;
+  document.getElementById('ct-subtotal-amt').textContent = '$' + sum;
 }
 
 // ── The deny seams: checkout / apply / kickstarter / checkout crumb ────
