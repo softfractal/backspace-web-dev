@@ -1224,12 +1224,12 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   line-height: calc(17px * var(--ui-scale));
   letter-spacing: 0;
   text-align: right;
-  text-shadow: var(--glow-text);
+  /* NO GLOW on typed values (Eric, Aug 31): the ink is the ink — the
+     field's warm dot carries focus, the caret carries the edit. */
   caret-color: var(--ink);
   cursor: var(--cursor-target);
-  transition: text-shadow .2s ease;
 }
-.bs-input:focus, .bs-area:focus { outline: none; text-shadow: var(--glow-text-hover); }
+.bs-input:focus, .bs-area:focus { outline: none; }
 .bs-input::placeholder, .bs-area::placeholder { color: #ffffff42; }
 .bs-area {
   text-align: left; resize: none;
