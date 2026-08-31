@@ -243,6 +243,7 @@ var STR = {
     coAddressBook:   'address book',
     coAddNew:        'add new',
     coSave:          'save',
+    coDelete:        'delete',
     coFullName:      'full name',
     coPhone:         'phone number',
     coPostal:        'postal code',

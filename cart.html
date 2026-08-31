@@ -631,6 +631,7 @@
     position: relative;
     width: calc(230px * var(--ui-scale)); height: calc(110px * var(--ui-scale));
     background: #4a4a4a8a; border: 0;
+    border-radius: calc(10px * var(--ui-scale));   /* the design's curved rectangle (Eric, Aug 31) */
     padding: calc(10px * var(--ui-scale)) calc(12px * var(--ui-scale));
     text-align: left;
     color: var(--text-soft);
@@ -668,9 +669,18 @@
     position: absolute;
     left: 33.68vw; top: 11.10vh;                /* frame 674 → col A */
     width: 28.36vw;                              /* through 1164 (490) */
+    /* the form's floor registers to the book's second card row (Eric,
+       Aug 31): height = book top (12.00vh) − form top + two cards +
+       gap; the wide company field bottoms itself against it */
+    height: calc(0.90vh + 240px * var(--ui-scale));
     grid-template-columns: 11.57vw 15.05vw;      /* frame 200 + 260 */
     column-gap: 0;
     justify-content: space-between;              /* = the frame's 30px gap */
+  }
+  /* the company line PINS to the form's floor — its input bottom IS
+     the book's second-row edge */
+  #co-ship-form .bs-field--wide {
+    position: absolute; left: 0; right: 0; bottom: 0;
   }
   /* billing's grid, frame-true within its window (lines 113..313 ·
      343..603 of the 531 width; rows land at the same house rhythm) */
@@ -748,6 +758,16 @@
      underneath are reachable (the full-strip head was eating the top
      row's clicks — the Aug 31 appearance-only bug). */
   .co-exp.is-open .co-exp-head { height: calc(34px * var(--ui-scale)); }
+  /* COLLAPSED, the strip's contents center as a group (Eric, Aug 31 —
+     the design draws title/subhead/logos vertically centered): the
+     frame offsets, strip-relative — title 40/1117, subhead 58, logo
+     row 75. Open windows keep the top-anchored offsets. */
+  .co-exp:not(.is-open) .co-exp-head { padding-top: 3.58vh; }
+  #co-faster .co-head { top: 3.58vh; left: calc(14px * var(--ui-scale)); }
+  .co-exp:not(.is-open) .co-subhead { top: 5.19vh; }
+  .co-exp:not(.is-open) .co-useship { top: 5.90vh; }
+  .co-exp:not(.is-open) .co-cards { top: 6.40vh; }
+  #co-faster .co-wallets { bottom: auto; top: 6.20vh; }
   .co-exp-body {
     position: absolute;
     left: 0; right: 0;
@@ -770,13 +790,14 @@
     display: flex; gap: calc(6px * var(--ui-scale));
     z-index: 3; pointer-events: none;
   }
-  .co-cards span {
-    background: #ededed; color: #0b0b0a;
-    font-family: var(--font-ui); font-weight: 600;
-    font-size: calc(7px * var(--ui-scale));
-    letter-spacing: .04em;
-    padding: calc(3px * var(--ui-scale)) calc(6px * var(--ui-scale));
+  .co-cardmark {
+    display: flex; align-items: center; justify-content: center;
+    height: calc(18px * var(--ui-scale));
+    padding: calc(3px * var(--ui-scale)) calc(5px * var(--ui-scale));
+    background: #fff;
+    border-radius: calc(3px * var(--ui-scale));
   }
+  .co-cardmark img { height: 100%; width: auto; display: block; }
   /* expiration: ONE label over ONE line, both dates BELOW it around
      the centered dash (the design's own drawing) */
   .co-exp-vals { display: flex; align-items: baseline; gap: calc(8px * var(--ui-scale)); }
@@ -798,17 +819,22 @@
     display: flex; gap: calc(8px * var(--ui-scale));
   }
   .co-wallet {
+    display: flex; align-items: center; justify-content: center;
     height: calc(24px * var(--ui-scale));
     padding: 0 calc(12px * var(--ui-scale));
-    background: #4a4a4a8a; border: 0;
-    color: var(--ink);
+    border: 0;
+    border-radius: calc(3px * var(--ui-scale));
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(10px * var(--ui-scale));
     letter-spacing: .02em;
     cursor: var(--cursor-target);
-    transition: background .16s;
+    transition: filter .16s;
   }
-  .co-wallet:hover, .co-wallet:focus-visible { background: #5c5c5c8a; outline: none; }
+  .co-wallet img { height: calc(12px * var(--ui-scale)); width: auto; display: block; }
+  .co-wallet--g    { background: #fff; }
+  .co-wallet--pp   { background: #ffc439; }          /* PayPal's own gold */
+  .co-wallet--shop { background: #5a31f4; color: #fff; }
+  .co-wallet:hover, .co-wallet:focus-visible { filter: brightness(1.12); outline: none; }
 
   /* Commit-arrival resolve for browsers WITHOUT view transitions. */
   @keyframes bs-arrive { from { opacity: 0; } }
@@ -966,11 +992,15 @@
       <span data-str="coPaymentHead"></span>
     </button>
     <span class="co-subhead" data-str="coCreditCard"></span>
-    <!-- brand chips — TEXT stand-ins on the light plate until the
-         assets ruling; placement per the design (right-aligned, in the
-         strip, visible collapsed too) -->
+    <!-- THE REAL MARKS (Eric, Aug 31: "find the actual logos") — the
+         official SVGs, self-hosted at assets/ui/pay (Wikimedia Commons
+         copies; payment-indicator use). NO data-str on these: the
+         string pass would clobber the imgs. -->
     <div class="co-cards" aria-hidden="true">
-      <span data-str="coCardMC"></span><span data-str="coCardAmex"></span><span data-str="coCardVisa"></span><span data-str="coCardUnion"></span>
+      <span class="co-cardmark"><img src="assets/ui/pay/mastercard.svg" alt=""></span>
+      <span class="co-cardmark"><img src="assets/ui/pay/amex.svg" alt=""></span>
+      <span class="co-cardmark"><img src="assets/ui/pay/visa.svg" alt=""></span>
+      <span class="co-cardmark"><img src="assets/ui/pay/unionpay.svg" alt=""></span>
     </div>
     <div class="co-exp-body" id="co-payment-body">
       <div id="co-pay-form" class="co-form"></div>
@@ -981,9 +1011,11 @@
     <span class="co-tri" aria-hidden="true"></span>
     <h2 class="co-head" data-str="coFasterHead"></h2>
     <div class="co-wallets">
-      <button class="co-wallet" type="button" data-str="coWalletG"></button>
-      <button class="co-wallet" type="button" data-str="coWalletPaypal"></button>
-      <button class="co-wallet" type="button" data-str="coWalletShop"></button>
+      <button class="co-wallet co-wallet--g" type="button" aria-label="G Pay"><img src="assets/ui/pay/gpay.svg" alt=""></button>
+      <button class="co-wallet co-wallet--pp" type="button" aria-label="PayPal"><img src="assets/ui/pay/paypal.svg" alt=""></button>
+      <!-- the Shop mark IS lowercase "shop" on the purple — drawn as
+           its own plate, wordmark-faithful without a wrong logo -->
+      <button class="co-wallet co-wallet--shop" type="button" data-str="coWalletShop"></button>
     </div>
   </section>
 </div>
@@ -1500,15 +1532,18 @@ function renderBook(){
       Object.keys(shipF).forEach(function(k){ shipF[k].input.value = a[k] || ''; });
       syncBilling();
       SoundBus.play('detent'); hapticTick();
-      renderBook();
+      renderBook(); updateSaveTab();
     });
     bookEl.appendChild(c);
   });
 }
 
-// The tab row: address book TOGGLES the card grid · add new clears ·
-// save banks the fields (update the chosen card, else a new one) — the
-// save flow is a LABELED interpretation awaiting design confirm.
+// The tab row, RULED (Eric, Aug 31): address book TOGGLES the grid ·
+// SAVE always banks the inputted form as a NEW entry (duplicates
+// allowed — his word) · ADD NEW just wipes the unsaved form · picking
+// a saved card autofills AND the save tab MORPHS TO DELETE for it;
+// editing any field deselects (the form diverged) and the tab returns
+// to save.
 var tabBook = document.getElementById('co-tab-book');
 var tabNew  = document.getElementById('co-tab-new');
 var tabSave = document.getElementById('co-tab-save');
@@ -1525,27 +1560,41 @@ tabNew.addEventListener('click', function(e){
   if (!clickOk()) return;
   bookSel = -1;
   Object.keys(shipF).forEach(function(k){ shipF[k].input.value = ''; });
-  renderBook();
+  renderBook(); updateSaveTab();
   shipF.name.input.focus();
   SoundBus.play('detent'); hapticTick();
 });
+function updateSaveTab(){
+  var del = bookSel >= 0;
+  tabSave.setAttribute('data-str', del ? 'coDelete' : 'coSave');
+  tabSave.textContent = T(del ? 'coDelete' : 'coSave');
+}
 tabSave.addEventListener('click', function(e){
   e.stopPropagation(); wake();
   if (!clickOk()) return;
+  if (bookSel >= 0){
+    // DELETE the selected saved address (the tab's morphed duty)
+    BOOK.splice(bookSel, 1);
+    bookSel = -1;
+    saveBookStore(); renderBook(); updateSaveTab();
+    SoundBus.play('detent'); hapticTick();
+    return;
+  }
   var req = SHIP_SPEC.filter(function(s){ return !s.opt; }).map(function(s){ return shipF[s.key].input; });
   var bad = C.validateFields(req);
   if (bad){ denyOn(tabSave); bad.focus(); return; }   // the house invalid-submit deny
   var entry = {};
   SHIP_SPEC.forEach(function(s){ entry[s.key] = shipF[s.key].input.value.trim(); });
-  if (bookSel >= 0) BOOK[bookSel] = entry;
-  else { BOOK.push(entry); bookSel = BOOK.length - 1; }
+  BOOK.push(entry);                                   // always NEW — duplicates allowed
+  bookSel = BOOK.length - 1;
   saveBookStore();
-  renderBook();
+  renderBook(); updateSaveTab();
   shipWin.classList.add('is-book');                   // the save's receipt: the book shows
   tabBook.classList.add('is-on');
   tabBook.setAttribute('aria-pressed', 'true');
   SoundBus.play('commit'); hapticTick();
 });
+updateSaveTab();
 
 // The expandables — the note group's law: collapsed by default, the
 // head is the toggle.
@@ -1582,7 +1631,12 @@ useShip.addEventListener('change', function(){
   SoundBus.play('detent'); hapticTick();
 });
 SHIP_SPEC.forEach(function(s){
-  shipF[s.key].input.addEventListener('input', function(){ syncBilling(); });
+  shipF[s.key].input.addEventListener('input', function(){
+    // editing deselects the saved card (the form diverged) — the tab
+    // returns to save
+    if (bookSel >= 0){ bookSel = -1; renderBook(); updateSaveTab(); }
+    syncBilling();
+  });
 });
 
 // The wallets DENY — the third-party overlay question rides the queue.
