@@ -296,6 +296,9 @@
     text-shadow: var(--glow-text);
   }
   #ct-specs {
+    /* the title→info gap grown 50% (Eric, Aug 31, corrected word):
+       the grid's 14 + 7 = 21px×ui */
+    margin-top: calc(7px * var(--ui-scale));
     display: grid; gap: calc(5px * var(--ui-scale));
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
@@ -313,9 +316,10 @@
   #ct-specs .ct-spec-k { color: var(--bs-label); }
   #ct-specs .ct-spec-n { color: var(--bs-label); }
   #ct-complete {
-    /* the air above the bar, grown 50% again on Eric's eye (Aug 31):
-       32 → 48px×ui total — 34px×ui atop the grid's 14 */
-    margin-top: calc(34px * var(--ui-scale));
+    /* the design's own air above the bar (Eric, Aug 31, p1: ~2.4×
+       ours) — 18px×ui atop the grid's 14 ≈ the drawn 32px×ui; his
+       50%-grow word was MEANT for the title gap and reverted here */
+    margin-top: calc(18px * var(--ui-scale));
     height: calc(30px * var(--ui-scale));
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 calc(12px * var(--ui-scale));
