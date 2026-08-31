@@ -108,7 +108,12 @@
     position: absolute; inset: 0;
     width: 100%; height: 100%;
     display: block;
+    transition: opacity var(--pop-fade);
   }
+  /* Ball.show(false) toggles .is-off — /hardware styled it, this page
+     never did, so an emptied cart kept the LAST FRAME frozen on the
+     canvas (Eric, Aug 31). The empty plate stands bare. */
+  #ct-preview canvas.is-off { opacity: 0; }
   /* The preview's corner triangle mirrors the SELECTED item's checkbox. */
   .ct-tri {
     position: absolute; top: 0; left: 0;
@@ -274,9 +279,14 @@
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .08em;
     cursor: var(--cursor-target);
-    transition: background .16s;
+    transition: background .16s, box-shadow .2s ease;
   }
-  #ct-kick-btn:hover, #ct-kick-btn:focus-visible { background: #fff; outline: none; }
+  /* the + chip's two-rung bloom (Eric, Aug 31: fake today, URL soon) */
+  #ct-kick-btn:hover, #ct-kick-btn:focus-visible {
+    background: #fff; outline: none;
+    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
+                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
+  }
   #ct-kick-note {
     height: calc(30px * var(--ui-scale));
     display: flex; align-items: center; justify-content: center;
