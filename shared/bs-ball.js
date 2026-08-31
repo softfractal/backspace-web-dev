@@ -19,6 +19,9 @@ window.BSBall = function(canvas){
   var cur = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1, cx: 0.47, cy: 0.55, rad: 0.21 };
   var tgt = { color: [0.1, 0.1, 0.1], metal: 1, rough: 0.4, scale: 1, cx: 0.47, cy: 0.55, rad: 0.21 };
   var running = false, visible = true, rot = 0, lastT = 0;
+  // THE VIEWING HAND (Eric, Aug 31): rotX is the drag pitch; grabbed
+  // pauses the presentation turn while the hand holds the model.
+  var rotX = 0, grabbed = false;
 
   function buildSphere(rows, cols){
     var pos = [], idx = [];
@@ -41,11 +44,13 @@ window.BSBall = function(canvas){
 
   var VS = [
     'attribute vec3 aPos;',
-    'uniform vec2 uRes; uniform vec2 uCenter; uniform float uRadius; uniform float uRot;',
+    'uniform vec2 uRes; uniform vec2 uCenter; uniform float uRadius; uniform float uRot; uniform float uRotX;',
     'varying vec3 vN; varying vec3 vP;',
     'void main(){',
     '  float cr = cos(uRot), sr = sin(uRot);',
     '  vec3 p = vec3(aPos.x*cr + aPos.z*sr, aPos.y, -aPos.x*sr + aPos.z*cr);',
+    '  float cx2 = cos(uRotX), sx2 = sin(uRotX);',       // the drag pitch
+    '  p = vec3(p.x, p.y*cx2 - p.z*sx2, p.y*sx2 + p.z*cx2);',
     '  vN = p; vP = p;',
     '  vec2 px = uCenter + p.xy * uRadius * vec2(1.0, -1.0);',
     '  vec2 ndc = (px / uRes) * 2.0 - 1.0;',
@@ -115,7 +120,7 @@ window.BSBall = function(canvas){
     var aPos = gl.getAttribLocation(prog, 'aPos');
     gl.enableVertexAttribArray(aPos);
     gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
-    ['uRes', 'uCenter', 'uRadius', 'uRot', 'uColor', 'uMetal', 'uRough'].forEach(function(n){
+    ['uRes', 'uCenter', 'uRadius', 'uRot', 'uRotX', 'uColor', 'uMetal', 'uRough'].forEach(function(n){
       U[n] = gl.getUniformLocation(prog, n);
     });
     gl.enable(gl.DEPTH_TEST);
@@ -132,7 +137,7 @@ window.BSBall = function(canvas){
     if (gl) gl.viewport(0, 0, canvas.width, canvas.height);
   }
   function drawFrame(dt){
-    rot += dt * 0.25;                            // the slow presentation turn
+    if (!grabbed) rot += dt * 0.25;              // the slow presentation turn — pauses in the grip
     // Targets ease in — material changes read as a settle, not a snap
     // (content snaps, SURFACES fade; a material is surface).
     var k = 1 - Math.exp(-dt * 7);
@@ -152,6 +157,7 @@ window.BSBall = function(canvas){
     gl.uniform2f(U.uCenter, w * cur.cx, h * cur.cy);
     gl.uniform1f(U.uRadius, Math.min(w, h) * cur.rad * cur.scale);
     gl.uniform1f(U.uRot, rot);
+    gl.uniform1f(U.uRotX, rotX);
     gl.uniform3f(U.uColor, cur.color[0], cur.color[1], cur.color[2]);
     gl.uniform1f(U.uMetal, cur.metal);
     gl.uniform1f(U.uRough, cur.rough);
@@ -180,9 +186,33 @@ window.BSBall = function(canvas){
       if (o.cy  != null) tgt.cy  = o.cy;
       if (o.rad != null) tgt.rad = o.rad;
     },
+    // THE VIEWING HAND (Eric, Aug 31): press-drag orbits the model.
+    // grab(true) pauses the presentation turn while the hand holds it
+    // (it resumes from wherever the hand leaves the model); orbit takes
+    // radian deltas — the page owns the px→rad rate; pitch clamps so
+    // the poles stay honest. hit() answers whether a viewport point is
+    // on the ball's disc — the canvas is pointer-transparent, so the
+    // page asks before treating a stage press as a grab.
+    grab: function(on){ grabbed = !!on; },
+    orbit: function(dYaw, dPitch){
+      rot += dYaw;
+      rotX = Math.max(-1.1, Math.min(1.1, rotX + dPitch));
+    },
+    hit: function(x, y){
+      var r = canvas.getBoundingClientRect();
+      if (r.width <= 0 || r.height <= 0) return false;
+      var px = (x - r.left) * (canvas.width / r.width);
+      var py = (y - r.top) * (canvas.height / r.height);
+      var dx2 = px - canvas.width * cur.cx;
+      var dy2 = py - canvas.height * cur.cy;
+      var rad = Math.min(canvas.width, canvas.height) * cur.rad * cur.scale;
+      return visible && (dx2 * dx2 + dy2 * dy2) <= rad * rad;
+    },
     // ?dev instrumentation: force one frame (headless/hidden captures
-    // never see rAF — the softfractal LOGGING-build precedent).
+    // never see rAF — the softfractal LOGGING-build precedent), and
+    // the orbit state for the witness.
     frame: function(){ if (gl){ for (var i = 0; i < 40; i++) drawFrame(0.05); } },
+    state: function(){ return { rot: rot, rotX: rotX, grabbed: grabbed }; },
     // SNAPSHOT (thirteenth word, Aug 29; alpha since the same day's
     // grey-plate ruling): render a configuration instantly and hand
     // back a PNG data URL WITH TRANSPARENCY — the product floats, so
@@ -196,7 +226,7 @@ window.BSBall = function(canvas){
       if (o.metal  != null){ cur.metal = tgt.metal = o.metal; }
       if (o.rough  != null){ cur.rough = tgt.rough = o.rough; }
       if (o.scale  != null){ cur.scale = tgt.scale = o.scale; }
-      rot = 0.6;                                 // one consistent presentation angle
+      rot = 0.6; rotX = 0;                       // one consistent presentation angle
       drawFrame(0);
       try { return canvas.toDataURL('image/png'); } catch (e) { return null; }
     }

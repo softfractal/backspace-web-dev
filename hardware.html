@@ -2239,6 +2239,33 @@ C.normalizeWordGlow();     // the right menu's sub-items joined rule-6 scope at 
 measurePitch();
 alignPanelMarkers();
 Ball.boot();
+// THE VIEWING HAND (Eric, Aug 31): press the model and drag to orbit —
+// yaw follows the hand (the presentation turn pauses in the grip and
+// resumes from where the hand leaves it); pitch clamps at the poles.
+// The press lands on the STAGE (the canvas is pointer-transparent);
+// the ball's own hit disc decides whether it is a grab, so every other
+// stage press keeps its old meaning. Mouse-first per the word — the
+// touch refinement (touch-action carve-out) rides its own ruling.
+(function(){
+  var stageEl = document.getElementById('bs-stage');
+  var held = false, lx = 0, ly = 0;
+  stageEl.addEventListener('pointerdown', function(e){
+    if (!Ball.hit(e.clientX, e.clientY)) return;
+    wake();
+    held = true; lx = e.clientX; ly = e.clientY;
+    Ball.grab(true);
+    try { stageEl.setPointerCapture(e.pointerId); } catch (err) {}
+    e.preventDefault();
+  });
+  stageEl.addEventListener('pointermove', function(e){
+    if (!held) return;
+    Ball.orbit((e.clientX - lx) * 0.005, (e.clientY - ly) * 0.004);
+    lx = e.clientX; ly = e.clientY;
+  });
+  var endGrab = function(){ if (held){ held = false; Ball.grab(false); } };
+  stageEl.addEventListener('pointerup', endGrab);
+  stageEl.addEventListener('pointercancel', endGrab);
+})();
 applySelectionToStage();
 renderTray();
 render();
