@@ -80,6 +80,13 @@
   /* The HOME MENU's interactive recipe (Aug 20): resting glow + two
      wider, softer halos. The icon bars use the pair below instead. */
   --glow-text-hover:  0 0 9.6px rgba(255,255,255,0.92), 0 0 24px rgba(255,255,255,0.5), 0 0 46px rgba(255,255,255,0.28);
+  /* THE PLATE BLOOM (Eric, Aug 31) — the filled pill's two-rung hover
+     halo, tokenized so the fold is one edit. PROVISIONAL member of the
+     glow family: the 12/30×ui rungs were ruled by eye against the +
+     chip (off the 9.6/24/46 calibrated ladder) and await the GM's
+     token fold + a rule-6-style normalization pass — plate AREA may
+     want the size-honesty the word glow got. */
+  --glow-plate-hover: 0 0 calc(12px * var(--ui-scale)) rgba(255,255,255,0.9), 0 0 calc(30px * var(--ui-scale)) rgba(255,255,255,0.45);
   /* The ICON BAR pair — ONE DESIGN TOKEN, TWO RENDERINGS (RULED, Eric,
      Aug 23): glyphs "use" --glow-text-icons in the token sense — the
      filter chain below is that token's glyph-side derivation, not an
@@ -1181,6 +1188,23 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 /* ── 3. The form subsystem — title → divider → value fields, the warm
    field markers, the option list, the inverted submit plate. The label
    is a stretched grid item, so its own border IS the full-column rule. */
+/* ── THE FILLED PILL (Eric, Aug 31) — the light-plate commit button's
+   shared grammar: target cursor, the micro transitions, and the
+   two-rung bloom on hover/focus (--glow-plate-hover). Consumers keep
+   their own geometry, type and plate tint, and their one-line hover
+   background lift (ID-styled consumers outrank a class — the lift
+   stays theirs so the cascade stays honest). Six consumers at birth:
+   the + chip, the tray's view-cart/checkout, cart's apply/checkout/
+   kickstarter. ── */
+.bs-fillpill {
+  cursor: var(--cursor-target);
+  transition: background .16s, color .16s, box-shadow .2s ease;
+}
+.bs-fillpill:hover, .bs-fillpill:focus-visible {
+  outline: none;
+  box-shadow: var(--glow-plate-hover);
+}
+
 .bs-form { display: grid; gap: calc(30px * var(--ui-scale)); }
 .bs-form-grid {
   display: grid; grid-template-columns: 1fr 1fr;

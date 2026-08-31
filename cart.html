@@ -278,15 +278,9 @@
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .08em;
-    cursor: var(--cursor-target);
-    transition: background .16s, box-shadow .2s ease;
   }
-  /* the + chip's two-rung bloom (Eric, Aug 31: fake today, URL soon) */
-  #ct-kick-btn:hover, #ct-kick-btn:focus-visible {
-    background: #fff; outline: none;
-    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
-                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
-  }
+  /* bloom/cursor/transitions ride .bs-fillpill (fake today, URL soon) */
+  #ct-kick-btn:hover, #ct-kick-btn:focus-visible { background: #fff; }
   #ct-kick-note {
     height: calc(30px * var(--ui-scale));
     display: flex; align-items: center; justify-content: center;
@@ -449,14 +443,10 @@
     font-family: var(--font-ui); font-weight: 300;
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .04em;
-    cursor: var(--cursor-target);
-    transition: background .16s, color .16s, box-shadow .2s ease;
   }
-  /* the + chip's own two-rung bloom (Eric, Aug 31) */
+  /* bloom/cursor/transitions ride .bs-fillpill; the lift stays here */
   .ct-bar .ct-bar-btn:hover, .ct-bar .ct-bar-btn:focus-visible {
-    background: #fff; color: #0b0b0a; outline: none;
-    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
-                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
+    background: #fff; color: #0b0b0a;
   }
   #ct-promo-in {
     flex: 1; min-width: 0;
@@ -494,14 +484,9 @@
     font-family: var(--font-ui); font-weight: 300;
     font-size: calc(12px * var(--ui-scale));
     letter-spacing: .06em;
-    cursor: var(--cursor-target);
-    transition: background .16s, box-shadow .2s ease;
   }
-  #ct-checkout:hover, #ct-checkout:focus-visible {
-    background: #fff; outline: none;
-    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
-                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
-  }
+  /* bloom/cursor/transitions ride .bs-fillpill; the lift stays here */
+  #ct-checkout:hover, #ct-checkout:focus-visible { background: #fff; }
 
   /* ═══ THE CHECKOUT STATE (Eric's word, Aug 31) ═══════════════════════
      State swap on the fade token: the cart-state left content fades
@@ -855,7 +840,7 @@
   <div style="position:relative">
     <div id="ct-rows" role="tablist" aria-label="Cart items"></div>
     <div id="ct-kick">
-      <button id="ct-kick-btn" type="button" data-str="cartKickstarter"></button>
+      <button id="ct-kick-btn" class="bs-fillpill" type="button" data-str="cartKickstarter"></button>
       <span id="ct-kick-note" data-str="cartKickNote"></span>
     </div>
   </div>
@@ -939,13 +924,13 @@
   <div id="ct-foot">
     <div class="ct-bar">
       <input id="ct-promo-in" type="text" autocomplete="off">
-      <button id="ct-apply" class="ct-bar-btn" type="button" data-str="cartApply"></button>
+      <button id="ct-apply" class="ct-bar-btn bs-fillpill" type="button" data-str="cartApply"></button>
     </div>
     <div class="ct-bar"><span data-str="cartTotal"></span><span id="ct-total-amt">—</span></div>
     <div class="ct-subline"><span data-str="cartSubtotal"></span><span id="ct-subtotal-amt">—</span></div>
     <div class="ct-subline"><span data-str="cartShipping"></span><span>—</span></div>
     <div class="ct-subline"><span data-str="cartTax"></span><span>—</span></div>
-    <button id="ct-checkout" type="button" data-str="cartCheckout"></button>
+    <button id="ct-checkout" class="bs-fillpill" type="button" data-str="cartCheckout"></button>
   </div>
 </div>
 

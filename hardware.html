@@ -568,19 +568,11 @@
     border: 0; padding: 0;
     font-family: var(--font-sans); font-weight: 300;
     font-size: calc(13px * var(--ui-scale));
-    cursor: var(--cursor-target);
-    transition: background .16s, box-shadow .2s ease;
   }
-  /* The + glows under the pointer (Eric, Aug 31) — the light plate
-     lifts to white and blooms; box-shadow, the drawn-minus's own
-     hover grammar (dark glyph on a light chip can't carry text glow). */
+  /* the bloom + cursor + transitions ride .bs-fillpill (Eric, Aug 31:
+     the factored filled pill); the lift line stays the consumer's */
   .hw-addrow .hw-add-chip:hover, .hw-addrow .hw-add-chip:focus-visible {
     background: #fff;
-    /* the bloom LADDERS (Eric, Aug 31: too dim) — tight core + wide halo,
-       the glow-text-hover token's own two-rung idea on a plate */
-    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
-                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
-    outline: none;
   }
   /* THE THREE ZONES, re-corrected (Eric, Aug 29: "add to cart is
      actually the plus icon, not the add to cart button text itself"):
@@ -946,15 +938,9 @@
     font-family: var(--font-ui); font-weight: 300;
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .04em;
-    cursor: var(--cursor-target);
-    transition: background .16s, box-shadow .2s ease;
   }
-  /* the plate blooms like the + chip (Eric, Aug 31: too dim) */
-  .hw-tray-btn:hover, .hw-tray-btn:focus-visible {
-    background: #fff; outline: none;
-    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
-                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
-  }
+  /* bloom/cursor/transitions ride .bs-fillpill; the lift stays here */
+  .hw-tray-btn:hover, .hw-tray-btn:focus-visible { background: #fff; }
   #hw-checkout {
     top: 0; right: 0;
     width: calc(99px * var(--ui-scale)); height: calc(30px * var(--ui-scale));
@@ -1074,7 +1060,7 @@
 <!-- THE ADD ROW — fixed page furniture at the frames' berth (77.35vh);
      always present for a real product, panel open or not. -->
 <div id="hw-addrow" class="hw-addrow" aria-label="Add to cart">
-  <button class="hw-add-chip" id="hw-add-chip" type="button" aria-label="Add to cart">+</button>
+  <button class="hw-add-chip bs-fillpill" id="hw-add-chip" type="button" aria-label="Add to cart">+</button>
   <div class="hw-add-bar" id="hw-add-bar" data-str="hwAddToCart" aria-hidden="true"></div>
   <!-- PRICE SEAM: fed by the ruled $1 placeholder (Eric, Aug 29); the
        per-configuration manifest source replaces it at the phase-2
@@ -1106,8 +1092,8 @@
            when the price-source ruling lands; never static. -->
       <span id="hw-total">—</span>
     </div>
-    <button id="hw-checkout" class="hw-tray-btn" type="button" data-str="hwCheckout"></button>
-    <button id="hw-viewcart" class="hw-tray-btn" type="button" data-str="hwViewCart"></button>
+    <button id="hw-checkout" class="hw-tray-btn bs-fillpill" type="button" data-str="hwCheckout"></button>
+    <button id="hw-viewcart" class="hw-tray-btn bs-fillpill" type="button" data-str="hwViewCart"></button>
   </div>
   </div><!-- /hw-tray-band -->
 </div>
