@@ -40,7 +40,10 @@
   body[data-bs-page="cart"] {
     --ct-top: 22.02vh;          /* rails y246 */
     --ct-rule: 24.62vh;         /* the section rule y275 */
-    --ct-crumb: 22.33vh;        /* breadcrumb ink y249 */
+    /* the crumb line self-centers in the rail-top→rule window (Eric,
+       Aug 31: "don't feel visually centered") — the midpoint of
+       22.02 and 24.62, ridden with translateY(-50%) */
+    --ct-crumb: 23.32vh;
   }
 
   /* ── Construction: the tray's rails carried up the page ─────────────── */
@@ -68,6 +71,7 @@
   /* ── Breadcrumb: CART › CHECKOUT ────────────────────────────────────── */
   #ct-crumbs {
     position: fixed; left: 5.56vw; top: var(--ct-crumb);
+    transform: translateY(-50%);
     z-index: 16;
     display: flex; align-items: baseline;
     gap: calc(14px * var(--ui-scale));
@@ -88,10 +92,13 @@
      freshly installed package. */
   .ct-crumb-btn {
     background: none; border: 0; padding: 0;
-    color: var(--bs-label); font-weight: 600;
+    /* the UNSELECTED crumb returns to Wide Light (Eric, Aug 31:
+       "the unselected item should be wide light"); the here one
+       carries the 600 */
+    color: var(--bs-label); font-weight: 300;
     font-family: var(--font-ui);
     /* the panel's SIZE reverted (Eric, Aug 31: too big proportionally
-       — the old rung stands); the styling stays: 600 every state, 0% */
+       — the old rung stands); 0% spacing stays */
     font-size: calc(12px * var(--ui-scale));
     letter-spacing: 0;
     cursor: var(--cursor-target);
@@ -99,11 +106,12 @@
   }
   .ct-crumb-btn:hover, .ct-crumb-btn:focus-visible { color: #fff; outline: none; }
   .ct-crumb-btn.is-here {
-    color: var(--ink); text-shadow: var(--glow-text);
+    color: var(--ink); font-weight: 600; text-shadow: var(--glow-text);
     pointer-events: none;
   }
   #ct-summary-head {
     position: fixed; left: 72.5vw; top: var(--ct-crumb);
+    transform: translateY(-50%);
     /* bold + glowing per the design's directive (Eric, Aug 31, p4);
        the panel's true rungs: WideSemiBold 14px/15, 0% spacing */
     color: var(--ink);
