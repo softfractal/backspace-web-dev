@@ -70,9 +70,11 @@
     font-size: calc(12px * var(--ui-scale));
     letter-spacing: .08em;
   }
-  #ct-crumbs .is-here { color: var(--ink); font-weight: 600; text-shadow: var(--glow-text); }
   #ct-crumbs .ct-crumb-sep { color: #e6e6e6; opacity: .5; font-weight: 300; }
-  #ct-crumb-checkout {
+  /* BOTH crumbs are buttons since the checkout state landed (Eric,
+     Aug 31): .is-here rides whichever names the standing state; the
+     other one is the way back/forward. */
+  .ct-crumb-btn {
     background: none; border: 0; padding: 0;
     color: var(--bs-label); font-weight: 300;
     font-family: var(--font-ui);
@@ -81,7 +83,11 @@
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  #ct-crumb-checkout:hover, #ct-crumb-checkout:focus-visible { color: #fff; outline: none; }
+  .ct-crumb-btn:hover, .ct-crumb-btn:focus-visible { color: #fff; outline: none; }
+  .ct-crumb-btn.is-here {
+    color: var(--ink); font-weight: 600; text-shadow: var(--glow-text);
+    pointer-events: none;
+  }
   #ct-summary-head {
     position: fixed; left: 72.5vw; top: var(--ct-crumb);
     color: var(--text-soft);
@@ -298,19 +304,6 @@
     letter-spacing: .02em;
   }
   #ct-specs .ct-spec-k { color: var(--bs-label); margin-right: calc(8px * var(--ui-scale)); }
-  #ct-pricebar {
-    margin-top: auto;                            /* the frames put it at the column's foot */
-    height: calc(30px * var(--ui-scale));
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 calc(12px * var(--ui-scale));
-    background: #4a4a4a5c;
-    color: var(--bs-label);
-    font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
-    letter-spacing: .04em;
-  }
-  #ct-pricebar b { color: var(--ink); font-weight: 600; }
-
   /* ── ORDER SUMMARY (1243..1651) ─────────────────────────────────────── */
   #ct-summary {
     position: fixed;
@@ -491,6 +484,232 @@
   }
   #ct-checkout:hover, #ct-checkout:focus-visible { background: #fff; outline: none; }
 
+  /* ═══ THE CHECKOUT STATE (Eric's word, Aug 31) ═══════════════════════
+     State swap on the fade token: the cart-state left content fades
+     OUT, then the windows fade IN (sequential handoff — the house
+     closing-then-arriving grammar). The receipt column never moves. */
+  #ct-preview, #ct-grid, #ct-detail { transition: opacity var(--pop-fade); }
+  body[data-ct-state="checkout"] #ct-preview,
+  body[data-ct-state="checkout"] #ct-grid,
+  body[data-ct-state="checkout"] #ct-detail {
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  #co-root {
+    opacity: 0; visibility: hidden;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  body[data-ct-state="checkout"] #co-root {
+    opacity: 1; visibility: visible;
+    transition: opacity var(--pop-fade) var(--pop-fade-duration), visibility 0s var(--pop-fade-duration);
+  }
+
+  /* The windows — frame-true placements ("1 checkout" group; x92 →
+     5.32vw etc.), the house translucent plate, the corner triangle. */
+  .co-window {
+    position: fixed;
+    background: var(--bsw-fill);
+    z-index: 5;
+  }
+  .co-tri {
+    position: absolute; top: 0; left: 0;
+    width: calc(9px * var(--ui-scale)); height: calc(12px * var(--ui-scale));
+    background: linear-gradient(to bottom right,
+      var(--ink) calc(50% - .5px), transparent calc(50% + .5px));
+    pointer-events: none;
+  }
+  #co-shipping { left: 5.32vw; top: 27.31vh; width: 63.72vw; height: 36.26vh; }
+  #co-billing  { left: 5.32vw;  top: 66.25vh; width: 30.73vw; }
+  #co-payment  { left: 37.79vw; top: 66.25vh; width: 13.89vw; }
+  #co-faster   { left: 53.36vw; top: 66.25vh; width: 15.68vw; height: 10.56vh; }
+  .co-head {
+    position: absolute; left: calc(14px * var(--ui-scale)); top: calc(13px * var(--ui-scale));
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .04em;
+  }
+
+  /* Shipping: the tab row (frame y371) and the address book grid
+     (2-up 230×110 cards, frame pitch 248/130). */
+  .co-tabs {
+    position: absolute; left: calc(21px * var(--ui-scale)); top: 5.91vh;
+    display: flex; gap: calc(8px * var(--ui-scale));
+  }
+  .co-tab {
+    height: calc(25px * var(--ui-scale));
+    padding: 0 calc(12px * var(--ui-scale));
+    background: #4a4a4a8a; border: 0;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(10px * var(--ui-scale));
+    letter-spacing: .04em;
+    cursor: var(--cursor-target);
+    transition: background .16s, color .16s;
+  }
+  .co-tab:hover, .co-tab:focus-visible { background: #5c5c5c8a; color: #fff; outline: none; }
+  .co-tab.is-on { background: #ededed; color: #0b0b0a; }
+  #co-book {
+    position: absolute; left: calc(16px * var(--ui-scale)); top: 12.00vh;
+    display: grid; grid-template-columns: repeat(2, calc(230px * var(--ui-scale)));
+    gap: calc(20px * var(--ui-scale)) calc(18px * var(--ui-scale));
+    max-height: calc(23vh);
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin; scrollbar-color: #ffffff5c transparent;
+    opacity: 0; visibility: hidden;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  #co-shipping.is-book #co-book {
+    opacity: 1; visibility: visible;
+    transition: opacity var(--pop-fade);
+  }
+  .co-card {
+    position: relative;
+    width: calc(230px * var(--ui-scale)); height: calc(110px * var(--ui-scale));
+    background: #4a4a4a8a; border: 0;
+    padding: calc(10px * var(--ui-scale)) calc(12px * var(--ui-scale));
+    text-align: left;
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(10px * var(--ui-scale));
+    line-height: 1.5;
+    letter-spacing: .02em;
+    cursor: var(--cursor-target);
+    transition: background .16s;
+    overflow: hidden;
+  }
+  .co-card:hover, .co-card:focus-visible { background: #5c5c5c8a; outline: none; }
+  .co-card b {
+    display: block; color: var(--ink); font-weight: 600;
+    font-size: calc(11px * var(--ui-scale));
+    margin-bottom: calc(3px * var(--ui-scale));
+  }
+  .co-card span { display: block; }
+  /* the warm dot marks the chosen address — the house marker */
+  .co-card.is-sel::after {
+    content: ''; position: absolute;
+    top: calc(8px * var(--ui-scale)); right: calc(8px * var(--ui-scale));
+    width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
+    border-radius: 50%;
+    background: var(--bs-marker-warm);
+    box-shadow: var(--bs-marker-warm-glow);
+  }
+
+  /* The forms — the factored .bs-field grammar, third consumer; the
+     frames right-align labels AND ink to each line's right end. */
+  .co-form .bs-field > label, .co-form .bs-input { text-align: right; }
+  #co-ship-form {
+    position: absolute;
+    left: 33.68vw; top: 11.10vh;                /* frame 674 → col A */
+    width: 26.62vw;                              /* through 1164 */
+    grid-template-columns: 11.57vw 15.05vw;      /* frame 200 + 260 */
+    column-gap: 0;
+    justify-content: space-between;
+  }
+  .co-exp-body .bs-form-grid { grid-template-columns: 1fr 1fr; }
+  .co-form .bs-field--wide { grid-column: 1 / -1; }
+
+  /* The expandables (the note group's directive: collapsed by default,
+     click the head to expand → detail; heights 118 → 338 frame-true).
+     Open: the window grows on the expand curve, the body waits for the
+     landing. Close: the body fades, then the window shrinks — the
+     house closing grammar, tokens only. */
+  .co-exp {
+    height: 10.56vh;
+    overflow: hidden;
+    transition: height var(--pop-duration) var(--expand-curve);
+  }
+  .co-exp.is-open {
+    height: 30.26vh;
+    transition: height var(--pop-duration) var(--expand-curve);
+  }
+  .co-exp:not(.is-open) { transition-delay: var(--pop-fade-duration); }
+  .co-exp-head {
+    position: absolute; left: 0; top: 0;
+    width: 100%; height: 10.56vh;
+    background: none; border: 0; margin: 0;
+    display: flex; align-items: flex-start;   /* a button centers its ink — the head hugs the top */
+    text-align: left;
+    padding: calc(13px * var(--ui-scale)) 0 0 calc(14px * var(--ui-scale));
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: .04em;
+    cursor: var(--cursor-target);
+    transition: text-shadow .16s;
+    z-index: 2;
+  }
+  .co-exp-head:hover, .co-exp-head:focus-visible {
+    outline: none; text-shadow: var(--glow-text);
+  }
+  .co-subhead {
+    position: absolute; left: calc(14px * var(--ui-scale)); top: calc(34px * var(--ui-scale));
+    color: var(--bs-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(9px * var(--ui-scale));
+    letter-spacing: .06em;
+    pointer-events: none;
+  }
+  .co-useship {
+    position: absolute; left: calc(14px * var(--ui-scale)); top: calc(38px * var(--ui-scale));
+    display: flex; align-items: center; gap: calc(8px * var(--ui-scale));
+    color: var(--text-soft);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(10px * var(--ui-scale));
+    letter-spacing: .02em;
+    cursor: var(--cursor-target);
+    z-index: 3;
+  }
+  .co-useship input {
+    appearance: none; -webkit-appearance: none;
+    width: calc(10px * var(--ui-scale)); height: calc(10px * var(--ui-scale));
+    margin: 0; border: 1px solid #fefefe99; background: none;
+    cursor: var(--cursor-target);
+    transition: background .16s, border-color .16s;
+  }
+  .co-useship input:checked { background: #fefefe; border-color: #fefefe; }
+  .co-useship input:focus-visible { outline: none; box-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255,255,255,.5); }
+  .co-exp-body {
+    position: absolute;
+    left: calc(14px * var(--ui-scale)); right: calc(14px * var(--ui-scale));
+    top: calc(62px * var(--ui-scale)); bottom: calc(14px * var(--ui-scale));
+    opacity: 0;
+    transition: opacity var(--pop-fade);
+    pointer-events: none;
+  }
+  .co-exp.is-open .co-exp-body {
+    opacity: 1; pointer-events: auto;
+    transition: opacity var(--pop-fade) var(--pop-duration);
+  }
+  #co-payment .co-exp-body { top: calc(58px * var(--ui-scale)); }
+  #co-pay-form { display: grid; gap: calc(14px * var(--ui-scale)); }
+  .co-exp-row { display: flex; align-items: center; gap: calc(8px * var(--ui-scale)); }
+  .co-exp-row .co-tilde { color: var(--bs-label); font-family: var(--font-ui); font-weight: 300; font-size: calc(11px * var(--ui-scale)); }
+  .co-exp-row .bs-field { flex: 1; }
+  .co-bill-off .bs-input { opacity: .4; pointer-events: none; }
+
+  /* Faster checkout — a standing shallow window; the wallets DENY (the
+     third-party overlay question rides the queue; text-only until the
+     brand-assets ruling). */
+  .co-wallets {
+    position: absolute; left: calc(14px * var(--ui-scale)); bottom: calc(12px * var(--ui-scale));
+    display: flex; gap: calc(8px * var(--ui-scale));
+  }
+  .co-wallet {
+    height: calc(24px * var(--ui-scale));
+    padding: 0 calc(12px * var(--ui-scale));
+    background: #4a4a4a8a; border: 0;
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(10px * var(--ui-scale));
+    letter-spacing: .02em;
+    cursor: var(--cursor-target);
+    transition: background .16s;
+  }
+  .co-wallet:hover, .co-wallet:focus-visible { background: #5c5c5c8a; outline: none; }
+
   /* Commit-arrival resolve for browsers WITHOUT view transitions. */
   @keyframes bs-arrive { from { opacity: 0; } }
   html.bs-arrive #bs-corner,
@@ -502,7 +721,7 @@
 
   /* PROVISIONAL narrow-portrait rules — collision prevention only. */
   @media (max-width: 900px) {
-    #ct-detail, #ct-summary-head { display: none; }
+    #ct-detail, #ct-summary-head, #co-root { display: none; }
     #ct-preview { left: 6vw; width: 88vw; }
     #ct-grid { left: 6vw; width: 88vw; }
     #ct-summary { left: 6vw; right: 6vw; top: 74vh; }
@@ -510,7 +729,7 @@
   }
 </style>
 </head>
-<body data-bs-page="cart">
+<body data-bs-page="cart" data-ct-state="cart">
 
 <script>
 (function(){
@@ -560,9 +779,9 @@
 
 <!-- Breadcrumb -->
 <div id="ct-crumbs">
-  <span class="is-here" data-str="cartCrumb"></span>
+  <button id="ct-crumb-cart" class="ct-crumb-btn is-here" type="button" data-str="cartCrumb" aria-current="page"></button>
   <span class="ct-crumb-sep" aria-hidden="true">›</span>
-  <button id="ct-crumb-checkout" type="button" data-str="cartCheckoutCrumb"></button>
+  <button id="ct-crumb-checkout" class="ct-crumb-btn" type="button" data-str="cartCheckoutCrumb"></button>
 </div>
 <span id="ct-summary-head" data-str="cartOrderSummary"></span>
 
@@ -585,7 +804,69 @@
   </div>
   <div id="ct-title"></div>
   <div id="ct-specs"></div>
-  <div id="ct-pricebar"><span data-str="cartEstimated"></span><b id="ct-est-price">—</b></div>
+  <!-- The estimated-completion tab left (Eric, Aug 31): the right
+       column's receipt already carries the money. -->
+</div>
+
+<!-- ═══ THE CHECKOUT STATE (Eric's word, Aug 31) ═══
+     The left-of-divider region swaps: preview/grid/detail out, the
+     checkout windows in; the far-right receipt column is the ANCHOR
+     and never moves. PLACEMENTS from the "1 checkout" frame group
+     (billing 92,740 531w · payment 653,740 240w · faster 922,740
+     271w · shipping 92,305 1101×405 — expanded heights 338);
+     MECHANISM from the "2cart-account" note group (the design team's
+     directive: collapsed by default, click to expand → detail) —
+     Eric's anchor ruling, LABELED interpretation. Payment fields are
+     NEVER persisted or prefilled; the summary's checkout, promo and
+     kickstarter stay deny seams; wallet buttons deny (the third-party
+     overlay question rides the queue; brand art awaits assets). -->
+<div id="co-root" aria-hidden="true">
+  <section class="co-window" id="co-shipping">
+    <span class="co-tri" aria-hidden="true"></span>
+    <h2 class="co-head" data-str="coShippingHead"></h2>
+    <div class="co-tabs">
+      <button id="co-tab-book" class="co-tab" type="button" data-str="coAddressBook" aria-pressed="false"></button>
+      <button id="co-tab-new" class="co-tab" type="button" data-str="coAddNew"></button>
+      <button id="co-tab-save" class="co-tab" type="button" data-str="coSave"></button>
+    </div>
+    <div id="co-book" role="list" aria-label="Address book"></div>
+    <div id="co-ship-form" class="co-form bs-form-grid"></div>
+  </section>
+
+  <section class="co-window co-exp" id="co-billing">
+    <span class="co-tri" aria-hidden="true"></span>
+    <button class="co-exp-head" id="co-billing-head" type="button" aria-expanded="false" aria-controls="co-billing-body">
+      <span data-str="coBillingHead"></span>
+    </button>
+    <label class="co-useship">
+      <input type="checkbox" id="co-useship-in">
+      <span data-str="coUseShipping"></span>
+    </label>
+    <div class="co-exp-body" id="co-billing-body">
+      <div id="co-bill-form" class="co-form bs-form-grid"></div>
+    </div>
+  </section>
+
+  <section class="co-window co-exp" id="co-payment">
+    <span class="co-tri" aria-hidden="true"></span>
+    <button class="co-exp-head" id="co-payment-head" type="button" aria-expanded="false" aria-controls="co-payment-body">
+      <span data-str="coPaymentHead"></span>
+    </button>
+    <span class="co-subhead" data-str="coCreditCard"></span>
+    <div class="co-exp-body" id="co-payment-body">
+      <div id="co-pay-form" class="co-form"></div>
+    </div>
+  </section>
+
+  <section class="co-window" id="co-faster">
+    <span class="co-tri" aria-hidden="true"></span>
+    <h2 class="co-head" data-str="coFasterHead"></h2>
+    <div class="co-wallets">
+      <button class="co-wallet" type="button" data-str="coWalletG"></button>
+      <button class="co-wallet" type="button" data-str="coWalletPaypal"></button>
+      <button class="co-wallet" type="button" data-str="coWalletShop"></button>
+    </div>
+  </section>
 </div>
 
 <!-- Order summary -->
@@ -882,9 +1163,6 @@ function render(){
 
   // detail
   titleEl.textContent = sel ? T('cartItemDeskTitle') : '—';
-  // the focused item's estimated price — the ruled $1 placeholder
-  document.getElementById('ct-est-price').textContent =
-    sel ? '$' + PLACEHOLDER_PRICE_USD : '—';
   specsEl.innerHTML = '';
   if (sel){
     var lines = [
@@ -976,15 +1254,250 @@ function render(){
   document.getElementById('ct-subtotal-amt').textContent = '$' + sum;
 }
 
-// ── The deny seams: checkout / apply / kickstarter / checkout crumb ────
-[['ct-checkout'], ['ct-apply'], ['ct-kick-btn'], ['ct-crumb-checkout']].forEach(function(pair){
+// ── The deny seams: apply / kickstarter stay denied (commerce wiring +
+// the third-party overlay are later phases). checkout and its crumb now
+// COMMIT into the checkout state — Eric's word, Aug 31; the FINAL
+// submission still denies below. ─────────────────────────────────────────
+[['ct-apply'], ['ct-kick-btn']].forEach(function(pair){
   var b = document.getElementById(pair[0]);
   b.addEventListener('click', function(e){
     e.stopPropagation();
     wake();
-    denyOn(b);   // commerce wiring + the third-party overlay are later phases
+    denyOn(b);
   });
 });
+
+// ═══ THE CHECKOUT STATE (Eric's word, Aug 31) ═══════════════════════════
+// Placements from the "1 checkout" frames; mechanism from the account
+// note group ("collapsed by default · click to expand → detail").
+var coRoot        = document.getElementById('co-root');
+var crumbCart     = document.getElementById('ct-crumb-cart');
+var crumbCheckout = document.getElementById('ct-crumb-checkout');
+var shipWin       = document.getElementById('co-shipping');
+var pageState     = 'cart';
+
+// The forms — the factored .bs-field grammar (its third consumer),
+// structure as data; every label an STR key.
+function buildField(spec){
+  var wrap = document.createElement('div');
+  wrap.className = 'bs-field' + (spec.wide ? ' bs-field--wide' : '');
+  var lab = document.createElement('label');
+  lab.setAttribute('data-str', spec.str);
+  lab.setAttribute('for', spec.id);
+  var inp = document.createElement('input');
+  inp.className = 'bs-input';
+  inp.id = spec.id; inp.type = 'text';
+  inp.autocomplete = 'off';
+  inp.spellcheck = false;
+  wrap.appendChild(lab); wrap.appendChild(inp);
+  return { wrap: wrap, input: inp };
+}
+var SHIP_SPEC = [
+  { key: 'name',    id: 'co-s-name',    str: 'coFullName' },
+  { key: 'country', id: 'co-s-country', str: 'coCountry' },
+  { key: 'phone',   id: 'co-s-phone',   str: 'coPhone' },
+  { key: 'city',    id: 'co-s-city',    str: 'coCity' },
+  { key: 'postal',  id: 'co-s-postal',  str: 'coPostal' },
+  { key: 'street',  id: 'co-s-street',  str: 'coStreet' },
+  { key: 'company', id: 'co-s-company', str: 'coCompanyLine', wide: true, opt: true }
+];
+var BILL_SPEC = [
+  { key: 'name',    id: 'co-b-name',    str: 'coFullName' },
+  { key: 'country', id: 'co-b-country', str: 'coCountry' },
+  { key: 'postal',  id: 'co-b-postal',  str: 'coPostal' },
+  { key: 'city',    id: 'co-b-city',    str: 'coCity' },
+  { key: 'street',  id: 'co-b-street',  str: 'coStreet', wide: true }
+];
+var shipF = {}, billF = {};
+SHIP_SPEC.forEach(function(s){ var f = buildField(s); shipF[s.key] = f; document.getElementById('co-ship-form').appendChild(f.wrap); });
+BILL_SPEC.forEach(function(s){ var f = buildField(s); billF[s.key] = f; document.getElementById('co-bill-form').appendChild(f.wrap); });
+// payment — the fields render and NOTHING persists or prefills them;
+// the real charge path is the commerce phase's to rule.
+(function(){
+  var form = document.getElementById('co-pay-form');
+  var num  = buildField({ id: 'co-p-num',  str: 'coCardNumber' });
+  num.input.inputMode = 'numeric';
+  var name = buildField({ id: 'co-p-name', str: 'coCardName' });
+  form.appendChild(num.wrap); form.appendChild(name.wrap);
+  var row = document.createElement('div');
+  row.className = 'co-exp-row';
+  var a = buildField({ id: 'co-p-exp-a', str: 'coCardExp' });
+  var t = document.createElement('span'); t.className = 'co-tilde'; t.textContent = '~';
+  var b = buildField({ id: 'co-p-exp-b', str: 'coCardExp' });
+  a.input.inputMode = 'numeric'; b.input.inputMode = 'numeric';
+  row.appendChild(a.wrap); row.appendChild(t); row.appendChild(b.wrap);
+  form.appendChild(row);
+})();
+
+// THE ADDRESS BOOK — localStorage on the cartStore's discipline (v1
+// schema, try/catch, LABELED default pending the persistence ruling).
+// Addresses only — payment data is NEVER stored.
+var BOOK = (function(){
+  try {
+    var d = JSON.parse(localStorage.getItem('bs-addr-v1') || 'null');
+    if (d && d.v === 1 && Array.isArray(d.list)) return d.list;
+  } catch(e){}
+  return [];
+})();
+function saveBookStore(){ try { localStorage.setItem('bs-addr-v1', JSON.stringify({ v: 1, list: BOOK })); } catch(e){} }
+var bookSel = -1;
+var bookEl  = document.getElementById('co-book');
+function renderBook(){
+  bookEl.innerHTML = '';
+  BOOK.forEach(function(a, i){
+    var c = document.createElement('button');
+    c.type = 'button';
+    c.className = 'co-card' + (i === bookSel ? ' is-sel' : '');
+    c.setAttribute('role', 'listitem');
+    var b = document.createElement('b'); b.textContent = a.name || '—';
+    c.appendChild(b);
+    [[a.street, a.city].filter(Boolean).join(', '),
+     [a.postal, a.country].filter(Boolean).join(' · '),
+     a.phone || ''].forEach(function(line){
+      var s = document.createElement('span'); s.textContent = line; c.appendChild(s);
+    });
+    c.addEventListener('click', function(e){
+      e.stopPropagation(); wake();
+      if (!clickOk()) return;
+      bookSel = i;
+      Object.keys(shipF).forEach(function(k){ shipF[k].input.value = a[k] || ''; });
+      syncBilling();
+      SoundBus.play('detent'); hapticTick();
+      renderBook();
+    });
+    bookEl.appendChild(c);
+  });
+}
+
+// The tab row: address book TOGGLES the card grid · add new clears ·
+// save banks the fields (update the chosen card, else a new one) — the
+// save flow is a LABELED interpretation awaiting design confirm.
+var tabBook = document.getElementById('co-tab-book');
+var tabNew  = document.getElementById('co-tab-new');
+var tabSave = document.getElementById('co-tab-save');
+tabBook.addEventListener('click', function(e){
+  e.stopPropagation(); wake();
+  if (!clickOk()) return;
+  var on = shipWin.classList.toggle('is-book');
+  tabBook.classList.toggle('is-on', on);
+  tabBook.setAttribute('aria-pressed', String(on));
+  SoundBus.play(on ? 'commit' : 'detent'); hapticTick();
+});
+tabNew.addEventListener('click', function(e){
+  e.stopPropagation(); wake();
+  if (!clickOk()) return;
+  bookSel = -1;
+  Object.keys(shipF).forEach(function(k){ shipF[k].input.value = ''; });
+  renderBook();
+  shipF.name.input.focus();
+  SoundBus.play('detent'); hapticTick();
+});
+tabSave.addEventListener('click', function(e){
+  e.stopPropagation(); wake();
+  if (!clickOk()) return;
+  var req = SHIP_SPEC.filter(function(s){ return !s.opt; }).map(function(s){ return shipF[s.key].input; });
+  var bad = C.validateFields(req);
+  if (bad){ denyOn(tabSave); bad.focus(); return; }   // the house invalid-submit deny
+  var entry = {};
+  SHIP_SPEC.forEach(function(s){ entry[s.key] = shipF[s.key].input.value.trim(); });
+  if (bookSel >= 0) BOOK[bookSel] = entry;
+  else { BOOK.push(entry); bookSel = BOOK.length - 1; }
+  saveBookStore();
+  renderBook();
+  shipWin.classList.add('is-book');                   // the save's receipt: the book shows
+  tabBook.classList.add('is-on');
+  tabBook.setAttribute('aria-pressed', 'true');
+  SoundBus.play('commit'); hapticTick();
+});
+
+// The expandables — the note group's law: collapsed by default, the
+// head is the toggle.
+function bindExp(winId){
+  var win = document.getElementById(winId);
+  var head = win.querySelector('.co-exp-head');
+  head.addEventListener('click', function(e){
+    e.stopPropagation(); wake();
+    if (!clickOk()) return;
+    var open = win.classList.toggle('is-open');
+    head.setAttribute('aria-expanded', String(open));
+    SoundBus.play(open ? 'commit' : 'detent'); hapticTick();
+  });
+  return win;
+}
+function collapseExp(win){
+  win.classList.remove('is-open');
+  win.querySelector('.co-exp-head').setAttribute('aria-expanded', 'false');
+}
+var billWin = bindExp('co-billing');
+var payWin  = bindExp('co-payment');
+
+// use-shipping-as-billing: checked mirrors the shipping fields live and
+// rests the billing form; unchecking frees it (values kept).
+var useShip = document.getElementById('co-useship-in');
+function syncBilling(){
+  if (!useShip.checked) return;
+  BILL_SPEC.forEach(function(s){ billF[s.key].input.value = shipF[s.key] ? shipF[s.key].input.value : ''; });
+}
+useShip.addEventListener('change', function(){
+  wake();
+  document.getElementById('co-bill-form').classList.toggle('co-bill-off', useShip.checked);
+  syncBilling();
+  SoundBus.play('detent'); hapticTick();
+});
+SHIP_SPEC.forEach(function(s){
+  shipF[s.key].input.addEventListener('input', function(){ syncBilling(); });
+});
+
+// The wallets DENY — the third-party overlay question rides the queue.
+Array.prototype.forEach.call(document.querySelectorAll('.co-wallet'), function(b){
+  b.addEventListener('click', function(e){
+    e.stopPropagation(); wake();
+    denyOn(b);
+  });
+});
+
+// The state machine: crumbs + the summary's checkout button walk the
+// two states; the FINAL submission (checkout while in checkout) denies.
+function setPageState(s){
+  if (pageState === s) return;
+  pageState = s;
+  document.body.setAttribute('data-ct-state', s);
+  crumbCart.classList.toggle('is-here', s === 'cart');
+  crumbCheckout.classList.toggle('is-here', s === 'checkout');
+  if (s === 'cart') crumbCart.setAttribute('aria-current', 'page'); else crumbCart.removeAttribute('aria-current');
+  if (s === 'checkout') crumbCheckout.setAttribute('aria-current', 'page'); else crumbCheckout.removeAttribute('aria-current');
+  coRoot.setAttribute('aria-hidden', String(s !== 'checkout'));
+  if (s === 'checkout'){
+    Ball.show(false);
+    collapseExp(billWin); collapseExp(payWin);        // collapsed by default — the note's law
+  } else {
+    render();                                          // restores preview + ball per selection
+  }
+}
+crumbCheckout.addEventListener('click', function(e){
+  e.stopPropagation(); wake();
+  if (pageState !== 'cart' || !clickOk()) return;
+  SoundBus.play('commit'); hapticTick();
+  setPageState('checkout');
+});
+crumbCart.addEventListener('click', function(e){
+  e.stopPropagation(); wake();
+  if (pageState !== 'checkout' || !clickOk()) return;
+  SoundBus.play('detent'); hapticTick();
+  setPageState('cart');
+});
+(function(){
+  var co = document.getElementById('ct-checkout');
+  co.addEventListener('click', function(e){
+    e.stopPropagation(); wake();
+    if (pageState === 'cart'){
+      if (clickOk()){ SoundBus.play('commit'); hapticTick(); setPageState('checkout'); }
+      return;
+    }
+    denyOn(co);   // the final submission — commerce wiring is unruled
+  });
+})();
+renderBook();
 
 // ── Corner nav — a destination page: ‹ goes back where you came from ───
 var pillPrimary = C.bindPill(primary, fwdBtn);
@@ -1029,6 +1542,22 @@ primary.addEventListener('click', function(e){
 // ── Mount ───────────────────────────────────────────────────────────────
 var RAIL_BACK = 0, RAIL_PILL = 1;
 var ladder = C.makeLadder([
+  // the checkout rungs (Eric, Aug 31): field → window → state, then
+  // the page boundary — one instrumented walker, house law.
+  { name: 'field', when: function(){
+      return pageState === 'checkout' && document.activeElement &&
+             coRoot.contains(document.activeElement) &&
+             document.activeElement.classList.contains('bs-input');
+    },
+    step: function(){ document.activeElement.blur(); } },
+  { name: 'window', when: function(){
+      return pageState === 'checkout' && !!coRoot.querySelector('.co-exp.is-open');
+    },
+    step: function(){
+      Array.prototype.forEach.call(coRoot.querySelectorAll('.co-exp.is-open'), collapseExp);
+    } },
+  { name: 'state', when: function(){ return pageState === 'checkout'; },
+    step: function(){ SoundBus.play('detent'); setPageState('cart'); } },
   { name: 'boundary', when: function(){ return true; },
     step: function(){ if (arrival) leaveBack(); } }
 ]);
@@ -1040,7 +1569,7 @@ C.init({
       trayItems: function(){ return links; } }
   ],
   touchSurfaces: [document.getElementById('bs-stage')],
-  sweepRoots: [cornerEl, gridEl, cardsEl, document.getElementById('ct-detail')],
+  sweepRoots: [cornerEl, gridEl, cardsEl, document.getElementById('ct-detail'), coRoot],
   hooks: {
     isLocked:       function(){ return false; },
     goBack:         function(){ ladder.back(); },
@@ -1052,6 +1581,7 @@ C.init({
     wheelNative:    function(e){
       if (gridEl.contains(e.target))  return gridEl.scrollHeight > gridEl.clientHeight + 1;
       if (cardsEl.contains(e.target)) return cardsEl.scrollHeight > cardsEl.clientHeight + 1;
+      if (bookEl.contains(e.target))  return bookEl.scrollHeight > bookEl.clientHeight + 1;
       var rows = document.getElementById('ct-rows');
       if (rows.contains(e.target)) return rows.scrollHeight > rows.clientHeight + 1;
       return false;
@@ -1070,7 +1600,8 @@ C.init({
     devState:       function(){
       window.__ctBall = Ball;
       return { items: ITEMS.length, checked: ITEMS.filter(function(i){ return i.checked; }).length,
-               selIdx: selIdx, arrival: arrival };
+               selIdx: selIdx, arrival: arrival,
+               state: pageState, book: BOOK.length };
     }
   }
 });

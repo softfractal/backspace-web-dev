@@ -229,7 +229,33 @@ var STR = {
     cartSubtotal:     'subtotal',
     cartShipping:     'shipping',
     cartTax:          'tax',
-    cartCheckout:     'checkout'
+    cartCheckout:     'checkout',
+    // ── the checkout state (Eric's word, Aug 31: the window-expansion
+    // mechanism — placements from the checkout frame group, mechanism
+    // from the account note group). cartEstimated above is DORMANT: the
+    // estimated-completion tab left the page by the same word.
+    coShippingHead:  'shipping address',
+    coBillingHead:   'billing address',
+    coPaymentHead:   'payment',
+    coCreditCard:    'credit card',
+    coFasterHead:    'Faster Checkout',
+    coAddressBook:   'address book',
+    coAddNew:        'add new',
+    coSave:          'save',
+    coFullName:      'full name',
+    coPhone:         'phone number',
+    coPostal:        'postal code',
+    coCountry:       'country / region',
+    coCity:          'city',
+    coStreet:        'street address',
+    coCompanyLine:   'company, apartment, suite, etc. (optional)',
+    coUseShipping:   'Use the shipping address as the billing address',
+    coCardNumber:    'card number',
+    coCardName:      "Cardholder's Name",
+    coCardExp:       'Expiration Date (MM / YY)',
+    coWalletG:       'G Pay',
+    coWalletPaypal:  'PayPal',
+    coWalletShop:    'shop'
   },
   zh: { /* populated when CN content lands; lookups fall back to en */ },
   ja: {},
