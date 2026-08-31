@@ -576,7 +576,10 @@
      hover grammar (dark glyph on a light chip can't carry text glow). */
   .hw-addrow .hw-add-chip:hover, .hw-addrow .hw-add-chip:focus-visible {
     background: #fff;
-    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .55);
+    /* the bloom LADDERS (Eric, Aug 31: too dim) — tight core + wide halo,
+       the glow-text-hover token's own two-rung idea on a plate */
+    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
+                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
     outline: none;
   }
   /* THE THREE ZONES, re-corrected (Eric, Aug 29: "add to cart is
@@ -944,9 +947,14 @@
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .04em;
     cursor: var(--cursor-target);
-    transition: background .16s;
+    transition: background .16s, box-shadow .2s ease;
   }
-  .hw-tray-btn:hover, .hw-tray-btn:focus-visible { background: #fff; outline: none; }
+  /* the plate blooms like the + chip (Eric, Aug 31: too dim) */
+  .hw-tray-btn:hover, .hw-tray-btn:focus-visible {
+    background: #fff; outline: none;
+    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
+                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
+  }
   #hw-checkout {
     top: 0; right: 0;
     width: calc(99px * var(--ui-scale)); height: calc(30px * var(--ui-scale));
