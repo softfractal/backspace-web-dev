@@ -45,7 +45,10 @@
 
   /* ── Construction: the tray's rails carried up the page ─────────────── */
   .ct-rail {
-    position: fixed; width: 1px;
+    /* the frames draw these at stroke 0.5 — the 1px full-white read
+       too heavy (Eric, Aug 31); hairline on retina, dimmed by the
+       browser's rounding on 1x */
+    position: fixed; width: 0.5px;
     top: var(--ct-top); height: calc(98.12vh - var(--ct-top));
     /* PURE WHITE per the mock (Eric, Aug 31) — the page's construction
        lines leave --panel-line's grey; page-scoped, flag for house-wide */
@@ -57,7 +60,7 @@
   #ct-rail-r   { right: 3.30vw; }
   #ct-rule {
     position: fixed; left: 1.91vw; right: 1.91vw;
-    top: var(--ct-rule); height: 1px;
+    top: var(--ct-rule); height: 0.5px;   /* the frames' own stroke */
     background: #fefefe;               /* pure white with the rails */
     pointer-events: none;
   }
