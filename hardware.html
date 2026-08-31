@@ -408,6 +408,17 @@
     height: calc(11px * var(--ui-scale));
     cursor: var(--cursor-target);
   }
+  /* THE HIT SURFACE (Eric, Aug 31: "a little too tight — same idea as
+     the other menu items"): an invisible border-box widens the strip's
+     target to the row's own band (11 → 25px×ui) — the minus-box /
+     bs-hit grammar; the ink never moves. */
+  .hw-scrub::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: calc(-7px * var(--ui-scale));
+    bottom: calc(-7px * var(--ui-scale));
+  }
   /* THE TEETH (Eric, Aug 31, second word: "it's the homepage slide bar
      interaction — the teeth grow as the mouse slides through, not a
      static block"): the home strip's own certified mechanics, ported —
