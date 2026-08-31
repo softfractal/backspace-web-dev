@@ -141,8 +141,10 @@
     max-height: calc(98.12vh - 70.28vh);
     /* FOUR COLUMNS spanning the preview's own width (Eric, Aug 31, p1:
        "the thumbnails together should have the same width as the main
-       preview") — 1fr cells, edges register at every window. Three
-       resting rows per the design's p5. */
+       preview") — 1fr cells, edges register at every window. TWO
+       resting rows (Eric's same-day revert of the three-row read:
+       "three rows look stupid"); the grid scrolls when an order
+       grows past them. */
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: calc(15px * var(--ui-scale)) calc(25px * var(--ui-scale));
@@ -1158,9 +1160,10 @@ function removeItem(i){
 
 // ── Render ──────────────────────────────────────────────────────────────
 function render(){
-  // grid — items + empties to the design's resting count (3 rows × 4)
+  // grid — items + empties to the resting count (2 rows × 4; scrolls
+  // past that — Eric's same-day revert of the three-row read)
   gridEl.innerHTML = '';
-  var n = Math.max(12, ITEMS.length);
+  var n = Math.max(8, ITEMS.length);
   for (var i = 0; i < n; i++){
     (function(idx){
       var item = ITEMS[idx] || null;
