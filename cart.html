@@ -440,9 +440,14 @@
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .04em;
     cursor: var(--cursor-target);
-    transition: background .16s, color .16s;
+    transition: background .16s, color .16s, box-shadow .2s ease;
   }
-  .ct-bar .ct-bar-btn:hover, .ct-bar .ct-bar-btn:focus-visible { background: #fff; color: #0b0b0a; outline: none; }
+  /* the + chip's own two-rung bloom (Eric, Aug 31) */
+  .ct-bar .ct-bar-btn:hover, .ct-bar .ct-bar-btn:focus-visible {
+    background: #fff; color: #0b0b0a; outline: none;
+    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
+                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
+  }
   #ct-promo-in {
     flex: 1; min-width: 0;
     background: none; border: 0; padding: 0;
@@ -480,9 +485,13 @@
     font-size: calc(12px * var(--ui-scale));
     letter-spacing: .06em;
     cursor: var(--cursor-target);
-    transition: background .16s;
+    transition: background .16s, box-shadow .2s ease;
   }
-  #ct-checkout:hover, #ct-checkout:focus-visible { background: #fff; outline: none; }
+  #ct-checkout:hover, #ct-checkout:focus-visible {
+    background: #fff; outline: none;
+    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .9),
+                0 0 calc(30px * var(--ui-scale)) rgba(255, 255, 255, .45);
+  }
 
   /* ═══ THE CHECKOUT STATE (Eric's word, Aug 31) ═══════════════════════
      State swap on the fade token: the cart-state left content fades
