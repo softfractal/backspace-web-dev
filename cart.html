@@ -296,9 +296,9 @@
     text-shadow: var(--glow-text);
   }
   #ct-specs {
-    /* the title→info gap grown 50% (Eric, Aug 31, corrected word):
-       the grid's 14 + 7 = 21px×ui */
-    margin-top: calc(7px * var(--ui-scale));
+    /* the title→info gap: grown 50% then 25% more (Eric, Aug 31):
+       21 × 1.25 = 26.25px×ui — the grid's 14 + 12.25 */
+    margin-top: calc(12.25px * var(--ui-scale));
     display: grid; gap: calc(5px * var(--ui-scale));
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
