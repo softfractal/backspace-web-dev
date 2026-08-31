@@ -85,8 +85,9 @@
     background: none; border: 0; padding: 0;
     color: var(--bs-label); font-weight: 600;
     font-family: var(--font-ui);
-    font-size: calc(14px / 0.9 * var(--ui-scale));
-    line-height: calc(15px / 0.9 * var(--ui-scale));
+    /* the panel's SIZE reverted (Eric, Aug 31: too big proportionally
+       — the old rung stands); the styling stays: 600 every state, 0% */
+    font-size: calc(12px * var(--ui-scale));
     letter-spacing: 0;
     cursor: var(--cursor-target);
     transition: color .16s;
@@ -102,8 +103,7 @@
        the panel's true rungs: WideSemiBold 14px/15, 0% spacing */
     color: var(--ink);
     font-family: var(--font-ui); font-weight: 600;
-    font-size: calc(14px / 0.9 * var(--ui-scale));
-    line-height: calc(15px / 0.9 * var(--ui-scale));
+    font-size: calc(11px * var(--ui-scale));   /* the old rung stands */
     letter-spacing: 0;
     text-shadow: var(--glow-text);
   }
