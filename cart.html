@@ -395,7 +395,9 @@
     position: absolute;
     left: calc(11px * var(--ui-scale)); top: calc(31px * var(--ui-scale));
     width: calc(87px * var(--ui-scale)); height: calc(65px * var(--ui-scale));
-    border: 1px solid var(--panel-line);
+    /* the frame retired (Eric, Aug 31): the card's grey backdrop is
+       enough; the photo letterboxes centered (contain, set in the
+       builder) instead of cover-cropping off-center */
   }
   .ct-card-title {
     position: absolute;
@@ -1279,7 +1281,8 @@ function render(){
     img.className = 'ct-card-chipimg';
     if (item.img){
       img.style.backgroundImage = 'url(' + item.img + ')';
-      img.style.backgroundSize = 'cover';
+      img.style.backgroundSize = 'contain';    // whole ball, centered — no crop drift
+      img.style.backgroundRepeat = 'no-repeat';
       img.style.backgroundPosition = 'center';
     } else {
       img.style.background = '#00000066';       // photo slot, dark until one exists
