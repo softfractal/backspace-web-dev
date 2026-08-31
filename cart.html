@@ -268,26 +268,8 @@
   }
   /* bloom/cursor/transitions ride .bs-fillpill (fake today, URL soon) */
   #ct-kick-btn:hover, #ct-kick-btn:focus-visible { background: #fff; }
-  #ct-kick-box {
-    display: grid; gap: calc(6px * var(--ui-scale));
-    opacity: 0; visibility: hidden;
-    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
-  }
-  #ct-kick.is-open #ct-kick-box {
-    opacity: 1; visibility: visible;
-    transition: opacity var(--pop-fade);
-  }
-  #ct-kick-box label {
-    height: calc(30px * var(--ui-scale));
-    display: flex; align-items: center; justify-content: center;
-    background: #4a4a4a5c;
-    color: var(--bs-label);
-    font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(9px * var(--ui-scale));
-    letter-spacing: .02em;
-    text-align: center;
-    cursor: var(--cursor-target);
-  }
+  /* the kickstarter order-number box WITHDRAWN (Eric, Aug 31) — the
+     input's ruling is still his to make */
   /* ═ THE CUSTOMIZATION INFO (Eric, Aug 31, p8-p9): bottom-aligned to
      the preview's own floor (69.14vh), drawn per the design's
      paddings — every roman numeral on its own line, the numeral in its
@@ -331,6 +313,10 @@
   #ct-specs .ct-spec-k { color: var(--bs-label); }
   #ct-specs .ct-spec-n { color: var(--bs-label); }
   #ct-complete {
+    /* the design's own air above the bar (Eric, Aug 31, p1: their gap
+       runs ~2.4× ours) — 18px×ui on top of the grid's 14 ≈ the drawn
+       32px×ui */
+    margin-top: calc(18px * var(--ui-scale));
     height: calc(30px * var(--ui-scale));
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 calc(12px * var(--ui-scale));
@@ -880,11 +866,11 @@
       <div class="ct-myst-row"><span class="ct-myst-chip">&#9678;</span><span class="ct-myst-bar">654321<i>&#8595;</i></span></div>
     </div>
     <div id="ct-kick">
-      <button id="ct-kick-btn" class="bs-fillpill" type="button" data-str="cartKickstarter" aria-expanded="false"></button>
-      <div id="ct-kick-box">
-        <label for="ct-kick-in" data-str="cartKickOrderNo"></label>
-        <input id="ct-kick-in" class="bs-input" type="text" autocomplete="off" spellcheck="false">
-      </div>
+      <!-- the order-number input WITHDRAWN (Eric, Aug 31: "until i
+           figure out how the company wants the order number to be
+           inputted") — the plate denies again; cartKickOrderNo sits
+           dormant in the pair for the ruling's return -->
+      <button id="ct-kick-btn" class="bs-fillpill" type="button" data-str="cartKickstarter"></button>
     </div>
   </div>
   <div id="ct-info">
@@ -1355,20 +1341,14 @@ expEl.addEventListener('click', function(e){
   render();
 });
 
-// KICKSTARTER (Eric, Aug 31): not per-product — the plate expands the
-// order-number box (a LABELED interpretation: the input takes the
-// backer's number; where it goes is the hand-off ruling's, with the
-// URL that is coming). Session-only, never persisted.
+// KICKSTARTER: the order-number input WITHDRAWN (Eric, Aug 31) — the
+// plate DENIES again until he rules how the number gets inputted;
+// the URL hand-off rides the same queue.
 (function(){
-  var kick = document.getElementById('ct-kick');
   var btn = document.getElementById('ct-kick-btn');
   btn.addEventListener('click', function(e){
     e.stopPropagation(); wake();
-    if (!clickOk()) return;
-    var on = kick.classList.toggle('is-open');
-    btn.setAttribute('aria-expanded', String(on));
-    SoundBus.play(on ? 'commit' : 'detent'); hapticTick();
-    if (on) document.getElementById('ct-kick-in').focus();
+    denyOn(btn);
   });
 })();
 
