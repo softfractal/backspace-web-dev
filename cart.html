@@ -597,18 +597,27 @@
     box-shadow: var(--bs-marker-warm-glow);
   }
 
-  /* The forms — the factored .bs-field grammar, third consumer; the
-     frames right-align labels AND ink to each line's right end. */
-  .co-form .bs-field > label, .co-form .bs-input { text-align: right; }
+  /* The forms — the factored .bs-field grammar (third consumer) IS the
+     frames' drawing already: label above the line, bold ink below it,
+     the warm dot at the line's left. The columns hold the frames' own
+     gap (674..874 · 904..1164 — the zero-gap overlap of Aug 31 is the
+     fixed bug). */
   #co-ship-form {
     position: absolute;
     left: 33.68vw; top: 11.10vh;                /* frame 674 → col A */
-    width: 26.62vw;                              /* through 1164 */
+    width: 28.36vw;                              /* through 1164 (490) */
     grid-template-columns: 11.57vw 15.05vw;      /* frame 200 + 260 */
+    column-gap: 0;
+    justify-content: space-between;              /* = the frame's 30px gap */
+  }
+  /* billing's grid, frame-true within its window (lines 113..313 ·
+     343..603 of the 531 width; rows land at the same house rhythm) */
+  #co-bill-form {
+    padding: 0 3.8% 0 4%;
+    grid-template-columns: 37.7% 49%;
     column-gap: 0;
     justify-content: space-between;
   }
-  .co-exp-body .bs-form-grid { grid-template-columns: 1fr 1fr; }
   .co-form .bs-field--wide { grid-column: 1 / -1; }
 
   /* The expandables (the note group's directive: collapsed by default,
@@ -671,10 +680,16 @@
   }
   .co-useship input:checked { background: #fefefe; border-color: #fefefe; }
   .co-useship input:focus-visible { outline: none; box-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255,255,255,.5); }
+  /* The body starts at the frames' own field zone (billing lines from
+     y902 in the 740-window → 11.8vh down) — clear of the head and the
+     checkbox; the OPEN head shrinks to its title zone so the fields
+     underneath are reachable (the full-strip head was eating the top
+     row's clicks — the Aug 31 appearance-only bug). */
+  .co-exp.is-open .co-exp-head { height: calc(34px * var(--ui-scale)); }
   .co-exp-body {
     position: absolute;
-    left: calc(14px * var(--ui-scale)); right: calc(14px * var(--ui-scale));
-    top: calc(62px * var(--ui-scale)); bottom: calc(14px * var(--ui-scale));
+    left: 0; right: 0;
+    top: 11.8vh; bottom: calc(10px * var(--ui-scale));
     opacity: 0;
     transition: opacity var(--pop-fade);
     pointer-events: none;
@@ -683,8 +698,10 @@
     opacity: 1; pointer-events: auto;
     transition: opacity var(--pop-fade) var(--pop-duration);
   }
-  #co-payment .co-exp-body { top: calc(58px * var(--ui-scale)); }
-  #co-pay-form { display: grid; gap: calc(14px * var(--ui-scale)); }
+  #co-pay-form {
+    display: grid; gap: calc(14px * var(--ui-scale));
+    padding: 0 8%;
+  }
   .co-exp-row { display: flex; align-items: center; gap: calc(8px * var(--ui-scale)); }
   .co-exp-row .co-tilde { color: var(--bs-label); font-family: var(--font-ui); font-weight: 300; font-size: calc(11px * var(--ui-scale)); }
   .co-exp-row .bs-field { flex: 1; }
@@ -1302,11 +1319,13 @@ var SHIP_SPEC = [
   { key: 'company', id: 'co-s-company', str: 'coCompanyLine', wide: true, opt: true }
 ];
 var BILL_SPEC = [
+  // six fields, the design's own set (p3 draws phone in billing too)
   { key: 'name',    id: 'co-b-name',    str: 'coFullName' },
   { key: 'country', id: 'co-b-country', str: 'coCountry' },
-  { key: 'postal',  id: 'co-b-postal',  str: 'coPostal' },
+  { key: 'phone',   id: 'co-b-phone',   str: 'coPhone' },
   { key: 'city',    id: 'co-b-city',    str: 'coCity' },
-  { key: 'street',  id: 'co-b-street',  str: 'coStreet', wide: true }
+  { key: 'postal',  id: 'co-b-postal',  str: 'coPostal' },
+  { key: 'street',  id: 'co-b-street',  str: 'coStreet' }
 ];
 var shipF = {}, billF = {};
 SHIP_SPEC.forEach(function(s){ var f = buildField(s); shipF[s.key] = f; document.getElementById('co-ship-form').appendChild(f.wrap); });

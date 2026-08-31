@@ -655,6 +655,12 @@ function bindKeyboard(){
       PAGE.goBack();
       return;
     }
+    // A FOCUSED FIELD OWNS ITS KEYS (Aug 31, found by the checkout
+    // forms): with the caret in an input/textarea, every key but
+    // Escape belongs to typing — W/S/A/D and the arrows must never be
+    // eaten by the machine mid-word. Escape stays above: the ladder's
+    // field rung is the blur.
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
     if (key === 'Enter'){
       e.preventDefault(); wake();
       if (PAGE.isLocked()) return;    // Enter only OPENS; Esc/back are the sole closers

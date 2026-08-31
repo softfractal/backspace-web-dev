@@ -276,48 +276,12 @@
   /* The chosen-ring stays available in this menu for CHOSEN semantics
      (none in phase one — the ring belongs to the panel's options). */
 
-  /* The custom rows: numeral selector LEFT of the sub-nav item, active
-     bold, callout leaders deferred to the GLB phase (a ball has no
-     parts to point at — on the record). Numerals are separate controls:
-     a <button> may not nest in a <button>. */
-  .hw-subrow {
-    display: flex; align-items: center; justify-content: flex-end;
-    gap: calc(10px * var(--ui-scale));
-  }
-  /* The reserve: the popped label slides INTO this space and lands
-     beside the numerals with the frames' own air (popped desktop 1572.9
-     vs numerals ending 1536) — never over them. Numerals hold their
-     flow space invisible, so selection never reflows the row. */
-  .hw-subrow .bs-subitem { margin-left: var(--side-menu-shift-x); }
-  .hw-num {
-    background: none; border: 0; padding: 0;
-    color: var(--text-soft);
-    font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(12px * var(--ui-scale));
-    line-height: calc(14px * var(--ui-scale));
-    letter-spacing: .06em;
-    cursor: var(--cursor-target);
-    /* Hidden at rest — the frames draw numerals on the ACTIVE row only;
-       they reveal with the row's pop (hover or live). */
-    opacity: 0;
-    pointer-events: none;
-    transition: color .16s, opacity var(--side-menu-fade);
-  }
-  /* NINTH WORD: hovering pops ONLY the menu item — the numerals do not
-     appear until the item has been SELECTED. */
-  .hw-subrow.is-live .hw-num {
-    opacity: .55;
-    pointer-events: auto;
-  }
-  .hw-subrow.is-live .hw-num:hover,
-  .hw-subrow.is-live .hw-num:focus-visible { color: #fff; opacity: 1; outline: none; }
-  .hw-subrow.is-live .hw-num.is-live { color: var(--ink); font-weight: 600; opacity: 1; text-shadow: var(--glow-text); }
-  /* STAGE INDICATORS — the frames draw the stage strip on the selected
-     row (desktopIII: I · II · III with the part live; Eric's p3 is that
-     drawing): I/II render as inert dim glyphs, never controls. The
-     build-one I/II ghost question closes here. */
-  .hw-num--stage { pointer-events: none !important; }
-  .hw-subrow.is-live .hw-num--stage { opacity: .3; }
+  /* THE NUMERALS RETIRED (Eric, Aug 31): the roman part selectors and
+     the stage strip leave the custom children — the design team is
+     taking the diy phase function another direction. SEL.part machinery
+     stays internal (rows select their default part); the desklegs
+     IV-vs-V pick has no surface until the new direction lands — on the
+     record in the build report. */
 
   /* ── The introduction plates — three DIAGONAL windows center-stage
      (ruled: build with the bs-window subsystem; lorem via the manifest;
@@ -430,8 +394,8 @@
 
   /* Color rows — Eric's p1 reference: label left, TICK SCRUBBER filling
      the row's right; the active row is bold+lit; A/D scrubs it. The
-     strip is layered gradients: dim short ticks full-width, bright
-     taller ticks clipped to the value fraction. */
+     strip is the tick bed; the WAVE cursor standing at t IS the value
+     (the design team's p4 — Eric, Aug 31). */
   .hw-colrow {
     display: grid;
     grid-template-columns: minmax(calc(96px * var(--ui-scale)), auto) 1fr;
@@ -443,28 +407,56 @@
     position: relative;
     height: calc(11px * var(--ui-scale));
     cursor: var(--cursor-target);
-    /* the resting tick bed */
+    /* the resting tick bed — uniform; the wave cursor carries the value */
     background: repeating-linear-gradient(90deg,
       #fefefe2e 0, #fefefe2e 1px, transparent 1px, transparent 5px);
     background-size: 100% calc(7px * var(--ui-scale));
     background-position: 0 50%;
     background-repeat: no-repeat;
   }
-  .hw-scrub-fill {
-    position: absolute; left: 0; top: 0; bottom: 0;
-    width: 50%;                      /* JS writes each row's own fraction */
-    overflow: hidden;
-    /* SCRUB MEMORY (Eric, Aug 28 third word): every row keeps and SHOWS
-       its own value — unchosen rows hold their fill at memory rank, the
-       chosen row's renders lit below. Progress is never erased. */
-    background: repeating-linear-gradient(90deg,
-      #fefefe59 0, #fefefe59 1px, transparent 1px, transparent 5px);
+  /* THE WAVE CURSOR (Eric, Aug 31 — the design team's p4): the ticks
+     around the value swell into a bell, bottoms on the bed's own
+     floor; the CHOSEN row's wave wears the double ring (the house
+     chosen-ring vocabulary, concentric on the peak). SCRUB MEMORY
+     holds: every row's wave stands at its own remembered t. */
+  .hw-scrub-wave {
+    position: absolute;
+    bottom: calc(2px * var(--ui-scale));        /* the bed ticks' floor */
+    display: flex; align-items: flex-end;
+    gap: calc(4px * var(--ui-scale));           /* 1px bars on the bed's 5px pitch */
+    transform: translateX(-50%);                /* JS writes each row's left % */
     pointer-events: none;
   }
-  .hw-colrow.is-chosen .hw-scrub-fill {
-    background: repeating-linear-gradient(90deg,
-      #fefefeb8 0, #fefefeb8 1px, transparent 1px, transparent 5px);
-    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .22);
+  .hw-scrub-wave i {
+    width: 1px;
+    background: #fefefe66;
+    transition: background .16s;
+  }
+  .hw-scrub-wave i:nth-child(1),  .hw-scrub-wave i:nth-child(13) { height: calc(7px * var(--ui-scale)); }
+  .hw-scrub-wave i:nth-child(2),  .hw-scrub-wave i:nth-child(12) { height: calc(8px * var(--ui-scale)); }
+  .hw-scrub-wave i:nth-child(3),  .hw-scrub-wave i:nth-child(11) { height: calc(10px * var(--ui-scale)); }
+  .hw-scrub-wave i:nth-child(4),  .hw-scrub-wave i:nth-child(10) { height: calc(13px * var(--ui-scale)); }
+  .hw-scrub-wave i:nth-child(5),  .hw-scrub-wave i:nth-child(9)  { height: calc(16px * var(--ui-scale)); }
+  .hw-scrub-wave i:nth-child(6),  .hw-scrub-wave i:nth-child(8)  { height: calc(19px * var(--ui-scale)); }
+  .hw-scrub-wave i:nth-child(7)                                  { height: calc(21px * var(--ui-scale)); }
+  .hw-colrow.is-chosen .hw-scrub-wave i { background: #fefefeeb; }
+  .hw-scrub-wave::before, .hw-scrub-wave::after {
+    content: ''; position: absolute;
+    left: 50%; bottom: calc(-8px * var(--ui-scale));
+    transform: translateX(-50%);
+    border-radius: 50%;
+    border: 1px solid #fefefe55;
+    opacity: 0;
+    transition: opacity .16s;
+  }
+  .hw-scrub-wave::before { width: calc(37px * var(--ui-scale)); height: calc(37px * var(--ui-scale)); }
+  .hw-scrub-wave::after  { width: calc(30px * var(--ui-scale)); height: calc(30px * var(--ui-scale)); border-color: #fefefe38; }
+  .hw-colrow.is-chosen .hw-scrub-wave::before,
+  .hw-colrow.is-chosen .hw-scrub-wave::after { opacity: 1; }
+  /* HOVER: the bar glows WITH its text (Eric, Aug 31) */
+  .hw-colrow:hover .hw-opt { color: #fff; text-shadow: var(--glow-text); }
+  .hw-colrow:hover .hw-scrub {
+    filter: drop-shadow(0 0 calc(6px * var(--ui-scale)) rgba(255, 255, 255, .35));
   }
 
   /* Size view — presets (label + dims readout) then the custom inputs:
@@ -1270,7 +1262,7 @@ function measurePitch(){ menuPitch = C.measureListPitch(classItems, menuPitch); 
 
 // ── The product menu — page-built on the factored accordion CSS (the
 // custom rows hold numeral controls, which cannot nest in a button). ─────
-var headEls = [], subWrapEls = [], introSubEls = [], customSubEls = [], numEls = {};
+var headEls = [], subWrapEls = [], introSubEls = [], customSubEls = [];
 (function buildProductMenu(){
   var defs = [
     { key: 'hwIntroduction', subs: HW.introSubs.map(function(k){ return { key: k }; }) },
@@ -1324,38 +1316,9 @@ var headEls = [], subWrapEls = [], introSubEls = [], customSubEls = [], numEls =
         if (h === 0) chooseIntroSub(sIdx);
         else chooseCustomSub(sIdx, null);
       });
-      if (h === 1 && sub.parts.length){
-        // The numeral selector renders LEFT of the sub-nav item (frames;
-        // active bold). Leaders to the physical parts wait for the GLB.
-        var row = document.createElement('div');
-        row.className = 'hw-subrow';
-        (sub.stages || []).forEach(function(g){
-          var sp = document.createElement('span');
-          sp.className = 'hw-num hw-num--stage';
-          sp.textContent = g;                    // inert stage glyphs (I, II)
-          sp.setAttribute('aria-hidden', 'true');
-          row.appendChild(sp);
-        });
-        sub.parts.forEach(function(p){
-          var np = document.createElement('button');
-          np.type = 'button';
-          np.className = 'hw-num';
-          np.textContent = p;                    // roman numerals — untranslated
-          np.tabIndex = -1;
-          np.setAttribute('aria-label', 'Part ' + p);
-          np.addEventListener('click', function(e){
-            e.stopPropagation();
-            wake();
-            if (clickOk()) chooseCustomSub(sIdx, p);
-          });
-          row.appendChild(np);
-          numEls[p] = np;
-        });
-        row.appendChild(subBtn);
-        list.appendChild(row);
-      } else {
-        list.appendChild(subBtn);
-      }
+      // The numerals retired (Eric, Aug 31) — every child is a plain
+      // sub row; chooseCustomSub defaults the part per row.
+      list.appendChild(subBtn);
       (h === 0 ? introSubEls : customSubEls).push(subBtn);
     });
     wrap.appendChild(list);
@@ -1705,8 +1668,9 @@ function buildPanelContent(){
       scrub.setAttribute('aria-label', T(c.key));
       scrub.setAttribute('aria-valuemin', '0');
       scrub.setAttribute('aria-valuemax', '100');
-      var fill = el('div', 'hw-scrub-fill');
-      scrub.appendChild(fill);
+      var wave = el('div', 'hw-scrub-wave');
+      for (var wi = 0; wi < 13; wi++) wave.appendChild(document.createElement('i'));
+      scrub.appendChild(wave);
       // Scrubbing CHOOSES the row and sets its value — one gesture, the
       // volume slider's own pointer grammar.
       var dragging = false;
@@ -1731,7 +1695,7 @@ function buildPanelContent(){
       scrub.addEventListener('pointercancel', end);
       row.appendChild(b); row.appendChild(scrub);
       colList.appendChild(row);
-      colRowEls.push(row); colScrubEls.push(fill);
+      colRowEls.push(row); colScrubEls.push(wave);
     });
     panelBody.appendChild(colList);
   } else if (panelView === 'size'){
@@ -1843,7 +1807,7 @@ function refreshPanel(){
     opt.classList.toggle('kb-hover', i === colorFocus);
     // Every row shows its remembered value (scrub memory, Eric's third
     // word); the chosen row's fill renders lit, the rest at memory rank.
-    colScrubEls[i].style.width = Math.round(p.color.t[i] * 100) + '%';
+    colScrubEls[i].style.left = (p.color.t[i] * 100).toFixed(1) + '%';
     row.querySelector('.hw-scrub').setAttribute('aria-valuenow', Math.round(p.color.t[i] * 100));
   });
   var custom = !!(parseFloat(SEL.size.custom.len) > 0 && parseFloat(SEL.size.custom.wid) > 0);
@@ -2018,15 +1982,8 @@ function render(){
     b.tabIndex = openHead === 0 ? 0 : -1;
   });
   customSubEls.forEach(function(b, i){
-    var live = openHead === 1 && i === customSub;
-    b.classList.toggle('is-live', live);
+    b.classList.toggle('is-live', openHead === 1 && i === customSub);
     b.tabIndex = openHead === 1 ? 0 : -1;
-    var row = b.parentElement;
-    if (row && row.classList.contains('hw-subrow')) row.classList.toggle('is-live', live);
-  });
-  Object.keys(numEls).forEach(function(p){
-    numEls[p].classList.toggle('is-live', SEL.part === p);
-    numEls[p].tabIndex = openHead === 1 ? 0 : -1;
   });
   var panelOn = panelView !== null;
   panelBody.querySelectorAll('button, input').forEach(function(e2){ e2.tabIndex = panelOn ? 0 : -1; });
