@@ -407,52 +407,34 @@
     position: relative;
     height: calc(11px * var(--ui-scale));
     cursor: var(--cursor-target);
-    /* the resting tick bed — uniform; the wave cursor carries the value */
-    background: repeating-linear-gradient(90deg,
-      #fefefe2e 0, #fefefe2e 1px, transparent 1px, transparent 5px);
-    background-size: 100% calc(7px * var(--ui-scale));
-    background-position: 0 50%;
-    background-repeat: no-repeat;
   }
-  /* THE WAVE CURSOR (Eric, Aug 31 — the design team's p4): the ticks
-     around the value swell into a bell, bottoms on the bed's own
-     floor; the CHOSEN row's wave wears the double ring (the house
-     chosen-ring vocabulary, concentric on the peak). SCRUB MEMORY
-     holds: every row's wave stands at its own remembered t. */
-  .hw-scrub-wave {
+  /* THE TEETH (Eric, Aug 31, second word: "it's the homepage slide bar
+     interaction — the teeth grow as the mouse slides through, not a
+     static block"): the home strip's own certified mechanics, ported —
+     heat = 1 − distance/10%-of-width, scaleY(1 + 1.55·heat) from the
+     floor, opacity .55 + .45·heat, the strip's .12s micro tempo. The
+     ticks are also the VALUE: lit ≤ t is the row's scrub memory (the
+     third word holds). The parked bell + rings retire; the two-ring
+     house cursor riding the bar IS the p4 circle. One deviation on
+     the record: home's resting 8px tick glow is dropped here — six
+     rows × 64 teeth pay it where twenty ticks could (the 96px law's
+     spirit); glow arrives WITH heat. */
+  .hw-tick {
+    --hw-heat: 0; --hw-heat-pct: 0%;
     position: absolute;
-    bottom: calc(2px * var(--ui-scale));        /* the bed ticks' floor */
-    display: flex; align-items: flex-end;
-    gap: calc(4px * var(--ui-scale));           /* 1px bars on the bed's 5px pitch */
-    transform: translateX(-50%);                /* JS writes each row's left % */
+    left: var(--hw-tick-x);
+    bottom: calc(2px * var(--ui-scale));
+    width: 1px; height: calc(7px * var(--ui-scale));
+    background: color-mix(in srgb, #fefefe2e, #ffffff var(--hw-heat-pct));
+    opacity: calc(.55 + var(--hw-heat) * .45);
+    transform: translateX(-50%) scaleY(calc(1 + var(--hw-heat) * 1.55));
+    transform-origin: bottom;
+    box-shadow: 0 0 calc(12px * var(--hw-heat) * var(--ui-scale)) rgba(255, 255, 255, .4);
+    transition: background .12s, opacity .12s, transform .12s, box-shadow .12s;
     pointer-events: none;
   }
-  .hw-scrub-wave i {
-    width: 1px;
-    background: #fefefe66;
-    transition: background .16s;
-  }
-  .hw-scrub-wave i:nth-child(1),  .hw-scrub-wave i:nth-child(13) { height: calc(7px * var(--ui-scale)); }
-  .hw-scrub-wave i:nth-child(2),  .hw-scrub-wave i:nth-child(12) { height: calc(8px * var(--ui-scale)); }
-  .hw-scrub-wave i:nth-child(3),  .hw-scrub-wave i:nth-child(11) { height: calc(10px * var(--ui-scale)); }
-  .hw-scrub-wave i:nth-child(4),  .hw-scrub-wave i:nth-child(10) { height: calc(13px * var(--ui-scale)); }
-  .hw-scrub-wave i:nth-child(5),  .hw-scrub-wave i:nth-child(9)  { height: calc(16px * var(--ui-scale)); }
-  .hw-scrub-wave i:nth-child(6),  .hw-scrub-wave i:nth-child(8)  { height: calc(19px * var(--ui-scale)); }
-  .hw-scrub-wave i:nth-child(7)                                  { height: calc(21px * var(--ui-scale)); }
-  .hw-colrow.is-chosen .hw-scrub-wave i { background: #fefefeeb; }
-  .hw-scrub-wave::before, .hw-scrub-wave::after {
-    content: ''; position: absolute;
-    left: 50%; bottom: calc(-8px * var(--ui-scale));
-    transform: translateX(-50%);
-    border-radius: 50%;
-    border: 1px solid #fefefe55;
-    opacity: 0;
-    transition: opacity .16s;
-  }
-  .hw-scrub-wave::before { width: calc(37px * var(--ui-scale)); height: calc(37px * var(--ui-scale)); }
-  .hw-scrub-wave::after  { width: calc(30px * var(--ui-scale)); height: calc(30px * var(--ui-scale)); border-color: #fefefe38; }
-  .hw-colrow.is-chosen .hw-scrub-wave::before,
-  .hw-colrow.is-chosen .hw-scrub-wave::after { opacity: 1; }
+  .hw-tick.is-lit { background: color-mix(in srgb, #fefefe59, #ffffff var(--hw-heat-pct)); }
+  .hw-colrow.is-chosen .hw-tick.is-lit { background: color-mix(in srgb, #fefefeb8, #ffffff var(--hw-heat-pct)); }
   /* HOVER: the bar glows WITH its text (Eric, Aug 31) */
   .hw-colrow:hover .hw-opt { color: #fff; text-shadow: var(--glow-text); }
   .hw-colrow:hover .hw-scrub {
@@ -1668,9 +1650,25 @@ function buildPanelContent(){
       scrub.setAttribute('aria-label', T(c.key));
       scrub.setAttribute('aria-valuemin', '0');
       scrub.setAttribute('aria-valuemax', '100');
-      var wave = el('div', 'hw-scrub-wave');
-      for (var wi = 0; wi < 13; wi++) wave.appendChild(document.createElement('i'));
-      scrub.appendChild(wave);
+      // the teeth — home's strip mechanics; ticks double as the value
+      var rowTicks = [];
+      for (var ti = 0; ti < 64; ti++){
+        var tk = document.createElement('span');
+        tk.className = 'hw-tick';
+        var tx = (ti + 0.5) / 64 * 100;
+        tk.dataset.x = tx.toFixed(3);
+        tk.style.setProperty('--hw-tick-x', tx.toFixed(3) + '%');
+        scrub.appendChild(tk);
+        rowTicks.push(tk);
+      }
+      function heat(pPct){
+        rowTicks.forEach(function(tk2){
+          var d = pPct === null ? Infinity : Math.abs(Number(tk2.dataset.x) - pPct);
+          var h2 = pPct === null ? 0 : Math.max(0, Math.min(1, 1 - d / 10));
+          tk2.style.setProperty('--hw-heat', h2.toFixed(3));
+          tk2.style.setProperty('--hw-heat-pct', Math.round(h2 * 100) + '%');
+        });
+      }
       // Scrubbing CHOOSES the row and sets its value — one gesture, the
       // volume slider's own pointer grammar.
       var dragging = false;
@@ -1689,13 +1687,18 @@ function buildPanelContent(){
         wake();
         fromPointer(e);
       });
-      scrub.addEventListener('pointermove', function(e){ if (dragging) fromPointer(e); });
-      var end = function(){ dragging = false; };
+      scrub.addEventListener('pointermove', function(e){
+        var r2 = scrub.getBoundingClientRect();
+        if (r2.width > 0) heat((e.clientX - r2.left) / r2.width * 100);
+        if (dragging) fromPointer(e);
+      });
+      scrub.addEventListener('pointerleave', function(){ if (!dragging) heat(null); });
+      var end = function(){ dragging = false; heat(null); };
       scrub.addEventListener('pointerup', end);
       scrub.addEventListener('pointercancel', end);
       row.appendChild(b); row.appendChild(scrub);
       colList.appendChild(row);
-      colRowEls.push(row); colScrubEls.push(wave);
+      colRowEls.push(row); colScrubEls.push(rowTicks);
     });
     panelBody.appendChild(colList);
   } else if (panelView === 'size'){
@@ -1807,7 +1810,10 @@ function refreshPanel(){
     opt.classList.toggle('kb-hover', i === colorFocus);
     // Every row shows its remembered value (scrub memory, Eric's third
     // word); the chosen row's fill renders lit, the rest at memory rank.
-    colScrubEls[i].style.left = (p.color.t[i] * 100).toFixed(1) + '%';
+    var rowT = p.color.t[i] * 100;
+    colScrubEls[i].forEach(function(tk3){
+      tk3.classList.toggle('is-lit', Number(tk3.dataset.x) <= rowT);
+    });
     row.querySelector('.hw-scrub').setAttribute('aria-valuenow', Math.round(p.color.t[i] * 100));
   });
   var custom = !!(parseFloat(SEL.size.custom.len) > 0 && parseFloat(SEL.size.custom.wid) > 0);

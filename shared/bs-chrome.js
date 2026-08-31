@@ -255,7 +255,11 @@ var STR = {
     coCardExp:       'Expiration Date (MM / YY)',
     coWalletG:       'G Pay',
     coWalletPaypal:  'PayPal',
-    coWalletShop:    'shop'
+    coWalletShop:    'shop',
+    coCardMC:        'mastercard',
+    coCardAmex:      'amex',
+    coCardVisa:      'visa',
+    coCardUnion:     'unionpay'
   },
   zh: { /* populated when CN content lands; lookups fall back to en */ },
   ja: {},

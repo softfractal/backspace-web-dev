@@ -702,9 +702,30 @@
     display: grid; gap: calc(14px * var(--ui-scale));
     padding: 0 8%;
   }
-  .co-exp-row { display: flex; align-items: center; gap: calc(8px * var(--ui-scale)); }
-  .co-exp-row .co-tilde { color: var(--bs-label); font-family: var(--font-ui); font-weight: 300; font-size: calc(11px * var(--ui-scale)); }
-  .co-exp-row .bs-field { flex: 1; }
+  /* the brand chips row (design: right-aligned under the head zone) */
+  .co-cards {
+    position: absolute; right: 8%; top: 5.1vh;
+    display: flex; gap: calc(6px * var(--ui-scale));
+    z-index: 3; pointer-events: none;
+  }
+  .co-cards span {
+    background: #ededed; color: #0b0b0a;
+    font-family: var(--font-ui); font-weight: 600;
+    font-size: calc(7px * var(--ui-scale));
+    letter-spacing: .04em;
+    padding: calc(3px * var(--ui-scale)) calc(6px * var(--ui-scale));
+  }
+  /* expiration: ONE label over ONE line, both dates BELOW it around
+     the centered dash (the design's own drawing) */
+  .co-exp-vals { display: flex; align-items: baseline; gap: calc(8px * var(--ui-scale)); }
+  .co-exp-vals .bs-input { flex: 1; }
+  .co-exp-vals .bs-input:first-child { text-align: left; }
+  .co-dash {
+    flex: none;
+    color: var(--bs-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+  }
   .co-bill-off .bs-input { opacity: .4; pointer-events: none; }
 
   /* Faster checkout — a standing shallow window; the wallets DENY (the
@@ -870,6 +891,12 @@
       <span data-str="coPaymentHead"></span>
     </button>
     <span class="co-subhead" data-str="coCreditCard"></span>
+    <!-- brand chips — TEXT stand-ins on the light plate until the
+         assets ruling; placement per the design (right-aligned, in the
+         strip, visible collapsed too) -->
+    <div class="co-cards" aria-hidden="true">
+      <span data-str="coCardMC"></span><span data-str="coCardAmex"></span><span data-str="coCardVisa"></span><span data-str="coCardUnion"></span>
+    </div>
     <div class="co-exp-body" id="co-payment-body">
       <div id="co-pay-form" class="co-form"></div>
     </div>
@@ -1338,14 +1365,27 @@ BILL_SPEC.forEach(function(s){ var f = buildField(s); billF[s.key] = f; document
   num.input.inputMode = 'numeric';
   var name = buildField({ id: 'co-p-name', str: 'coCardName' });
   form.appendChild(num.wrap); form.appendChild(name.wrap);
-  var row = document.createElement('div');
-  row.className = 'co-exp-row';
-  var a = buildField({ id: 'co-p-exp-a', str: 'coCardExp' });
-  var t = document.createElement('span'); t.className = 'co-tilde'; t.textContent = '~';
-  var b = buildField({ id: 'co-p-exp-b', str: 'coCardExp' });
-  a.input.inputMode = 'numeric'; b.input.inputMode = 'numeric';
-  row.appendChild(a.wrap); row.appendChild(t); row.appendChild(b.wrap);
-  form.appendChild(row);
+  // expiration: the design draws ONE label over ONE line, both dates
+  // BELOW it around a centered dash (Eric's reference, Aug 31)
+  var exp = document.createElement('div');
+  exp.className = 'bs-field';
+  var lab = document.createElement('label');
+  lab.setAttribute('data-str', 'coCardExp');
+  lab.setAttribute('for', 'co-p-exp-a');
+  var vals = document.createElement('div');
+  vals.className = 'co-exp-vals';
+  var a = document.createElement('input');
+  a.className = 'bs-input'; a.id = 'co-p-exp-a'; a.type = 'text';
+  a.autocomplete = 'off'; a.spellcheck = false; a.inputMode = 'numeric';
+  var dash = document.createElement('span');
+  dash.className = 'co-dash'; dash.textContent = '-';
+  var b = document.createElement('input');
+  b.className = 'bs-input'; b.id = 'co-p-exp-b'; b.type = 'text';
+  b.autocomplete = 'off'; b.spellcheck = false; b.inputMode = 'numeric';
+  b.setAttribute('aria-label', 'Expiration end (MM / YY)');
+  vals.appendChild(a); vals.appendChild(dash); vals.appendChild(b);
+  exp.appendChild(lab); exp.appendChild(vals);
+  form.appendChild(exp);
 })();
 
 // THE ADDRESS BOOK — localStorage on the cartStore's discipline (v1
