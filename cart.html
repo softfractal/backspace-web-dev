@@ -393,11 +393,17 @@
   }
   .ct-card-chipimg {
     position: absolute;
-    left: calc(11px * var(--ui-scale)); top: calc(31px * var(--ui-scale));
-    width: calc(87px * var(--ui-scale)); height: calc(65px * var(--ui-scale));
-    /* the frame retired (Eric, Aug 31): the card's grey backdrop is
-       enough; the photo letterboxes centered (contain, set in the
-       builder) instead of cover-cropping off-center */
+    left: calc(11px * var(--ui-scale)); top: calc(14px * var(--ui-scale));
+    width: calc(87px * var(--ui-scale)); height: calc(88px * var(--ui-scale));
+    /* frame retired (Eric, Aug 31); the ball DOUBLED same day: the
+       16:9 snap (ball = 72% of image height) under contain was
+       width-limited — ball 35px×ui. The zoom is calibrated: image
+       height 111% of the 88 box → ball 0.72 × 97.7 ≈ 70.4px×ui =
+       2.00× exactly, no clipping; the cropped sides are the snap's
+       empty margins. */
+    background-size: auto 111%;
+    background-position: center;
+    background-repeat: no-repeat;
   }
   .ct-card-title {
     position: absolute;
@@ -1280,10 +1286,7 @@ function render(){
     var img = document.createElement('span');
     img.className = 'ct-card-chipimg';
     if (item.img){
-      img.style.backgroundImage = 'url(' + item.img + ')';
-      img.style.backgroundSize = 'contain';    // whole ball, centered — no crop drift
-      img.style.backgroundRepeat = 'no-repeat';
-      img.style.backgroundPosition = 'center';
+      img.style.backgroundImage = 'url(' + item.img + ')';   // the CSS owns size/position
     } else {
       img.style.background = '#00000066';       // photo slot, dark until one exists
     }
