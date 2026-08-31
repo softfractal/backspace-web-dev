@@ -584,6 +584,15 @@
     font-family: var(--font-sans); font-weight: 300;
     font-size: calc(13px * var(--ui-scale));
     cursor: var(--cursor-target);
+    transition: background .16s, box-shadow .2s ease;
+  }
+  /* The + glows under the pointer (Eric, Aug 31) — the light plate
+     lifts to white and blooms; box-shadow, the drawn-minus's own
+     hover grammar (dark glyph on a light chip can't carry text glow). */
+  .hw-addrow .hw-add-chip:hover, .hw-addrow .hw-add-chip:focus-visible {
+    background: #fff;
+    box-shadow: 0 0 calc(12px * var(--ui-scale)) rgba(255, 255, 255, .55);
+    outline: none;
   }
   /* THE THREE ZONES, re-corrected (Eric, Aug 29: "add to cart is
      actually the plus icon, not the add to cart button text itself"):
