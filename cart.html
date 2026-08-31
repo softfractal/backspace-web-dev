@@ -74,27 +74,37 @@
   /* BOTH crumbs are buttons since the checkout state landed (Eric,
      Aug 31): .is-here rides whichever names the standing state; the
      other one is the way back/forward. */
+  /* THE PANEL'S TRUE RUNGS (Eric, Aug 31 — the design's typography
+     panel, the first live-text values §5.1 ever got): ChillDuanSans
+     WideSemiBold 600 in EVERY crumb state (the here-ness reads by
+     color + glow alone — the drop to Wide Light 300 was the
+     "square-ish" feel), 14px/15 at frame scale (÷0.9 law), 0% spacing.
+     The woff2 is the true cut — witnessed width-identical to the
+     freshly installed package. */
   .ct-crumb-btn {
     background: none; border: 0; padding: 0;
-    color: var(--bs-label); font-weight: 300;
+    color: var(--bs-label); font-weight: 600;
     font-family: var(--font-ui);
-    font-size: calc(12px * var(--ui-scale));
-    letter-spacing: .08em;
+    font-size: calc(14px / 0.9 * var(--ui-scale));
+    line-height: calc(15px / 0.9 * var(--ui-scale));
+    letter-spacing: 0;
     cursor: var(--cursor-target);
     transition: color .16s;
   }
   .ct-crumb-btn:hover, .ct-crumb-btn:focus-visible { color: #fff; outline: none; }
   .ct-crumb-btn.is-here {
-    color: var(--ink); font-weight: 600; text-shadow: var(--glow-text);
+    color: var(--ink); text-shadow: var(--glow-text);
     pointer-events: none;
   }
   #ct-summary-head {
     position: fixed; left: 72.5vw; top: var(--ct-crumb);
-    /* bold + glowing per the design's directive (Eric, Aug 31, p4) */
+    /* bold + glowing per the design's directive (Eric, Aug 31, p4);
+       the panel's true rungs: WideSemiBold 14px/15, 0% spacing */
     color: var(--ink);
     font-family: var(--font-ui); font-weight: 600;
-    font-size: calc(11px * var(--ui-scale));
-    letter-spacing: .12em;
+    font-size: calc(14px / 0.9 * var(--ui-scale));
+    line-height: calc(15px / 0.9 * var(--ui-scale));
+    letter-spacing: 0;
     text-shadow: var(--glow-text);
   }
 
