@@ -40,10 +40,11 @@
   body[data-bs-page="cart"] {
     --ct-top: 22.02vh;          /* rails y246 */
     --ct-rule: 24.62vh;         /* the section rule y275 */
-    /* the crumb line self-centers in the rail-top→rule window (Eric,
-       Aug 31: "don't feel visually centered") — the midpoint of
-       22.02 and 24.62, ridden with translateY(-50%) */
-    --ct-crumb: 23.32vh;
+    /* the crumb line rides HIGH in the rail-top→rule window like the
+       tray's CART (Eric, Aug 31: the 50% midpoint sat too close to
+       the rule; the reference eyeballs ≈33%, the tray's ruled 30%) —
+       22.02 + 0.30 × 2.60, ridden with translateY(-50%) */
+    --ct-crumb: 22.80vh;
   }
 
   /* ── Construction: the tray's rails carried up the page ─────────────── */
