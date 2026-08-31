@@ -220,7 +220,8 @@ var STR = {
     cartItemDeskTitle:'The OASIS DESK (Pre-order)',
     cartSpecSize:     'size',
     cartSpecOptions:  'options',
-    cartEstimated:    'Estimated completion',
+    cartEstimated:    'Estimated Completion:',   // revived Aug 31: the production-date bar's label
+    cartKickOrderNo:  'Kickstarter order number',
     cartKickstarter:  'KICKSTARTER',
     cartKickNote:     'Also available on kickstarter',
     cartPromo:        'promo code',

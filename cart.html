@@ -90,10 +90,12 @@
   }
   #ct-summary-head {
     position: fixed; left: 72.5vw; top: var(--ct-crumb);
-    color: var(--text-soft);
-    font-family: var(--font-ui); font-weight: 300;
+    /* bold + glowing per the design's directive (Eric, Aug 31, p4) */
+    color: var(--ink);
+    font-family: var(--font-ui); font-weight: 600;
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .12em;
+    text-shadow: var(--glow-text);
   }
 
   /* ── The big preview (95,305,715,467) — the selected item's stage ───── */
@@ -137,7 +139,12 @@
     left: 5.50vw; top: 70.28vh;
     width: 41.38vw;
     max-height: calc(98.12vh - 70.28vh);
-    display: flex; flex-wrap: wrap;
+    /* FOUR COLUMNS spanning the preview's own width (Eric, Aug 31, p1:
+       "the thumbnails together should have the same width as the main
+       preview") — 1fr cells, edges register at every window. Three
+       resting rows per the design's p5. */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: calc(15px * var(--ui-scale)) calc(25px * var(--ui-scale));
     overflow: hidden auto;
     overscroll-behavior: contain;
@@ -147,8 +154,8 @@
   }
   .ct-thumb {
     position: relative;
-    flex: none;
-    width: calc(160px * var(--ui-scale)); height: calc(90px * var(--ui-scale));
+    width: 100%;
+    aspect-ratio: 16 / 9;
     background: #4a4a4a5c;
     border: 0; padding: 0;
     transition: background .16s;
@@ -165,35 +172,9 @@
   .ct-thumb.is-filled:hover .ct-thumb-img,
   .ct-thumb.is-filled:focus-visible .ct-thumb-img { filter: brightness(1.28); }
   .ct-thumb.is-live { background: #5c5c5c7a; }   /* the previewed one */
-  /* THE MINUS (sixteenth word): the FOCUSED thumbnail carries a remove
-     control at its top right — thumbnail-level deletion joins the
-     summary card's X. */
-  .ct-thumb-minus {
-    position: absolute; top: 0; right: 0;
-    width: calc(28px * var(--ui-scale)); height: calc(28px * var(--ui-scale));
-    color: var(--text-soft);
-    cursor: var(--cursor-target);
-    z-index: 2;
-    transition: color .16s;
-  }
-  /* Drawn dash, equal insets top and right — doubled to 10px×ui on
-     Eric's word (Aug 29); hit box 18→28 keeps the symmetric surround. */
-  .ct-thumb-minus::after {
-    content: '';
-    position: absolute;
-    top: calc(10px * var(--ui-scale));
-    right: calc(10px * var(--ui-scale));
-    width: calc(8px * var(--ui-scale));
-    height: max(1px, calc(1.2px * var(--ui-scale)));
-    background: currentColor;
-    transition: box-shadow .2s ease;
-  }
-  .ct-thumb-minus:hover, .ct-thumb-minus:focus-visible {
-    color: #fff; outline: none;
-  }
-  .ct-thumb-minus:hover::after, .ct-thumb-minus:focus-visible::after {
-    box-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255, 255, 255, .65);
-  }
+  /* The thumbnail minus RETIRED (Eric, Aug 31, p2): deletion lives on
+     the summary card's X — the row-slot minus on /hardware stands
+     (that page has no summary). */
   .ct-thumb-name {
     position: absolute; left: calc(9px * var(--ui-scale)); bottom: calc(7px * var(--ui-scale));
     color: var(--text-soft);
@@ -221,50 +202,54 @@
     display: flex; flex-direction: column;
     gap: calc(12px * var(--ui-scale));
   }
-  /* Item-switch rows — LABELED INTERPRETATION of the note's "click
-     button -> expand below": one row per cart item; the open row is the
-     previewed one and its details render below. */
-  #ct-rows {
-    display: grid; gap: calc(6px * var(--ui-scale));
-    max-height: calc(102px * var(--ui-scale));
-    overflow: hidden auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: #ffffff5c transparent;
-  }
-  .ct-row {
-    display: flex; align-items: stretch;
-    height: calc(30px * var(--ui-scale));
-    border: 0; padding: 0; background: none;
-    cursor: var(--cursor-target);
-    flex: none;
-  }
-  .ct-row-chip {
-    flex: none;
-    width: calc(30px * var(--ui-scale));
-    display: grid; place-items: center;
+  /* ═ THE ↑↓ EXPANDER (Eric, Aug 31, p6-p7 — supersedes the item-switch
+     rows, whose confirm this answers): selection lives on the
+     thumbnails; the arrow plate expands the SELECTED product's
+     customization info, remembered PER ITEM (independent and
+     individual, his word). The two ⊙-number rows ride the expansion
+     AS DRAWN — purpose unknown ("keep them as so for now"); the
+     123456/654321 literals are Eric's authorized statics, awaiting
+     the design team's clarification. */
+  #ct-exp {
+    width: calc(30px * var(--ui-scale)); height: calc(30px * var(--ui-scale));
+    border: 0; padding: 0;
     background: #ededed; color: #0b0b0a;
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
+    font-size: calc(12px * var(--ui-scale));
+    letter-spacing: -.06em;
   }
-  .ct-row-bar {
-    flex: none;
-    width: calc(87px * var(--ui-scale));
+  #ct-exp:hover, #ct-exp:focus-visible { background: #fff; }
+  #ct-mystery {
+    display: grid; gap: calc(6px * var(--ui-scale));
+    margin-top: calc(8px * var(--ui-scale));
+    width: calc(147px * var(--ui-scale));
+    opacity: 0; visibility: hidden;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  #ct-mystery.is-on {
+    opacity: 1; visibility: visible;
+    transition: opacity var(--pop-fade);
+  }
+  .ct-myst-row { display: flex; height: calc(30px * var(--ui-scale)); }
+  .ct-myst-chip {
+    flex: none; width: calc(30px * var(--ui-scale));
+    display: grid; place-items: center;
+    background: #ededed; color: #0b0b0a;
+    font-family: var(--font-ui); font-size: calc(12px * var(--ui-scale));
+  }
+  .ct-myst-bar {
+    flex: 1;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 calc(8px * var(--ui-scale));
+    padding: 0 calc(10px * var(--ui-scale));
     background: #4a4a4a5c;
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(10px * var(--ui-scale));
+    font-size: calc(11px * var(--ui-scale));
     letter-spacing: .04em;
-    white-space: nowrap;
-    transition: background .16s, color .16s;
   }
-  .ct-row:hover .ct-row-bar, .ct-row:focus-visible .ct-row-bar { background: #5c5c5c5c; color: #fff; }
-  .ct-row:focus-visible { outline: none; }
-  .ct-row.is-live .ct-row-bar { color: var(--ink); font-weight: 600; }
-  /* Kickstarter — drawn per the frames; an EXTERNAL hand-off seam: the
-     click DENIES until the third-party overlay ruling (phase 2+). */
+  .ct-myst-bar i { font-style: normal; color: var(--ink); }
+  /* Kickstarter — the plate now EXPANDS the order-number box (Eric,
+     Aug 31, p7: not per-product; the URL hand-off is still coming). */
   #ct-kick {
     position: absolute; right: 0; top: 0;
     width: calc(133px * var(--ui-scale));
@@ -281,7 +266,16 @@
   }
   /* bloom/cursor/transitions ride .bs-fillpill (fake today, URL soon) */
   #ct-kick-btn:hover, #ct-kick-btn:focus-visible { background: #fff; }
-  #ct-kick-note {
+  #ct-kick-box {
+    display: grid; gap: calc(6px * var(--ui-scale));
+    opacity: 0; visibility: hidden;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  #ct-kick.is-open #ct-kick-box {
+    opacity: 1; visibility: visible;
+    transition: opacity var(--pop-fade);
+  }
+  #ct-kick-box label {
     height: calc(30px * var(--ui-scale));
     display: flex; align-items: center; justify-content: center;
     background: #4a4a4a5c;
@@ -290,9 +284,27 @@
     font-size: calc(9px * var(--ui-scale));
     letter-spacing: .02em;
     text-align: center;
+    cursor: var(--cursor-target);
+  }
+  /* ═ THE CUSTOMIZATION INFO (Eric, Aug 31, p8-p9): bottom-aligned to
+     the preview's own floor (69.14vh), drawn per the design's
+     paddings — every roman numeral on its own line, the numeral in its
+     own column; the completion bar carries the DATE, never the price
+     (the receipt already owns the money; the date source is unruled —
+     the "—" seam until production dates land; May 11–20 and $3499 are
+     do-not-port statics). Shown only while the item's ↑↓ stands open. */
+  #ct-info {
+    position: absolute; left: 0; right: 0;
+    bottom: 28.98vh;                 /* container ends 1.88vh up; 98.12−69.14 */
+    display: grid; gap: calc(14px * var(--ui-scale));
+    opacity: 0; visibility: hidden;
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
+  }
+  #ct-info.is-on {
+    opacity: 1; visibility: visible;
+    transition: opacity var(--pop-fade);
   }
   #ct-title {
-    margin-top: calc(160px * var(--ui-scale));   /* the frames' air above the title */
     color: var(--ink);
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(14px * var(--ui-scale));
@@ -300,14 +312,33 @@
     text-shadow: var(--glow-text);
   }
   #ct-specs {
-    display: grid; gap: calc(6px * var(--ui-scale));
+    display: grid; gap: calc(5px * var(--ui-scale));
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
     font-size: calc(11px * var(--ui-scale));
     line-height: 1.5;
     letter-spacing: .02em;
   }
-  #ct-specs .ct-spec-k { color: var(--bs-label); margin-right: calc(8px * var(--ui-scale)); }
+  .ct-spec-line {
+    display: grid;
+    grid-template-columns: calc(56px * var(--ui-scale)) calc(18px * var(--ui-scale)) 1fr;
+    column-gap: calc(8px * var(--ui-scale));
+  }
+  .ct-spec-line.is-group { margin-top: calc(8px * var(--ui-scale)); }
+  .ct-spec-line:first-child { margin-top: 0; }
+  #ct-specs .ct-spec-k { color: var(--bs-label); }
+  #ct-specs .ct-spec-n { color: var(--bs-label); }
+  #ct-complete {
+    height: calc(30px * var(--ui-scale));
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 calc(12px * var(--ui-scale));
+    background: #4a4a4a5c;
+    color: var(--bs-label);
+    font-family: var(--font-ui); font-weight: 300;
+    font-size: calc(11px * var(--ui-scale));
+    letter-spacing: .02em;
+  }
+  #ct-complete b { color: var(--ink); font-weight: 600; }
   /* ── ORDER SUMMARY (1243..1651) ─────────────────────────────────────── */
   #ct-summary {
     position: fixed;
@@ -838,16 +869,29 @@
 <!-- The detail column -->
 <div id="ct-detail">
   <div style="position:relative">
-    <div id="ct-rows" role="tablist" aria-label="Cart items"></div>
+    <!-- the ↑↓ expander — the item-switch rows' successor (Eric, Aug 31) -->
+    <button id="ct-exp" class="bs-fillpill" type="button" aria-expanded="false"
+            aria-label="Customization info">&#8593;&#8595;</button>
+    <div id="ct-mystery" aria-hidden="true">
+      <!-- kept AS DRAWN on Eric's word — purpose unknown, literals his -->
+      <div class="ct-myst-row"><span class="ct-myst-chip">&#9678;</span><span class="ct-myst-bar">123456<i>&#8593;</i></span></div>
+      <div class="ct-myst-row"><span class="ct-myst-chip">&#9678;</span><span class="ct-myst-bar">654321<i>&#8595;</i></span></div>
+    </div>
     <div id="ct-kick">
-      <button id="ct-kick-btn" class="bs-fillpill" type="button" data-str="cartKickstarter"></button>
-      <span id="ct-kick-note" data-str="cartKickNote"></span>
+      <button id="ct-kick-btn" class="bs-fillpill" type="button" data-str="cartKickstarter" aria-expanded="false"></button>
+      <div id="ct-kick-box">
+        <label for="ct-kick-in" data-str="cartKickOrderNo"></label>
+        <input id="ct-kick-in" class="bs-input" type="text" autocomplete="off" spellcheck="false">
+      </div>
     </div>
   </div>
-  <div id="ct-title"></div>
-  <div id="ct-specs"></div>
-  <!-- The estimated-completion tab left (Eric, Aug 31): the right
-       column's receipt already carries the money. -->
+  <div id="ct-info">
+    <div id="ct-title"></div>
+    <div id="ct-specs"></div>
+    <!-- the production-date bar (Eric, Aug 31, p8): label + DATE seam,
+         never the price — the receipt owns the money -->
+    <div id="ct-complete"><span data-str="cartEstimated"></span><b id="ct-complete-date">&#8212;</b></div>
+  </div>
 </div>
 
 <!-- ═══ THE CHECKOUT STATE (Eric's word, Aug 31) ═══
@@ -995,7 +1039,8 @@ function save(){ C.cartStore.save(ITEMS); }
 
 // ── DOM ─────────────────────────────────────────────────────────────────
 var gridEl   = document.getElementById('ct-grid');
-var rowsEl   = document.getElementById('ct-rows');
+var expEl    = document.getElementById('ct-exp');
+var expInfo  = {};   // per-item ↑↓ memory (session-live; attract never sweeps it)
 var cardsEl  = document.getElementById('ct-cards');
 var countEl  = document.getElementById('ct-items-count');
 var titleEl  = document.getElementById('ct-title');
@@ -1113,9 +1158,9 @@ function removeItem(i){
 
 // ── Render ──────────────────────────────────────────────────────────────
 function render(){
-  // grid — items + empties to the frames' resting count
+  // grid — items + empties to the design's resting count (3 rows × 4)
   gridEl.innerHTML = '';
-  var n = Math.max(8, ITEMS.length);
+  var n = Math.max(12, ITEMS.length);
   for (var i = 0; i < n; i++){
     (function(idx){
       var item = ITEMS[idx] || null;
@@ -1136,25 +1181,8 @@ function render(){
           b.insertBefore(photo, b.firstChild);   // behind the triangle + name
         }
         b.appendChild(name);
-        if (idx === selIdx){
-          // the focused product's remove control (sixteenth word) — a
-          // role-button span: a real <button> may not nest in the thumb.
-          var minus = document.createElement('span');
-          minus.className = 'ct-thumb-minus';   // the dash is drawn by the CSS
-          minus.setAttribute('role', 'button');
-          minus.setAttribute('tabindex', '0');
-          minus.setAttribute('aria-label', 'Remove from cart');
-          var removeIt = function(e){
-            e.stopPropagation();
-            wake();
-            if (clickOk()) removeItem(idx);
-          };
-          minus.addEventListener('click', removeIt);
-          minus.addEventListener('keydown', function(e){
-            if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); removeIt(e); }
-          });
-          b.appendChild(minus);
-        }
+        // the thumbnail minus RETIRED (Eric, Aug 31, p2) — deletion
+        // lives on the summary card's X
         b.setAttribute('aria-label', T(item.classKey) + ' — toggle for checkout, preview');
         // THE TENTH WORD (Eric, Aug 29): the frame itself checks and
         // unchecks — and still drives the big preview + detail column
@@ -1169,6 +1197,18 @@ function render(){
           SoundBus.play(item.checked ? 'commit' : 'detent'); hapticTick();
           render();
         });
+      } else {
+        // empty slots keep the resting ghost triangle (the design's
+        // p5 draws them; the hardware row's own empty grammar)
+        var ghost = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        ghost.setAttribute('class', 'ct-tri');
+        ghost.setAttribute('viewBox', '0 0 10 10');
+        ghost.setAttribute('aria-hidden', 'true');
+        var gp = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        gp.setAttribute('d', 'M0.5 0.5 H9 L0.5 9.5 Z');
+        gp.setAttribute('style', 'stroke:#fefefe2b');
+        ghost.appendChild(gp);
+        b.appendChild(ghost);
       }
       gridEl.appendChild(b);
     })(i);
@@ -1182,50 +1222,35 @@ function render(){
   Ball.show(!!sel);
   if (sel) Ball.set(stageParamsFor(sel.sel));
 
-  // item-switch rows (labeled interpretation of the note)
-  rowsEl.innerHTML = '';
-  ITEMS.forEach(function(item, i){
-    var r = document.createElement('button');
-    r.type = 'button';
-    r.className = 'ct-row' + (i === selIdx ? ' is-live' : '');
-    r.setAttribute('role', 'tab');
-    r.setAttribute('aria-selected', String(i === selIdx));
-    var chip = document.createElement('span');
-    chip.className = 'ct-row-chip';
-    chip.textContent = (i + 1);
-    var bar = document.createElement('span');
-    bar.className = 'ct-row-bar';
-    var lbl = document.createElement('span');
-    lbl.textContent = T(item.classKey);
-    var arrow = document.createElement('span');
-    arrow.textContent = i === selIdx ? '▾' : '▸';
-    bar.appendChild(lbl); bar.appendChild(arrow);
-    r.appendChild(chip); r.appendChild(bar);
-    r.addEventListener('click', function(e){
-      e.stopPropagation();
-      wake();
-      selectItem(i);
-    });
-    rowsEl.appendChild(r);
-  });
+  // the ↑↓ expander's state — per-item memory (Eric, Aug 31: each
+  // product independent and individual); the item-switch rows retired
+  var infoOn = !!(sel && expInfo[sel.id]);
+  document.getElementById('ct-info').classList.toggle('is-on', infoOn);
+  document.getElementById('ct-mystery').classList.toggle('is-on', infoOn);
+  expEl.setAttribute('aria-expanded', String(infoOn));
 
-  // detail
+  // the customization info — the design's own line grammar (Aug 31,
+  // p8-p9): every roman numeral its own line, the numeral columned;
+  // only the parts the model CARRIES render (I/II are unbuilt stages —
+  // never faked)
   titleEl.textContent = sel ? T('cartItemDeskTitle') : '—';
   specsEl.innerHTML = '';
   if (sel){
-    var lines = [
-      [T('cartSpecSize'), sizeText(sel.sel)],
-      [T('hwSubDesktop') + ' III', partText(sel.sel, 'III')],
-      [T('hwSubDesklegs') + ' IV', partText(sel.sel, 'IV')],
-      [T('hwSubDesklegs') + ' V', partText(sel.sel, 'V')]
-    ];
-    lines.forEach(function(l){
+    [
+      { k: T('cartSpecSize'),   n: '',    v: sizeText(sel.sel),        g: true },
+      { k: T('hwSubDesktop'),   n: 'III', v: partText(sel.sel, 'III'), g: true },
+      { k: T('hwSubDesklegs'),  n: 'IV',  v: partText(sel.sel, 'IV'),  g: true },
+      { k: '',                  n: 'V',   v: partText(sel.sel, 'V') }
+    ].forEach(function(l){
       var d = document.createElement('div');
+      d.className = 'ct-spec-line' + (l.g ? ' is-group' : '');
       var k = document.createElement('span');
-      k.className = 'ct-spec-k';
-      k.textContent = l[0];
-      d.appendChild(k);
-      d.appendChild(document.createTextNode(l[1]));
+      k.className = 'ct-spec-k'; k.textContent = l.k;
+      var nn = document.createElement('span');
+      nn.className = 'ct-spec-n'; nn.textContent = l.n;
+      var v = document.createElement('span');
+      v.textContent = l.v;
+      d.appendChild(k); d.appendChild(nn); d.appendChild(v);
       specsEl.appendChild(d);
     });
   }
@@ -1306,7 +1331,7 @@ function render(){
 // the third-party overlay are later phases). checkout and its crumb now
 // COMMIT into the checkout state — Eric's word, Aug 31; the FINAL
 // submission still denies below. ─────────────────────────────────────────
-[['ct-apply'], ['ct-kick-btn']].forEach(function(pair){
+[['ct-apply']].forEach(function(pair){
   var b = document.getElementById(pair[0]);
   b.addEventListener('click', function(e){
     e.stopPropagation();
@@ -1314,6 +1339,35 @@ function render(){
     denyOn(b);
   });
 });
+
+// THE ↑↓ EXPANDER (Eric, Aug 31): toggles the SELECTED product's
+// customization info; the state is remembered per item.
+expEl.addEventListener('click', function(e){
+  e.stopPropagation(); wake();
+  var sel = ITEMS[selIdx];
+  if (!sel){ denyOn(expEl); return; }            // nothing selected, nothing to show
+  if (!clickOk()) return;
+  expInfo[sel.id] = !expInfo[sel.id];
+  SoundBus.play(expInfo[sel.id] ? 'commit' : 'detent'); hapticTick();
+  render();
+});
+
+// KICKSTARTER (Eric, Aug 31): not per-product — the plate expands the
+// order-number box (a LABELED interpretation: the input takes the
+// backer's number; where it goes is the hand-off ruling's, with the
+// URL that is coming). Session-only, never persisted.
+(function(){
+  var kick = document.getElementById('ct-kick');
+  var btn = document.getElementById('ct-kick-btn');
+  btn.addEventListener('click', function(e){
+    e.stopPropagation(); wake();
+    if (!clickOk()) return;
+    var on = kick.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', String(on));
+    SoundBus.play(on ? 'commit' : 'detent'); hapticTick();
+    if (on) document.getElementById('ct-kick-in').focus();
+  });
+})();
 
 // ═══ THE CHECKOUT STATE (Eric's word, Aug 31) ═══════════════════════════
 // Placements from the "1 checkout" frames; mechanism from the account
@@ -1645,8 +1699,6 @@ C.init({
       if (gridEl.contains(e.target))  return gridEl.scrollHeight > gridEl.clientHeight + 1;
       if (cardsEl.contains(e.target)) return cardsEl.scrollHeight > cardsEl.clientHeight + 1;
       if (bookEl.contains(e.target))  return bookEl.scrollHeight > bookEl.clientHeight + 1;
-      var rows = document.getElementById('ct-rows');
-      if (rows.contains(e.target)) return rows.scrollHeight > rows.clientHeight + 1;
       return false;
     },
     wheelStep:      function(){ return false; },
