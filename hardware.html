@@ -255,20 +255,43 @@
      5×5×ui at the rail, y cap-mid solved (--bs-dot-y). A pseudo on
      every sub-item, revealed by the pop — hover AND active, exactly
      the red dot's fade grammar. */
+  /* ═ THE HOLLOW-DOT LAW (Eric, Aug 31) ═ For menus where one item can
+     POP while another stands SELECTED (this page's two side menus are
+     the type's only consumers today; the law is recorded in the canon
+     for future menus of the kind): the popped-UNSELECTED item wears
+     the OUTLINE dot — selection FILLS it. The hollow state carries the
+     soft glow rung only: a 1px ring drowns under the full ladder at
+     5px×ui, so the fill is what the eye reads as the choice. */
   #hw-product-menu .bs-subitem::after {
     content: ''; position: absolute;
     right: 0;
     top: var(--bs-dot-y, 50%);
     width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
-    background: var(--bs-marker-blue); border-radius: 50%;
+    background: transparent;                     /* hollow until chosen */
+    border: 1px solid var(--bs-marker-blue);
+    box-sizing: border-box;
+    border-radius: 50%;
+    box-shadow: 0 0 calc(9px * var(--ui-scale)) rgba(18, 82, 119, .5);
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity var(--side-menu-fade);
+  }
+  #hw-product-menu .bs-subitem.is-live::after {
+    background: var(--bs-marker-blue);           /* the choice fills */
     /* The fitted spread ladder at the blue's own hue (PROVISIONAL —
        parity with the warm marker's ladder; one line strikes it). */
     box-shadow:
       0 0 calc(9px  * var(--ui-scale))                              rgba(18, 82, 119, .85),
       0 0 calc(32px * var(--ui-scale)) calc(3px  * var(--ui-scale)) rgba(18, 82, 119, .42);
-    transform: translateY(-50%);
-    opacity: 0;
-    transition: opacity var(--side-menu-fade);
+  }
+  /* the red side — the class menu obeys the same law (the pair's
+     .bs-item stays untouched: /home's commit-away menu is a DIFFERENT
+     type and keeps its certified filled dot) */
+  #hw-class-menu .bs-item.kb-hover:not(.active)::before {
+    background: transparent;
+    border: 1px solid var(--color-signal-red);
+    box-sizing: border-box;
+    box-shadow: 0 0 8px rgba(157, 31, 0, .35);
   }
   #hw-product-menu .bs-subitem.kb-hover::after,
   #hw-product-menu .bs-subitem:focus-visible::after,
