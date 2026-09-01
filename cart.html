@@ -1587,9 +1587,12 @@ tabSave.addEventListener('click', function(e){
   e.stopPropagation(); wake();
   if (!clickOk()) return;
   if (bookSel >= 0){
-    // DELETE the selected saved address (the tab's morphed duty)
+    // DELETE the selected saved address (the tab's morphed duty) —
+    // and the autofilled form wipes with it (Eric, Aug 31)
     BOOK.splice(bookSel, 1);
     bookSel = -1;
+    Object.keys(shipF).forEach(function(kk){ shipF[kk].input.value = ''; });
+    syncBilling();
     saveBookStore(); renderBook(); updateSaveTab();
     SoundBus.play('detent'); hapticTick();
     return;
