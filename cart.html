@@ -611,12 +611,16 @@
     transition: background .16s, color .16s;
   }
   .co-tab:hover, .co-tab:focus-visible { background: #5c5c5c8a; color: #fff; outline: none; }
-  .co-tab.is-on { background: #ededed; color: #0b0b0a; }
+  /* selected tab reads by WEIGHT, not fill (Eric, Aug 31, p2) */
+  .co-tab.is-on { color: var(--ink); font-weight: 600; }
   #co-book {
     position: absolute; left: calc(16px * var(--ui-scale)); top: 12.00vh;
     display: grid; grid-template-columns: repeat(2, calc(230px * var(--ui-scale)));
     gap: calc(20px * var(--ui-scale)) calc(18px * var(--ui-scale));
     max-height: calc(23vh);
+    /* the scrollbar rides OUTSIDE the cards (Eric, Aug 31, p1): the
+       padding is its lane — it never overlaps a saved address */
+    padding-right: calc(16px * var(--ui-scale));
     overflow: hidden auto;
     overscroll-behavior: contain;
     scrollbar-width: thin; scrollbar-color: #ffffff5c transparent;
