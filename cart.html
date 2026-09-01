@@ -811,15 +811,14 @@
     display: flex; gap: calc(6px * var(--ui-scale));
     z-index: 3; pointer-events: none;
   }
-  /* the design team's OWN badges (their Figma exports, Aug 31) — they
-     carry their own plates, so no wrapper chrome; UnionPay's canvas
-     holds transparent margin, its height compensates to read uniform */
+  /* the design team's OWN badges — their SVG exports rendered white
+     as black (broken embedded rasters), so the PNGS they sent replace
+     them (Eric, Aug 31); self-plated, no wrapper chrome */
   .co-cardmark {
     display: flex; align-items: center; justify-content: center;
     height: calc(20px * var(--ui-scale));
   }
   .co-cardmark img { height: calc(20px * var(--ui-scale)); width: auto; display: block; }
-  .co-cardmark:last-child img { height: calc(24px * var(--ui-scale)); }
   /* expiration: ONE label over ONE line, both dates BELOW it around
      the centered dash (the design's own drawing) */
   .co-exp-vals { display: flex; align-items: baseline; gap: calc(8px * var(--ui-scale)); }
@@ -1020,10 +1019,10 @@
          copies; payment-indicator use). NO data-str on these: the
          string pass would clobber the imgs. -->
     <div class="co-cards" aria-hidden="true">
-      <span class="co-cardmark"><img src="assets/ui/pay/mastercard.svg" alt=""></span>
-      <span class="co-cardmark"><img src="assets/ui/pay/amex.svg" alt=""></span>
-      <span class="co-cardmark"><img src="assets/ui/pay/visa.svg" alt=""></span>
-      <span class="co-cardmark"><img src="assets/ui/pay/unionpay.svg" alt=""></span>
+      <span class="co-cardmark"><img src="assets/ui/pay/mastercard.png" alt=""></span>
+      <span class="co-cardmark"><img src="assets/ui/pay/amex.png" alt=""></span>
+      <span class="co-cardmark"><img src="assets/ui/pay/visa.png" alt=""></span>
+      <span class="co-cardmark"><img src="assets/ui/pay/unionpay.png" alt=""></span>
     </div>
     <div class="co-exp-body" id="co-payment-body">
       <div id="co-pay-form" class="co-form"></div>
