@@ -667,15 +667,20 @@
      fixed bug). */
   #co-ship-form {
     position: absolute;
-    left: 33.68vw; top: 11.10vh;                /* frame 674 → col A */
+    left: 33.68vw;
+    /* THE REGISTER (Eric, Aug 31): the first row's label/dot sits ON
+       the book's first-card top edge (12.00vh) and the company line's
+       ink ON the second card's bottom edge (+240px×ui) — the rows
+       breathe INSIDE the register with a decreased gap (30 → 18px×ui,
+       his word) so nothing collides with the pinned floor line. */
+    top: 12.00vh;
     width: 28.36vw;                              /* through 1164 (490) */
-    /* the form's floor registers to the book's second card row (Eric,
-       Aug 31): height = book top (12.00vh) − form top + two cards +
-       gap; the wide company field bottoms itself against it */
-    height: calc(0.90vh + 240px * var(--ui-scale));
+    height: calc(240px * var(--ui-scale));
     grid-template-columns: 11.57vw 15.05vw;      /* frame 200 + 260 */
     column-gap: 0;
+    row-gap: calc(18px * var(--ui-scale));
     justify-content: space-between;              /* = the frame's 30px gap */
+    align-content: start;                        /* rows hug the register's top — never stretch into the floor */
   }
   /* the company line PINS to the form's floor — its input bottom IS
      the book's second-row edge */
@@ -757,17 +762,17 @@
      checkbox; the OPEN head shrinks to its title zone so the fields
      underneath are reachable (the full-strip head was eating the top
      row's clicks — the Aug 31 appearance-only bug). */
-  .co-exp.is-open .co-exp-head { height: calc(34px * var(--ui-scale)); }
-  /* COLLAPSED, the strip's contents center as a group (Eric, Aug 31 —
-     the design draws title/subhead/logos vertically centered): the
-     frame offsets, strip-relative — title 40/1117, subhead 58, logo
-     row 75. Open windows keep the top-anchored offsets. */
-  .co-exp:not(.is-open) .co-exp-head { padding-top: 3.58vh; }
+  /* The strip's contents hold the frame offsets IN BOTH STATES (Eric,
+     Aug 31, p5: expansion grows the BOTTOM — the title never moves),
+     with p4's airier spread between title and sub contents. The open
+     head's hit zone covers the standing title. */
+  .co-exp .co-exp-head { padding-top: 3.58vh; }
+  .co-exp.is-open .co-exp-head { height: calc(3.58vh + 26px * var(--ui-scale)); }
   #co-faster .co-head { top: 3.58vh; left: calc(14px * var(--ui-scale)); }
-  .co-exp:not(.is-open) .co-subhead { top: 5.19vh; }
-  .co-exp:not(.is-open) .co-useship { top: 5.90vh; }
-  .co-exp:not(.is-open) .co-cards { top: 6.40vh; }
-  #co-faster .co-wallets { bottom: auto; top: 6.20vh; }
+  #co-payment .co-subhead { top: 5.60vh; }
+  #co-billing .co-useship { top: 6.30vh; }
+  #co-payment .co-cards { top: 7.00vh; }
+  #co-faster .co-wallets { bottom: auto; top: 6.80vh; }
   .co-exp-body {
     position: absolute;
     left: 0; right: 0;
