@@ -773,22 +773,22 @@
      checkbox; the OPEN head shrinks to its title zone so the fields
      underneath are reachable (the full-strip head was eating the top
      row's clicks — the Aug 31 appearance-only bug). */
-  /* THE GROUP CENTERS (Eric, Aug 31: title + sub contents TOGETHER
-     take the strip's vertical center, per window — not the title
-     alone). p4's spread between the pieces holds; the offsets are
-     solved so each group's extent centers in the 10.56vh strip:
-     billing (title→checkbox, h≈3.72vh) → 3.42 · payment (title→
-     chips, h≈4.87) → 2.85 · faster (title→wallets, h≈5.15) → 2.71.
-     STATE-INVARIANT per the standing-titles law: expansion grows the
-     bottom, nothing here moves. */
-  #co-billing .co-exp-head { padding-top: 3.42vh; }
-  #co-payment .co-exp-head { padding-top: 2.85vh; }
-  .co-exp.is-open .co-exp-head { height: calc(3.42vh + 26px * var(--ui-scale)); }
-  #co-faster .co-head { top: 2.71vh; left: calc(14px * var(--ui-scale)); }
-  #co-payment .co-subhead { top: 4.87vh; }
-  #co-billing .co-useship { top: 6.14vh; }
-  #co-payment .co-cards { top: 6.27vh; }
-  #co-faster .co-wallets { bottom: auto; top: 5.93vh; }
+  /* THE UNIFIED GROUP MODEL (Eric, Aug 31, superseding the per-window
+     solve): ONE fixed combined height for all three strips — title
+     line (17) + gap (24, payment's subhead lives in it) + sub band
+     (24) = 65px×ui, centered in the 10.56vh strip. TITLES align to
+     each other; SUB CONTENTS align to each other, each centered on
+     the shared band (billing's short checkbox gets the invisible
+     fill — its centering within the band IS the fill). STATE-
+     INVARIANT per the standing-titles law. */
+  .co-window { --co-title-y: calc((10.56vh - 65px * var(--ui-scale)) / 2); }
+  #co-billing .co-exp-head, #co-payment .co-exp-head { padding-top: var(--co-title-y); }
+  .co-exp.is-open .co-exp-head { height: calc(var(--co-title-y) + 26px * var(--ui-scale)); }
+  #co-faster .co-head { top: var(--co-title-y); left: calc(14px * var(--ui-scale)); }
+  #co-payment .co-subhead { top: calc(var(--co-title-y) + 19px * var(--ui-scale)); }
+  #co-payment .co-cards   { top: calc(var(--co-title-y) + 43px * var(--ui-scale)); }  /* band + (24−20)/2 */
+  #co-billing .co-useship { top: calc(var(--co-title-y) + 47px * var(--ui-scale)); }  /* band + (24−12)/2 */
+  #co-faster .co-wallets  { bottom: auto; top: calc(var(--co-title-y) + 41px * var(--ui-scale)); }
   .co-exp-body {
     position: absolute;
     left: 0; right: 0;
@@ -811,14 +811,15 @@
     display: flex; gap: calc(6px * var(--ui-scale));
     z-index: 3; pointer-events: none;
   }
+  /* the design team's OWN badges (their Figma exports, Aug 31) — they
+     carry their own plates, so no wrapper chrome; UnionPay's canvas
+     holds transparent margin, its height compensates to read uniform */
   .co-cardmark {
     display: flex; align-items: center; justify-content: center;
-    height: calc(18px * var(--ui-scale));
-    padding: calc(3px * var(--ui-scale)) calc(5px * var(--ui-scale));
-    background: #fff;
-    border-radius: calc(3px * var(--ui-scale));
+    height: calc(20px * var(--ui-scale));
   }
-  .co-cardmark img { height: 100%; width: auto; display: block; }
+  .co-cardmark img { height: calc(20px * var(--ui-scale)); width: auto; display: block; }
+  .co-cardmark:last-child img { height: calc(24px * var(--ui-scale)); }
   /* expiration: ONE label over ONE line, both dates BELOW it around
      the centered dash (the design's own drawing) */
   .co-exp-vals { display: flex; align-items: baseline; gap: calc(8px * var(--ui-scale)); }
@@ -842,7 +843,8 @@
   .co-wallet {
     display: flex; align-items: center; justify-content: center;
     height: calc(24px * var(--ui-scale));
-    padding: 0 calc(12px * var(--ui-scale));
+    width: calc(64px * var(--ui-scale));   /* ALL at the widest (PayPal's) — Eric, Aug 31 */
+    padding: 0;
     border: 0;
     border-radius: calc(3px * var(--ui-scale));
     font-family: var(--font-ui); font-weight: 600;
