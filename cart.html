@@ -762,17 +762,22 @@
      checkbox; the OPEN head shrinks to its title zone so the fields
      underneath are reachable (the full-strip head was eating the top
      row's clicks — the Aug 31 appearance-only bug). */
-  /* The strip's contents hold the frame offsets IN BOTH STATES (Eric,
-     Aug 31, p5: expansion grows the BOTTOM — the title never moves),
-     with p4's airier spread between title and sub contents. The open
-     head's hit zone covers the standing title. */
-  .co-exp .co-exp-head { padding-top: 3.58vh; }
-  .co-exp.is-open .co-exp-head { height: calc(3.58vh + 26px * var(--ui-scale)); }
-  #co-faster .co-head { top: 3.58vh; left: calc(14px * var(--ui-scale)); }
-  #co-payment .co-subhead { top: 5.60vh; }
-  #co-billing .co-useship { top: 6.30vh; }
-  #co-payment .co-cards { top: 7.00vh; }
-  #co-faster .co-wallets { bottom: auto; top: 6.80vh; }
+  /* THE GROUP CENTERS (Eric, Aug 31: title + sub contents TOGETHER
+     take the strip's vertical center, per window — not the title
+     alone). p4's spread between the pieces holds; the offsets are
+     solved so each group's extent centers in the 10.56vh strip:
+     billing (title→checkbox, h≈3.72vh) → 3.42 · payment (title→
+     chips, h≈4.87) → 2.85 · faster (title→wallets, h≈5.15) → 2.71.
+     STATE-INVARIANT per the standing-titles law: expansion grows the
+     bottom, nothing here moves. */
+  #co-billing .co-exp-head { padding-top: 3.42vh; }
+  #co-payment .co-exp-head { padding-top: 2.85vh; }
+  .co-exp.is-open .co-exp-head { height: calc(3.42vh + 26px * var(--ui-scale)); }
+  #co-faster .co-head { top: 2.71vh; left: calc(14px * var(--ui-scale)); }
+  #co-payment .co-subhead { top: 4.87vh; }
+  #co-billing .co-useship { top: 6.14vh; }
+  #co-payment .co-cards { top: 6.27vh; }
+  #co-faster .co-wallets { bottom: auto; top: 5.93vh; }
   .co-exp-body {
     position: absolute;
     left: 0; right: 0;
