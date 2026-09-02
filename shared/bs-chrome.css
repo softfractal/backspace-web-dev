@@ -138,6 +138,10 @@
      §hotness; reports/tools/hotness_study.js. */
   /* The utility cluster runs 25% larger than the base UI scale (Eric). */
   --icons-scale: calc(var(--ui-scale) * 1.25);
+  /* THE EXPANSION FLOOR's standard gap: the cluster's own 24 rhythm (8.8 pads
+     + 6.4 gap between circles), between a capped pill's bottom edge and the
+     content beneath it (Eric, Sept 3: the gap is the set value; the height adapts). */
+  --bs-pill-gap: calc(24px * var(--icons-scale));
   --font-display: "Syncopate", "Chill Duan Sans", ui-sans-serif, system-ui, sans-serif;
   --font-ui:      "Chill Duan Sans Wide", "Chill Duan Sans", ui-sans-serif, system-ui, sans-serif;
   /* --font-sans omits Octarine until G-Octarine clears. */
@@ -496,7 +500,22 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   overflow: hidden;
   transition: height var(--pop-motion);   /* the universal tempo */
 }
-.bs-pill.is-open { height: var(--open-h); }
+/* THE EXPANSION FLOOR (Eric, Sept 3): a pill's expansion must never overlap
+   page content below it. The machine (fitPill in the js) finds the
+   nearest visible text / image / input below the head inside the pill's
+   column, and caps the open height so the pill's bottom edge sits
+   --bs-pill-gap above it — the gap is the standard, the height adapts
+   per page and window. A capped list pill (language, account) scrolls
+   its tray; the volume track simply shortens with the pill (the fill
+   stays proportional). Nominal heights stay in --open-h; the cap arrives
+   inline as --open-h-cap. */
+.bs-pill.is-open { height: var(--open-h-cap, var(--open-h)); }
+.bs-pill.is-capped .bs-tray {
+  max-height: calc(var(--open-h-cap) - 35px * var(--icons-scale));
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: none;                 /* the 35px×icons capsule has no lane for a bar; wheel, keys and touch scroll it */
+}
+.bs-pill.is-capped .bs-tray::-webkit-scrollbar { display: none; }
 .bs-head {
   width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
   display: flex; align-items: center; justify-content: center;
@@ -601,7 +620,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   width: 100%;
   /* The track is everything below the head — the fill runs to the very
      brim of the pill. --open-h is inherited from the pill's inline style. */
-  height: calc(var(--open-h) - 35px * var(--icons-scale));
+  height: calc(var(--open-h-cap, var(--open-h)) - 35px * var(--icons-scale));   /* shortens with the cap (the expansion floor) */
   position: relative;
   cursor: var(--cursor-target);
   outline: none;

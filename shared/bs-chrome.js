@@ -446,7 +446,7 @@ var _rzTimer = null;
 window.addEventListener('resize', function(){
   setScale();
   clearTimeout(_rzTimer);
-  _rzTimer = setTimeout(function(){ PAGE.onFontsReady(); }, 150);   // re-measure hook
+  _rzTimer = setTimeout(function(){ PAGE.onFontsReady(); fitOpenPills(); }, 150);   // re-measure hook (+ the expansion floor)
 });
 
 // ── Utility cluster — markup identical to the certified static DOM,
@@ -455,11 +455,11 @@ function buildUtilityCluster(){
   var mount = document.getElementById('bs-icons');
   if (!mount) return;
   mount.innerHTML =
-    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-lang" style="--open-h: calc(157px * var(--icons-scale))">' +
+    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-lang" data-open="157" style="--open-h: calc(157px * var(--icons-scale))">' +
       '<button class="bs-head" id="bs-lang" type="button" aria-label="Language" aria-haspopup="true" aria-expanded="false">EN</button>' +
       '<div class="bs-tray" id="bs-lang-tray"></div>' +
     '</div></div>' +
-    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-sound" style="--open-h: calc(209px * var(--icons-scale))">' +
+    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-sound" data-open="209" style="--open-h: calc(209px * var(--icons-scale))">' +
       '<button class="bs-head" id="bs-sound" type="button" aria-label="Sound" aria-haspopup="true" aria-expanded="false">' +
         '<img src="assets/ui/icon-figma-brand-awareness.png" alt="" aria-hidden="true">' +
       '</button>' +
@@ -472,7 +472,7 @@ function buildUtilityCluster(){
     '<div class="bs-hit"><button class="bs-round" id="bs-cart" type="button" aria-label="Cart">' +
       '<img src="assets/ui/icon-cart-checkout.svg" alt="" aria-hidden="true">' +
     '</button></div>' +
-    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-account" style="--open-h: calc(178px * var(--icons-scale))">' +
+    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-account" data-open="178" style="--open-h: calc(178px * var(--icons-scale))">' +
       '<button class="bs-head" id="bs-account" type="button" aria-label="Account" aria-haspopup="true" aria-expanded="false">' +
         '<img src="assets/ui/icon-figma-person.png" alt="" aria-hidden="true">' +
       '</button>' +
@@ -492,10 +492,49 @@ function buildUtilityCluster(){
 
 // ── Pills — hover grows the circle into a capsule; touch taps the head to
 // open first; a tap outside closes everything. ───────────────────────────
+/* THE EXPANSION FLOOR (Eric, Sept 3): before a pill opens, find the nearest
+   visible content below its head inside its own column (text runs, images,
+   inputs — never the chrome, never the stage canvas) and cap the open
+   height so the pill's bottom edge sits --bs-pill-gap above it. The gap is
+   the standard; the height adapts to the page and the window. A capped
+   list pill scrolls its tray (is-capped); the volume track just shortens.
+   Below one tray row the cap stops shrinking — a page whose content sits
+   that high must move it. Re-fitted on resize while open. */
+function pillFloor(pill){
+  var pr = pill.getBoundingClientRect(), head = pill.querySelector('.bs-head');
+  var yTop = (head ? head.getBoundingClientRect().bottom : pr.top);
+  var x0 = pr.left, x1 = pr.right, floor = window.innerHeight;
+  function consider(r){ if (r.width <= 0 || r.height <= 0) return; if (r.right <= x0 || r.left >= x1 || r.top < yTop) return; if (r.top < floor) floor = r.top; }
+  function chrome(el){ return !!el.closest('#bs-icons, #bs-corner, #bs-cursor, #bs-haptic, #bs-wordmark'); }
+  function visible(el){ return el.checkVisibility ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) : true; }
+  var tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n;
+  while ((n = tw.nextNode())) {
+    if (!n.nodeValue || !n.nodeValue.trim()) continue;
+    var el = n.parentElement; if (!el || chrome(el) || !visible(el)) continue;
+    var rg = document.createRange(); rg.selectNodeContents(n);
+    var rects = rg.getClientRects(); for (var i = 0; i < rects.length; i++) consider(rects[i]);
+  }
+  var boxes = document.querySelectorAll('img, svg, input, textarea, select, video');
+  for (var j = 0; j < boxes.length; j++) { if (chrome(boxes[j]) || !visible(boxes[j])) continue; consider(boxes[j].getBoundingClientRect()); }
+  return floor;
+}
+function fitPill(pill){
+  var nominal = parseFloat(pill.getAttribute('data-open') || '0'); if (!nominal) return;
+  var ui = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale')) || 1, icons = ui * 1.25;
+  var gap = 24 * icons, headH = 35 * icons, rowH = (pill.id === 'bs-pill-account' ? 45 : 38) * icons;
+  var top = pill.getBoundingClientRect().top;
+  var avail = pillFloor(pill) - gap - top;
+  var want = nominal * icons;
+  var cap = Math.min(want, Math.max(headH + rowH, avail));
+  if (cap < want - 0.5) { pill.style.setProperty('--open-h-cap', cap.toFixed(2) + 'px'); pill.classList.add('is-capped'); }
+  else { pill.style.removeProperty('--open-h-cap'); pill.classList.remove('is-capped'); }
+}
+function fitOpenPills(){ var open = document.querySelectorAll('.bs-pill.is-open'); for (var i = 0; i < open.length; i++) fitPill(open[i]); }
 function bindPill(pillEl, headEl){
   var pill = pillEl, head = headEl;
   function open(){
     if (!pill.classList.contains('is-open')){
+      fitPill(pill);                                            // the expansion floor, before the height transition starts
       pill.classList.add('is-open');
       head.setAttribute('aria-expanded', 'true');
       if (api.onOpenChange) api.onOpenChange(true);
@@ -569,7 +608,7 @@ function renderTray(){
     document.getElementById('bs-vol-track').classList.add('kb-hover');   // the slider arms as a whole
     return;
   }
-  trayItems(iconLock).forEach(function(b, i){ b.classList.toggle('kb-hover', i === trayIdx); });
+  trayItems(iconLock).forEach(function(b, i){ b.classList.toggle('kb-hover', i === trayIdx); if (i === trayIdx && b.scrollIntoView && b.closest('.bs-pill.is-capped')) b.scrollIntoView({ block: 'nearest' }); });
 }
 function lockPill(i){
   var c = ICONS[i];
@@ -764,6 +803,8 @@ function bindWheel(){
     // The page may own this wheel outright (a locked panel's native
     // scroll) — asked BEFORE preventDefault, or the scroll is already dead.
     if (PAGE.wheelNative(e)) return;
+    // A CAPPED pill tray under the pointer scrolls natively (the expansion floor).
+    if (e.target && e.target.closest && e.target.closest('.bs-pill.is-capped .bs-tray')) return;
     e.preventDefault();
     wake();
     if (PAGE.isLocked()){ PAGE.denyLocked(); return; }
@@ -1386,6 +1427,7 @@ window.BSChrome = {
   // re-runs it for locale swaps.
   normalizeWordGlow: normalizeWordGlow,   // alias (rule 6's name)
   normalizeBloom: normalizeBloom,
+  fitPills: fitOpenPills,                  // the expansion floor: re-fit open pills after a page relayout
   bindPill: bindPill,
   renderStrings: renderStrings,
   // The factored trio (Aug 28) + the measurement primitives they lean on.
