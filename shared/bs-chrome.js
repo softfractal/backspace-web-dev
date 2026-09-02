@@ -891,7 +891,9 @@ var BLOOM = {
   capsule:   { HARDWARE: 1.68, SOFTWARE: 1.79, COMMUNITY: 1.839, SUPPORT: 1.885 },
   social:    { Instagram: 1.791, YouTube: 2.038, TikTok: 2.127, X: 3.57, Discord: 1.968, Facebook: 1.854 },
   lang:      { EN: 2.315, ZH: 2.546, JA: 2.757, ES: 2.548 },
-  sub:       { overview: 1.963, 'industrial design': 1.863, specifications: 1.854, ecosystem: 1.84, support: 1.99 },
+  // weight-keyed: the hovered sub-item is Wide 300, the SELECTED one (is-chosen / is-live) is 600 — denser ink, its own values
+  sub:       { 300: { overview: 1.963, 'industrial design': 1.863, specifications: 1.854, ecosystem: 1.84, support: 1.99, size: 2.084, desktop: 1.766, desklegs: 1.664 },
+               600: { overview: 1.041, 'industrial design': 0.918, specifications: 0.924, ecosystem: 0.933, support: 0.979, size: 1.192, desktop: 0.913, desklegs: 0.916 } },
   head:      { INTRODUCTION: 1.04, CUSTOM: 1.064 },
   traylabel: { CART: 1.329 },
   option:    { 'product consulting': 1.093, 'order & delivery': 1.122, 'warranty & repair': 1.115 },
@@ -906,17 +908,18 @@ var BLOOM_SCOPE = [
   ['.bs-subitem', 'sub'], ['.hw-head', 'head'], ['.hw-tray-label', 'traylabel'],
   ['.bs-option', 'option'], ['.sup-door-label', 'door'], ['.ct-crumb-btn', 'crumb']
 ];
+function bloomOne(el, surface){
+  if (el.querySelector('img')) return;                            // glyph heads are handled by id below
+  var table = BLOOM[typeof surface === 'function' ? surface(el) : surface] || {};
+  if (table[300] || table[600]) table = table[getComputedStyle(el).fontWeight === '600' ? 600 : 300] || {};   // weight-keyed surfaces
+  var key = (el.textContent || '').trim();
+  if (Object.prototype.hasOwnProperty.call(table, key)) el.style.setProperty('--bloom-g', String(table[key]));
+  else el.style.removeProperty('--bloom-g');                       // the surface (or state) default in the CSS stands
+}
 function normalizeBloom(){
   BLOOM_SCOPE.forEach(function(pair){
     var els = document.querySelectorAll(pair[0]);
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i];
-      if (el.querySelector('img')) continue;                       // glyph heads are handled by id below
-      var table = BLOOM[typeof pair[1] === 'function' ? pair[1](el) : pair[1]] || {};
-      var key = (el.textContent || '').trim();
-      if (Object.prototype.hasOwnProperty.call(table, key)) el.style.setProperty('--bloom-g', String(table[key]));
-      else el.style.removeProperty('--bloom-g');                   // the surface default in the CSS stands
-    }
+    for (var i = 0; i < els.length; i++) bloomOne(els[i], pair[1]);
   });
   var glyphs = [['#bs-sound img', 'bs-sound'], ['#bs-cart img', 'bs-cart'], ['#bs-account img', 'bs-account'],
                 ['.site-round-button svg', 'corner-back']];
@@ -933,8 +936,32 @@ function normalizeWordGlow(){ normalizeBloom(); }
 var _bloomT = null;
 function watchBloom(){
   if (!window.MutationObserver) return;
-  new MutationObserver(function(){ if (_bloomT) return; _bloomT = setTimeout(function(){ _bloomT = null; normalizeBloom(); }, 40); })
-    .observe(document.body, { childList: true, subtree: true, characterData: true });
+  new MutationObserver(function(records){
+    var structural = false;
+    for (var i = 0; i < records.length; i++) {
+      var r = records[i];
+      if (r.type === 'attributes') {                               // a class change: re-solve THAT element (its weight may have changed: selected = 600)
+        var el = r.target; if (el.nodeType !== 1) continue;
+        for (var k = 0; k < BLOOM_SCOPE.length; k++) if (el.matches && el.matches(BLOOM_SCOPE[k][0])) { bloomOne(el, BLOOM_SCOPE[k][1]); break; }
+      } else structural = true;
+    }
+    if (structural && !_bloomT) _bloomT = setTimeout(function(){ _bloomT = null; normalizeBloom(); }, 40);
+  }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class'] });
+}
+/* THE EMISSION AREA (Eric, Sept 3): the accordion's inner clip exists for
+   the travel only. When a sub-list's open transition ends the wrap takes
+   .is-settled (the css releases the clip so the glow is not cut); the
+   moment .is-on leaves, .is-settled leaves with it — before the collapse
+   paints — so the travel is clipped again. */
+function bindSublistClip(){
+  document.addEventListener('transitionend', function(e){
+    var w = e.target; if (!w.classList || !w.classList.contains('bs-sublist-wrap') || e.propertyName !== 'grid-template-rows') return;
+    if (w.classList.contains('is-on')) w.classList.add('is-settled');
+  });
+  if (!window.MutationObserver) return;
+  new MutationObserver(function(records){
+    for (var i = 0; i < records.length; i++) { var w = records[i].target; if (w.classList && w.classList.contains('bs-sublist-wrap') && !w.classList.contains('is-on') && w.classList.contains('is-settled')) w.classList.remove('is-settled'); }
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
 }
 
 /* THE DOM CURSOR — the page renders the two-ring cursor itself (fixed
@@ -1111,7 +1138,8 @@ function init(config){
 
   setScale();
   normalizeBloom();      // THE HOTNESS LAW — boot pass (page markup is live by now)
-  watchBloom();          // …and every later render (panels, trays, sub-lists)
+  watchBloom();          // …and every later render (panels, trays, sub-lists); class changes re-solve the element (selected = 600)
+  bindSublistClip();     // the accordion clip is for the travel only (the emission area, Sept 3)
   bootDomCursor();       // the page-rendered cursor (see the CSS block's law comment)
   // Boot sits in attract (screen dormant, prompt on, nothing pre-lit);
   // wake() arms the idle clock on first input. Re-measure once the

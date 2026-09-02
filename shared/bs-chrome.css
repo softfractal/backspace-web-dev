@@ -1084,6 +1084,13 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   transition: grid-template-rows var(--pop-motion);
 }
 .bs-sublist-wrap.is-on { grid-template-rows: 1fr; }
+/* THE EMISSION AREA (Eric, Sept 3): the inner list's overflow clip exists
+   for the 0fr→1fr travel only. Once the open transition has ended the
+   machine marks the wrap .is-settled and the clip is released, so the lit
+   glow (46px reach) is no longer cut flush at the rail and 6-13px above
+   and below the list (measured: desklegs' hard edge). Closing removes
+   .is-settled before the collapse starts (bindSublistClip in the js). */
+.bs-sublist-wrap.is-on.is-settled .bs-sublist { overflow: visible; }
 .bs-sublist {
   overflow: hidden;
   display: grid;
@@ -1130,6 +1137,11 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   text-shadow: var(--bloom-lit);   /* THE HOTNESS LAW — the 184px swept-surface trim is moot: the ring set tops out at 46px */
 }
 .bs-subitem.is-chosen { color: #fff; font-weight: 600; }
+/* HOTNESS LAW (Eric, Sept 3): a SELECTED sub-item keeps its glow, like the
+   selected class item; bold ink is denser, so the selected state carries
+   its own solved intensity (the BLOOM table's 600 column; default .93). */
+.bs-subitem.is-chosen, .bs-subitem.is-live { text-shadow: var(--bloom-lit); }
+.bs-subitem.is-chosen, .bs-subitem.is-live { --bloom-g: .93; }
 /* THE HOLLOW RING — vocabulary member three: a chosen sub-item carries
    the signal-red OUTLINE ring in the parent's own left gutter. */
 .bs-subitem.is-chosen::before {
