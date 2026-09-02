@@ -636,16 +636,15 @@
      bug never returns); view cart + checkout DENY to seams until the
      cart page and the commerce ruling land. */
   /* EXPANDABLE (Eric's sixth word, p1): clicking the CART text calls
-     the row up and collapses it. Collapsed = the B-2 strip — a slim
-     surface bar at the stage's own center span (322..1379 → 18.63vw,
-     w 61.17vw, top 95.34vh) with the corner triangle, an inset rule
-     and the label. Expanded = the full band. Both travel on the house
-     tempo; adding to cart calls the row up. */
+     the row up and collapses it. RE-RULED Sept 1: the collapsed strip
+     now spans the EXPANDED band's own width (the rule's 1.91vw
+     insets — the B-2 stage-span strip is superseded), so the open is
+     a pure RISE: no horizontal grow phase remains. */
   #hw-tray { position: fixed; inset: 0; z-index: 14; pointer-events: none; }
   #hw-tray-strip {
     position: absolute;
-    left: 18.63vw; top: 95.34vh;
-    width: 61.17vw; height: calc(100vh - 95.34vh);
+    left: 1.91vw; right: 1.91vw; top: 95.34vh;
+    height: calc(100vh - 95.34vh);
     background: var(--bsw-fill);
     border: 0; padding: 0;
     pointer-events: auto;
@@ -666,25 +665,28 @@
   }
   .hw-strip-rule {
     position: absolute;
-    left: calc(30px * var(--ui-scale)); right: calc(35px * var(--ui-scale));
+    /* edge-to-edge: the strip's rule IS the band rule at rest, so the
+       rise is a pure translate — zero scale anywhere */
+    left: 0; right: 0;
     top: calc(25px * var(--ui-scale));
     height: 1px; background: var(--panel-line);
   }
   .hw-strip-label {
     position: absolute;
-    left: calc(31px * var(--ui-scale)); top: calc(33px * var(--ui-scale));
+    /* aligned to the band label's own 5.50vw line — one CART line
+       through the whole choreography */
+    left: calc(5.50vw - 1.91vw); top: calc(33px * var(--ui-scale));
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .08em;
   }
-  /* THE EXPANSION CHOREOGRAPHY (thirteenth word, Eric, Aug 29): the
-     strip's translucent box FADES · the line GROWS horizontally at the
-     strip's own height · then PULLS UP to the band rule's 87.11vh while
-     the two rails DRAW · and the full row's contents reveal. One clock,
-     keyframe percentage splits — the waterfall's own discipline; tempo
-     tokens only, zero local durations. The close stays a plain fade
-     (the house's closing grammar). */
+  /* THE EXPANSION CHOREOGRAPHY (thirteenth word, Eric, Aug 29 — the
+     GROW phase retired Sept 1 with the full-width strip): the strip's
+     translucent box FADES · the line PULLS UP from the strip's own
+     height to the band rule's 87.11vh while the two rails DRAW · and
+     the full row's contents reveal. One clock, tempo tokens only,
+     zero local durations. */
   #hw-tray-band {
     position: absolute; inset: 0;
     pointer-events: none;
@@ -701,20 +703,13 @@
   }
   #hw-tray-band > * { pointer-events: auto; }
   @keyframes hw-rule-in {
-    0% {
-      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.62);
-      animation-timing-function: var(--expand-curve);
-    }
-    45% {
-      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(1);
-      animation-timing-function: var(--expand-curve);
-    }
-    100% { transform: translateY(0) scaleX(1); }
+    0% { transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)); }
+    100% { transform: translateY(0); }
   }
-  #hw-tray.is-open .hw-tray-rule { animation: hw-rule-in var(--pop-duration) both; }
+  #hw-tray.is-open .hw-tray-rule { animation: hw-rule-in var(--pop-duration) var(--expand-curve) both; }
   @keyframes hw-rail-in {
-    0%, 45% { transform: scaleY(0); }
-    100%    { transform: scaleY(1); }
+    0%   { transform: scaleY(0); }
+    100% { transform: scaleY(1); }
   }
   #hw-tray.is-open .hw-tray-rail--l,
   #hw-tray.is-open .hw-tray-rail--r {
@@ -739,35 +734,28 @@
     opacity: 1;
     transition-delay: var(--pop-duration);
   }
-  /* THE COLLAPSE MIRRORS IT (fourteenth word, Eric, Aug 29): contents
-     fade first · then the rule descends while the rails undraw · the
-     line shrinks back to the strip's width · the strip fades in on cue.
-     Driven by .is-closing (JS holds it for exactly the choreography's
-     token-derived length, then releases to the hidden base state — by
-     which time the strip's own rule stands where the animated one
-     lands, so the hand-off is seamless). */
+  /* THE COLLAPSE MIRRORS IT (fourteenth word, Eric, Aug 29 — the
+     shrink tail retired Sept 1 with the grow): contents fade first ·
+     then the rule DESCENDS while the rails undraw · the strip fades
+     in on cue. Driven by .is-closing (JS holds it for exactly the
+     choreography's token-derived length, then releases to the hidden
+     base state — the strip's edge-to-edge rule stands where the
+     animated one lands, so the hand-off is seamless). */
   #hw-tray.is-closing #hw-tray-band {
     opacity: 1; visibility: visible;
     transition: none;
   }
   #hw-tray.is-closing #hw-tray-band > * { pointer-events: none; }
   @keyframes hw-rule-out {
-    0% {
-      transform: translateY(0) scaleX(1);
-      animation-timing-function: var(--expand-curve);
-    }
-    55% {
-      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(1);
-      animation-timing-function: var(--expand-curve);
-    }
-    100% { transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.62); }
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)); }
   }
   #hw-tray.is-closing .hw-tray-rule {
-    animation: hw-rule-out var(--pop-duration) var(--pop-fade-duration) both;
+    animation: hw-rule-out var(--pop-duration) var(--expand-curve) var(--pop-fade-duration) both;
   }
   @keyframes hw-rail-out {
-    0%        { transform: scaleY(1); }
-    55%, 100% { transform: scaleY(0); }
+    0%   { transform: scaleY(1); }
+    100% { transform: scaleY(0); }
   }
   #hw-tray.is-closing .hw-tray-rail--l,
   #hw-tray.is-closing .hw-tray-rail--r {
