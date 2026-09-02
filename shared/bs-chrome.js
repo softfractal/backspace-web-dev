@@ -897,7 +897,8 @@ var BLOOM = {
   option:    { 'product consulting': 1.093, 'order & delivery': 1.122, 'warranty & repair': 1.115 },
   door:      { 'fill out form': 2.795 },
   crumb:     { CART: 1.132, CHECKOUT: 2.33 },
-  glyph:     { 'bs-sound': 1.282, 'bs-cart': 0.94, 'bs-account': 1.056, 'corner-back': 1.234 }   // the › chevron's two states live in the CSS (open capsule / closed circle)
+  glyph:     { 'bs-sound': 2.567, 'bs-cart': 0.839, 'bs-account': 0.931, 'corner-back': 1.011,   // the 4-pass chain (Sept 3); the › chevron's two states live in the CSS
+               'Sign in': 0.797, 'Account details': 0.745, 'Order lookup': 0.737 }                 // the account tray icons, by their item's aria-label
 };
 var BLOOM_SCOPE = [
   ['.bs-item', function(el){ return document.body.getAttribute('data-bs-page') === 'home' ? 'menuHome' : 'menu'; }],
@@ -920,6 +921,8 @@ function normalizeBloom(){
   var glyphs = [['#bs-sound img', 'bs-sound'], ['#bs-cart img', 'bs-cart'], ['#bs-account img', 'bs-account'],
                 ['.site-round-button svg', 'corner-back']];
   glyphs.forEach(function(g){ var el = document.querySelector(g[0]); if (el && BLOOM.glyph[g[1]]) el.style.setProperty('--bloom-g', String(BLOOM.glyph[g[1]])); });
+  var trayImgs = document.querySelectorAll('.bs-tray-item img');
+  for (var j = 0; j < trayImgs.length; j++) { var key = trayImgs[j].parentElement.getAttribute('aria-label') || ''; if (BLOOM.glyph[key]) trayImgs[j].style.setProperty('--bloom-g', String(BLOOM.glyph[key])); }
 }
 /* The old name stays as an alias: /hardware, /support and /cart call it
    after building their lists. Lists built later (panels, trays, sub-lists
