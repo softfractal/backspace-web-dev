@@ -105,9 +105,11 @@
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .ct-crumb-btn:hover, .ct-crumb-btn:focus-visible { color: #fff; outline: none; }
+  .ct-crumb-btn { --bloom-g: 1.731; }   /* HOTNESS LAW: the away crumb lights on hover (CART 1.13 / CHECKOUT 2.33 per string) */
+  .ct-crumb-btn:hover, .ct-crumb-btn:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
   .ct-crumb-btn.is-here {
-    color: var(--ink); font-weight: 600; text-shadow: var(--glow-text);
+    /* STANDING: the here crumb never hovers — rest glow at the reference's rest hotness (solved .667) */
+    color: var(--ink); font-weight: 600; text-shadow: var(--bloom-rest); --bloom-g-rest: .667;
     pointer-events: none;
   }
   #ct-summary-head {
@@ -119,7 +121,7 @@
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(11px * var(--ui-scale));   /* the old rung stands */
     letter-spacing: 0;
-    text-shadow: var(--glow-text);
+    text-shadow: var(--bloom-rest); --bloom-g-rest: .599;   /* HOTNESS LAW: standing title, solved */
   }
 
   /* ── The big preview (95,305,715,467) — the selected item's stage ───── */
@@ -317,7 +319,7 @@
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(14px * var(--ui-scale));
     letter-spacing: .04em;
-    text-shadow: var(--glow-text);
+    text-shadow: var(--bloom-rest); --bloom-g-rest: .55;   /* HOTNESS LAW: standing title (PROVISIONAL: ORDER SUMMARY's rung) */
   }
   #ct-specs {
     /* the title→info gap: grown 50% then 25% more (Eric, Aug 31):
@@ -444,7 +446,7 @@
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .ct-card-x:hover, .ct-card-x:focus-visible { color: #fff; outline: none; text-shadow: var(--glow-text); }
+  .ct-card-x:hover, .ct-card-x:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }   /* HOTNESS LAW (intensity default 1 — a single glyph, not yet on the harness) */
   .ct-step {
     position: absolute;
     left: calc(110px * var(--ui-scale)); bottom: calc(14px * var(--ui-scale));
@@ -739,7 +741,7 @@
     z-index: 2;
   }
   .co-exp-head:hover, .co-exp-head:focus-visible {
-    outline: none; text-shadow: var(--glow-text);
+    outline: none; text-shadow: var(--bloom-lit);   /* HOTNESS LAW (default 1 — 600-weight heads sit near the reference) */
   }
   .co-subhead {
     position: absolute; left: calc(14px * var(--ui-scale)); top: calc(34px * var(--ui-scale));

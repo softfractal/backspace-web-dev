@@ -122,7 +122,7 @@
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(22px * var(--ui-scale));
     letter-spacing: .14em;
-    text-shadow: var(--glow-text);
+    text-shadow: var(--bloom-rest);   /* standing copy (HOTNESS LAW) */
   }
   #hw-coming .hw-coming-sub {
     margin-top: calc(10px * var(--ui-scale));
@@ -149,7 +149,9 @@
     font-size: calc(17px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
     line-height: calc(18px * var(--ui-scale));
     letter-spacing: .08em;
-    text-shadow: var(--glow-text);
+    /* HOTNESS LAW: a STANDING title (never hovers) — glows at rest at the
+       reference's rest hotness; g solved by the harness (Sept 3). */
+    text-shadow: var(--bloom-rest); --bloom-g-rest: .527;
   }
   #hw-class-menu {
     position: fixed;
@@ -203,13 +205,15 @@
     line-height: calc(13.5px * var(--ui-scale));
     letter-spacing: .08em;
     text-align: right; white-space: nowrap;
-    text-shadow: var(--glow-text-word);
+    /* HOTNESS LAW: no resting glow (hoverable); lit on the one ring set,
+       intensity 1.052 (the harness's median for the two heads). */
+    --bloom-g: 1.052;
     cursor: var(--cursor-target);
     transition: color .16s;
   }
   .hw-head.kb-hover, .hw-head:focus-visible {
     color: #fff; outline: none;
-    text-shadow: var(--glow-text-hover);
+    text-shadow: var(--bloom-lit);
   }
   .hw-head.is-open { color: var(--ink); font-weight: 600; }
   /* The right menu's slots consume the factored accordion; only the
@@ -399,13 +403,16 @@
     font-size: calc(13px * var(--ui-scale));
     line-height: calc(19px * var(--ui-scale));
     letter-spacing: 0;
-    text-shadow: var(--glow-text-word);
+    /* HOTNESS LAW: no resting glow (hoverable); the LIT ring set on hover,
+       intensity 2.359 (small 300-weight rows need two pastes). */
+    --bloom-g: 2.359;   /* the 300-weight rows; the CHOSEN row (600) solved to 1.088 below */
     cursor: var(--cursor-target);
     transition: color .16s;
   }
+  .hw-sizerow.is-chosen .hw-opt, .hw-colrow.is-chosen .hw-opt { --bloom-g: 1.088; }
   .hw-opt.kb-hover, .hw-opt:hover, .hw-opt:focus-visible {
     color: #fff; outline: none;
-    text-shadow: var(--glow-text);
+    text-shadow: var(--bloom-lit);
   }
   /* NO DOTS IN THE PANELS (Eric, Aug 28 fourth word, p4: "all
      customization selection indication shouldn't be dots") — the outer
@@ -470,7 +477,7 @@
   .hw-tick.is-lit { background: color-mix(in srgb, #fefefe59, #ffffff var(--hw-heat-pct)); }
   .hw-colrow.is-chosen .hw-tick.is-lit { background: color-mix(in srgb, #fefefeb8, #ffffff var(--hw-heat-pct)); }
   /* HOVER: the bar glows WITH its text (Eric, Aug 31) */
-  .hw-colrow:hover .hw-opt { color: #fff; text-shadow: var(--glow-text); }
+  .hw-colrow:hover .hw-opt { color: #fff; text-shadow: var(--bloom-lit); }
   .hw-colrow:hover .hw-scrub {
     filter: drop-shadow(0 0 calc(6px * var(--ui-scale)) rgba(255, 255, 255, .35));
   }
@@ -485,7 +492,7 @@
     /* the whole row is ONE target (Eric, Sept 2) — dims included */
     cursor: var(--cursor-target);
   }
-  .hw-sizerow:hover .hw-opt { color: #fff; text-shadow: var(--glow-text); }
+  .hw-sizerow:hover .hw-opt { color: #fff; text-shadow: var(--bloom-lit); }
   .hw-sizerow:hover .hw-sizedims { color: #fff; }
   .hw-sizedims {
     color: var(--bs-label);
@@ -514,8 +521,10 @@
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; }
-  .hw-unit button.is-live { color: var(--ink); font-weight: 600; text-shadow: var(--glow-text); }
+  .hw-unit button { --bloom-g: 3.784; }              /* HOTNESS LAW: the 300-weight unit (solved on IN) */
+  .hw-unit button.is-live { --bloom-g: 1.604; }      /* the live unit is 600 (solved on CM) */
+  .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
+  .hw-unit button.is-live { color: var(--ink); font-weight: 600; }   /* HOTNESS LAW: selected = bold; the glow marks the cursor only */
   .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(11px * var(--ui-scale)); }
   /* THE PILL FIELDS (Eric, Aug 28 fourth word, p2: "size dimension
      inputs happen within a pill") — the design team's capsule: hairline
@@ -824,12 +833,12 @@
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .08em;
-    text-shadow: var(--glow-text);
+    --bloom-g: 1.329;   /* HOTNESS LAW: no resting glow (hoverable); lit intensity solved */
     cursor: var(--cursor-target);
     transition: color .16s;
   }
   .hw-tray-label:hover, .hw-tray-label:focus-visible {
-    color: #fff; outline: none; text-shadow: var(--glow-text-hover);
+    color: #fff; outline: none; text-shadow: var(--bloom-lit);
   }
   /* UNLIMITED items (Eric's sixth word): the slot row is a horizontal
      SCROLLER spanning the rail-to-divider region; the wheel belongs to

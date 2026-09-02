@@ -285,7 +285,7 @@
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(13px * var(--ui-scale));
     line-height: calc(17px * var(--ui-scale));
-    text-shadow: var(--glow-text);
+    text-shadow: var(--bloom-rest);   /* HOTNESS LAW: standing (nothing happens when pressed) */
   }
   .sup-chosen:focus { outline: none; }
   /* .bs-foot / .bs-note / .bs-submit — factored with the form (Aug 28);
@@ -335,12 +335,15 @@
     letter-spacing: .01em;
     white-space: nowrap;
     cursor: var(--cursor-target);
-    text-shadow: var(--glow-text);
+    /* HOTNESS LAW: no resting glow (hoverable); lit on the one ring set.
+       Intensity PROVISIONAL 2.5 (11px sans 300 — not yet on the harness;
+       the door label of the same face solved to 2.795). */
+    --bloom-g: 2.5;
     transition: background .16s, color .16s, text-shadow .2s ease;
   }
   .sup-plate:hover, .sup-plate:focus-visible, .sup-plate.kb-hover {
     background: #ffffff2e; color: #fff; outline: none;
-    text-shadow: var(--glow-text-hover);
+    text-shadow: var(--bloom-lit);
   }
   /* The form door — the frame's white + square joined to a grey label
      plate. One control, two halves. */
@@ -368,7 +371,7 @@
     font-family: var(--font-sans); font-weight: 300;
     font-size: calc(11px * var(--ui-scale));
     letter-spacing: .01em; white-space: nowrap;
-    text-shadow: var(--glow-text);
+    --bloom-g: 2.795;   /* HOTNESS LAW: no resting glow (hoverable); lit intensity solved */
     transition: background .16s, color .16s, text-shadow .2s ease;
   }
   .sup-door:hover .sup-door-plus, .sup-door:focus-visible .sup-door-plus,
@@ -397,7 +400,7 @@
   }
   .sup-door:hover .sup-door-label, .sup-door:focus-visible .sup-door-label,
   .sup-door.kb-hover .sup-door-label {
-    background: #ffffff2e; color: #fff; text-shadow: var(--glow-text-hover);
+    background: #ffffff2e; color: #fff; text-shadow: var(--bloom-lit);
   }
   .sup-door:focus-visible { outline: none; }
 

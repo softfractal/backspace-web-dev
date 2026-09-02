@@ -873,59 +873,65 @@ function setLang(code){
   PAGE.onLangChange(T);
   normalizeWordGlow();
 }
-/* WHOLE-WORD NORMALIZATION (Eric, Aug 23 — glow law rule 6, equation
-   form; supersedes the same-day 1-char bucket). Smaller text icons
-   carry ONE glow intensity regardless of letter count. Per element and
-   state the machine solves
-       raw(n) = P - D*e^(-k(n-1))          uncompensated contour light
-       fp(n)  = P' - D'*e^(-k'(n-1))       light at full comp paste
-       f      = clamp((T - raw)/(fp - raw), 0, 1)
-   and writes f into --wg-fr/--wg-fh; the word tokens' comp rings scale
-   by it. Constants are FITTED (rmse <= 1.4 on 2-4 words per length,
-   ui-.7 reference) per context: the row/capsule face and the tray
-   face have different summation curves. T is each context's ratified
-   norm (row: the long-word plateau; tray: its live 2-char level — the
-   token-emission anchor surface stays byte-stable). The selector list
-   IS the ruling's scope — the homepage main menu is excluded by the
-   ruling; img-holding elements glow whole-element via the filter chain
-   already and are skipped. Re-runs at every STR render so locale swaps
-   re-solve; CJK gets its own constants when CN copy lands (Latin
-   curves do not transfer). Dataset + residuals: reports/glow_audit.md. */
-var GLOW_EQ = {
-  row: {
-    rest:  { raw: {P:34.79, D:9.64,  k:0.20}, fp: {P:45.83,  D:13.46, k:0.46}, T:32.0 },
-    hover: { raw: {P:85.6,  D:35.82, k:0.34}, fp: {P:123.34, D:47.97, k:0.58}, T:81.3 }
-  },
-  tray: {
-    rest:  null,   // tray texts carry no resting glow (structural, on record)
-    hover: { raw: {P:82.48, D:46.48, k:1.00}, fp: {P:127.02, D:67.48, k:1.02}, T:65.53 }
-  }
+/* THE HOTNESS LAW (Eric, Sept 2-3, 2026 — supersedes rule 6's whole-word
+   equation and its fitted curves). Every bloom item glows at the hotness
+   of the hardware class-menu item `desk` (near-halo 56.5 lit). The pair's
+   CSS declares one ring set; each element gets ONE number, --bloom-g
+   (intensity, in copies of the tight rings; see the css law block §6).
+   The values below were SOLVED BY MEASUREMENT on the real pages by the
+   harness (reports/tools/hotness_study.js): the root of hotness(g) = 56.5
+   per string. Per-surface defaults live in the CSS; this table refines
+   them per string. Strings not in the table keep the surface default
+   (a locale swap re-runs the harness; the runtime canvas solver is the
+   next step once calibrated). Re-runs at every STR render. */
+var BLOOM = {
+  menu:      { desk: 1.00, module: 0.964, keyboard: 0.926, mouse: 0.995, light: 0.968, powerbank: 0.907, watercup: 0.932, headset: 0.908, speakers: 0.924,
+               'CONTACT US': 0.957, FAQ: 0.999, WARRANTY: 0.885, 'RETURN & REFUND POLICY': 0.891, 'PRODUCT GUIDES': 0.899, 'BUSINESS REQUEST': 0.842 },
+  menuHome:  { HARDWARE: 0.861, SOFTWARE: 0.897, COMMUNITY: 0.916, SUPPORT: 0.933 },
+  capsule:   { HARDWARE: 1.68, SOFTWARE: 1.79, COMMUNITY: 1.839, SUPPORT: 1.885 },
+  social:    { Instagram: 1.791, YouTube: 2.038, TikTok: 2.127, X: 3.57, Discord: 1.968, Facebook: 1.854 },
+  lang:      { EN: 2.315, ZH: 2.546, JA: 2.757, ES: 2.548 },
+  sub:       { overview: 1.963, 'industrial design': 1.863, specifications: 1.854, ecosystem: 1.84, support: 1.99 },
+  head:      { INTRODUCTION: 1.04, CUSTOM: 1.064 },
+  traylabel: { CART: 1.329 },
+  option:    { 'product consulting': 1.093, 'order & delivery': 1.122, 'warranty & repair': 1.115 },
+  door:      { 'fill out form': 2.795 },
+  crumb:     { CART: 1.132, CHECKOUT: 2.33 },
+  glyph:     { 'bs-sound': 1.282, 'bs-cart': 0.94, 'bs-account': 1.056, 'corner-back': 1.234 }   // the › chevron's two states live in the CSS (open capsule / closed circle)
 };
-function glowF(eq, n){
-  if (!eq) return 0;
-  var e = function(c){ return c.P - c.D * Math.exp(-c.k * (n - 1)); };
-  var raw = e(eq.raw), fp = e(eq.fp);
-  if (fp - raw < 0.001) return 0;
-  return Math.max(0, Math.min(1, (eq.T - raw) / (fp - raw)));
+var BLOOM_SCOPE = [
+  ['.bs-item', function(el){ return document.body.getAttribute('data-bs-page') === 'home' ? 'menuHome' : 'menu'; }],
+  ['.site-primary-nav__link', 'capsule'], ['.bs-social-link', 'social'], ['.bs-tray-item, #bs-lang', 'lang'],
+  ['.bs-subitem', 'sub'], ['.hw-head', 'head'], ['.hw-tray-label', 'traylabel'],
+  ['.bs-option', 'option'], ['.sup-door-label', 'door'], ['.ct-crumb-btn', 'crumb']
+];
+function normalizeBloom(){
+  BLOOM_SCOPE.forEach(function(pair){
+    var els = document.querySelectorAll(pair[0]);
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el.querySelector('img')) continue;                       // glyph heads are handled by id below
+      var table = BLOOM[typeof pair[1] === 'function' ? pair[1](el) : pair[1]] || {};
+      var key = (el.textContent || '').trim();
+      if (Object.prototype.hasOwnProperty.call(table, key)) el.style.setProperty('--bloom-g', String(table[key]));
+      else el.style.removeProperty('--bloom-g');                   // the surface default in the CSS stands
+    }
+  });
+  var glyphs = [['#bs-sound img', 'bs-sound'], ['#bs-cart img', 'bs-cart'], ['#bs-account img', 'bs-account'],
+                ['.site-round-button svg', 'corner-back']];
+  glyphs.forEach(function(g){ var el = document.querySelector(g[0]); if (el && BLOOM.glyph[g[1]]) el.style.setProperty('--bloom-g', String(BLOOM.glyph[g[1]])); });
 }
-function normalizeWordGlow(){
-  // .bs-subitem (support's in-menu sub-lists, Aug 25): 12px interactive
-  // row-face text — in scope BY THE RULING's own class (smaller text
-  // icons; only the home menu is excluded). Solved on the ROW curves;
-  // the constants were FIT AT 14px, and at 12px they transfer safely
-  // only because every current label is long (n>=15 -> f~0, the token
-  // renders certified-identical). A SHORT sub label (real copy, or CN)
-  // needs the 12px re-fit before its f is honest — flagged in the audit.
-  var els = document.querySelectorAll('.bs-social-link, .site-primary-nav__link, .bs-tray-item, .bs-subitem, #bs-lang');
-  for (var i = 0; i < els.length; i++) {
-    var el = els[i];
-    if (el.querySelector('img')) continue;
-    var n = (el.textContent || '').trim().length;
-    if (!n) continue;
-    var ctx = (el.id === 'bs-lang' || el.classList.contains('bs-tray-item')) ? GLOW_EQ.tray : GLOW_EQ.row;
-    el.style.setProperty('--wg-fr', glowF(ctx.rest, n).toFixed(3));
-    el.style.setProperty('--wg-fh', glowF(ctx.hover, n).toFixed(3));
-  }
+/* The old name stays as an alias: /hardware, /support and /cart call it
+   after building their lists. Lists built later (panels, trays, sub-lists
+   on demand) are covered by the observer: any childList mutation
+   re-runs the pass, debounced. Writing --bloom-g is an attribute
+   mutation, not childList, so the observer cannot feed itself. */
+function normalizeWordGlow(){ normalizeBloom(); }
+var _bloomT = null;
+function watchBloom(){
+  if (!window.MutationObserver) return;
+  new MutationObserver(function(){ if (_bloomT) return; _bloomT = setTimeout(function(){ _bloomT = null; normalizeBloom(); }, 40); })
+    .observe(document.body, { childList: true, subtree: true, characterData: true });
 }
 
 /* THE DOM CURSOR — the page renders the two-ring cursor itself (fixed
@@ -1101,7 +1107,8 @@ function init(config){
   bindSweep(config.sweepRoots || []);
 
   setScale();
-  normalizeWordGlow();   // whole-word rule 6 — boot pass (page markup is live by now)
+  normalizeBloom();      // THE HOTNESS LAW — boot pass (page markup is live by now)
+  watchBloom();          // …and every later render (panels, trays, sub-lists)
   bootDomCursor();       // the page-rendered cursor (see the CSS block's law comment)
   // Boot sits in attract (screen dormant, prompt on, nothing pre-lit);
   // wake() arms the idle clock on first input. Re-measure once the
@@ -1346,7 +1353,8 @@ window.BSChrome = {
   // (support's sub-lists render their STR labels at boot, after the
   // init-time pass saw them empty) re-solve here. setLang already
   // re-runs it for locale swaps.
-  normalizeWordGlow: normalizeWordGlow,
+  normalizeWordGlow: normalizeWordGlow,   // alias (rule 6's name)
+  normalizeBloom: normalizeBloom,
   bindPill: bindPill,
   renderStrings: renderStrings,
   // The factored trio (Aug 28) + the measurement primitives they lean on.

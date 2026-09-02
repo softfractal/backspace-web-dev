@@ -103,35 +103,39 @@
      anchor; never touch reach without a reach ruling. */
   --glow-icon-hover:  brightness(2) drop-shadow(0 0 3px rgba(255,255,255,1)) drop-shadow(0 0 4px rgba(255,255,255,0.9)) drop-shadow(0 0 7px rgba(255,255,255,0.82)) drop-shadow(0 0 12px rgba(255,255,255,0.18)) drop-shadow(0 0 20px rgba(255,255,255,0.03));
   --glow-text-icons:  0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1), 0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95), 0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75), 0 0 96px rgba(255,255,255,0.5), 0 0 184px rgba(255,255,255,0.3);
-  /* WHOLE-WORD NORMALIZATION (Eric, Aug 23 — glow law rule 6, EQUATION
-     FORM; supersedes the same-day 1-char bucket, identical landing for
-     the live X). Letter halos sum by kernel coverage, so a word's glow
-     climbs with letter count toward a plateau — short words read
-     dimmer (X measured 0.60x the long platforms' contour on hover).
-     Eric's ruling: one intensity for every smaller text icon
-     regardless of length; homepage main menu excluded. The machine
-     solves, per element and state, with fitted constants per context
-     (row/capsule face vs tray face):
-         raw(n) = P  - D *e^(-k (n-1))   uncompensated contour light
-         fp(n)  = P' - D'*e^(-k'(n-1))   contour light at full paste
-         f(n)   = clamp((T - raw(n)) / (fp(n) - raw(n)), 0, 1)
-     and writes f into --wg-fr/--wg-fh (see normalizeWordGlow in the
-     js). The comp rings below scale by f — rule 3's paste-the-layer,
-     delivered fractionally; never a widened radius. f=0 renders these
-     tokens visually identical to the certified pair, so long words
-     change by nothing they can see (comp alphas 0-0.07). Constants,
-     the 2-4-words-per-length dataset, closed-loop flatness (rest
-     30.0-31.8 across n=1..6, hover 75.3-81.1, vs 25-31 / 49-78
-     uncompensated), and the recorded residuals (mid-band ~5% under
-     target, no live consumer; 1-char tray saturates -9%, none exists;
-     damping side unbuilt, no consumer; CJK re-measures when CN lands):
-     reports/glow_audit.md.
-     DECLARATION SITE: the two word tokens are declared on the SCOPE
-     ELEMENTS below, not here — var() inside a custom property
-     substitutes at the DECLARING element, so a :root declaration would
-     bake the root's --wg-f* (unset → 0) into the inherited value and
-     the per-element solve could never reach the formula. Do not move
-     them back to :root. */
+  /* ══════════════ 6. THE HOTNESS LAW (Eric, Sept 2-3, 2026) ══════════════
+     Supersedes the whole-word normalization (rule 6 in equation form,
+     Aug 23) and its fitted curves. Eric's word: "make all bloom items
+     glow at the same visual hotness as the hardware page's menu sub
+     item" — smaller glyphs, shorter words and smaller fonts read dimmer
+     because a blur sitting on thin or small ink is mostly empty.
+     HOTNESS = the light the glow ADDS in the first 3px outside the ink
+     (the near-halo mean, measured on the real compositor). THE
+     REFERENCE = the hardware class-menu item `desk`: LIT 56.5 (its
+     3-ring recipe on weight 600 / #fff), REST 16.9 (one 9.6px @ .58
+     ring on weight 300). Two classes: HOVERABLE surfaces glow only when
+     lit (no resting glow — Eric, Sept 3); STANDING surfaces (titles that
+     never hover: OASIS, ORDER SUMMARY, the current crumb, copy lines)
+     glow at rest at the reference's rest hotness.
+     ONE RING SET (the reference's 9.6 / 24 / 46 @ .92 / .5 / .28) and ONE
+     NUMBER PER ELEMENT, --bloom-g (intensity, in copies of the tight
+     rings): g < 1 multiplies every ring's alpha (big / bold items come
+     down); g > 1 keeps the rings at their own alphas and PASTES the tight rings (9.6 / 24)
+     again at alpha (g − 1), twice at (g − 2), thrice at (g − 3) —
+     smaller / thinner items get MORE rings, never a wider radius (rule
+     3). Solved per element by measurement (the harness in
+     reports/tools; the formula: g is the root of hotness(g) = 56.5, two
+     measurements + one secant step land within 3%). Values shipped
+     STATIC in the pair's BLOOM table (bs-chrome.js normalizeBloom:
+     per-surface defaults in CSS, per-string values from the harness);
+     the runtime canvas solver is the next step once calibrated.
+     DECLARATION SITE: the bloom tokens are declared on `body *` (every
+     element declares its own copy) because var() inside a custom
+     property substitutes at the DECLARING element — a :root declaration
+     would bake the root's --bloom-g into every element. Rings whose
+     paste alpha resolves to 0 are transparent and paint nothing
+     visible. Measured record: reports/gm_session_2026-09-02_token_pass.md
+     §hotness; reports/tools/hotness_study.js. */
   /* The utility cluster runs 25% larger than the base UI scale (Eric). */
   --icons-scale: calc(var(--ui-scale) * 1.25);
   --font-display: "Syncopate", "Chill Duan Sans", ui-sans-serif, system-ui, sans-serif;
@@ -296,14 +300,48 @@
   --committed-ink: #fefefe;
 }
 
-/* Rule-6 word tokens — declared on the scope so var(--wg-f*) resolves
-   per element (see the :root law block for the equation and why these
-   cannot live at :root). Values: certified base rings + comp rings
-   scaled by the element's solved deficit fraction; f=0 = certified. */
-.bs-social-link, .site-primary-nav__link, .bs-tray-item, .bs-head, .bs-round, .bs-subitem {
-  --glow-text-word: 0 0 9.6px rgba(255,255,255,0.58), 0 0 9.6px rgb(255 255 255 / calc(min(0.58, var(--wg-fr, 0) * 0.58)));
-  --glow-text-icons-word: 0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1), 0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95), 0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75), 0 0 96px rgba(255,255,255,0.5), 0 0 184px rgba(255,255,255,0.3), 0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))), 0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))), 0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95))), 0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95)));
+/* THE HOTNESS LAW's tokens — declared on EVERY element (declaration-site
+   law, see the :root law block §6). --bloom-g is the element's intensity
+   (default 1 = the reference's own recipe); --bloom-g-rest the same for
+   standing rest glows. Consumers: text-shadow: var(--bloom-lit) on the
+   lit rung of every hoverable text; var(--bloom-rest) on standing
+   surfaces; filter: var(--bloom-icon) on glyph icons (the glyph-side
+   derivation of the same law: its passes scale by the same g). */
+body * {
+  --bloom-lit:
+    0 0 9.6px rgb(255 255 255 / calc(min(.92, .92 * var(--bloom-g, 1)))),
+    0 0 24px  rgb(255 255 255 / calc(min(.5,  .5  * var(--bloom-g, 1)))),
+    0 0 46px  rgb(255 255 255 / calc(min(.28, .28 * var(--bloom-g, 1)))),
+    0 0 9.6px rgb(255 255 255 / calc(clamp(0, .92 * (var(--bloom-g, 1) - 1), .92))),
+    0 0 24px  rgb(255 255 255 / calc(clamp(0, .5  * (var(--bloom-g, 1) - 1), .5))),
+    0 0 9.6px rgb(255 255 255 / calc(clamp(0, .92 * (var(--bloom-g, 1) - 2), .92))),
+    0 0 24px  rgb(255 255 255 / calc(clamp(0, .5  * (var(--bloom-g, 1) - 2), .5))),
+    0 0 9.6px rgb(255 255 255 / calc(clamp(0, .92 * (var(--bloom-g, 1) - 3), .92))),
+    0 0 24px  rgb(255 255 255 / calc(clamp(0, .5  * (var(--bloom-g, 1) - 3), .5)));
+  --bloom-rest: 0 0 9.6px rgb(255 255 255 / calc(min(.58, .58 * var(--bloom-g-rest, 1))));
+  --bloom-icon: brightness(2)
+    drop-shadow(0 0 3px  rgb(255 255 255 / calc(min(1,   1   * var(--bloom-g, 1)))))
+    drop-shadow(0 0 4px  rgb(255 255 255 / calc(min(.9,  .9  * var(--bloom-g, 1)))))
+    drop-shadow(0 0 7px  rgb(255 255 255 / calc(min(.82, .82 * var(--bloom-g, 1)))))
+    drop-shadow(0 0 12px rgb(255 255 255 / calc(min(.18, .18 * var(--bloom-g, 1)))))
+    drop-shadow(0 0 20px rgb(255 255 255 / calc(min(.03, .03 * var(--bloom-g, 1)))))
+    drop-shadow(0 0 4px  rgb(255 255 255 / calc(clamp(0, .9  * (var(--bloom-g, 1) - 1), .9))))
+    drop-shadow(0 0 7px  rgb(255 255 255 / calc(clamp(0, .82 * (var(--bloom-g, 1) - 1), .82))));
 }
+/* Per-surface intensity defaults (the harness's medians, Sept 3); the
+   machine's BLOOM table refines them per string (normalizeBloom). */
+.bs-item { --bloom-g: .926; }
+body[data-bs-page="home"] .bs-item { --bloom-g: .907; }
+.site-primary-nav__link { --bloom-g: 1.815; }
+.bs-tray-item, #bs-lang { --bloom-g: 2.547; }
+.bs-subitem { --bloom-g: 1.963; }
+.bs-option { --bloom-g: 1.115; }
+.bs-round img, .bs-head img, .site-round-button svg, .site-primary-nav__forward-button svg { --bloom-g: 1.056; }
+/* The › chevron inside the CLOSED pill is clipped by the circle (overflow
+   hidden), which eats part of its halo — its closed-state intensity is
+   solved separately from the open capsule's. */
+.site-primary-nav__forward-button svg { --bloom-g: .98; }                       /* open capsule (solved) */
+.site-primary-nav:not(.is-open) .site-primary-nav__forward-button svg { --bloom-g: 1.28; }   /* closed circle (solved) */
 
 /* Retina cut for the ring cursor where cursor+image-set parses (the
    spec's own progressive pattern: unsupporting engines keep the plain
@@ -467,7 +505,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .bs-round img, .bs-head img {
   width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale));
   display: block;
-  filter: drop-shadow(0 0 6px rgba(255,255,255,0.35));
+  /* HOTNESS LAW: hoverable glyphs carry no resting glow (Eric, Sept 3). */
 }
 #bs-cart img { width: calc(20px * var(--icons-scale)); height: calc(20px * var(--icons-scale)); }
 @media (hover: hover) and (pointer: fine) {
@@ -475,7 +513,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   /* Hover-glow rule (Eric): EXPANDABLE controls glow on their SUB items
      only (the heads just lift color); a NON-expandable control — the
      cart — glows itself. */
-  .bs-round:hover img { filter: var(--glow-icon-hover); }
+  .bs-round:hover img { filter: var(--bloom-icon); }
 }
 /* Keyboard twins of the hover state: the native Tab cursor, and the
    A/D icon-bar cursor (.kb-hover — same class the menu rail uses).
@@ -483,9 +521,9 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    Enter is what expands); text heads bloom via text-shadow, glyph
    heads via the filter chain. */
 .bs-round:focus-visible, .bs-head:focus-visible,
-.bs-round.kb-hover, .bs-head.kb-hover { color: #fff; outline: none; text-shadow: var(--glow-text-icons-word); }
+.bs-round.kb-hover, .bs-head.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
 .bs-round:focus-visible img, .bs-round.kb-hover img,
-.bs-head.kb-hover img { filter: var(--glow-icon-hover); }
+.bs-head.kb-hover img { filter: var(--bloom-icon); }
 .bs-round img, .bs-head img { transition: filter 0.2s ease; }
 /* STATE-LADDER DISCIPLINE (Eric): the outer glow is backspace's
    translation of softfractal's ink-FOCUSED state — it lives in exactly
@@ -493,7 +531,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    (items, or the volume fill), so the head hands its glow off; only the
    color lift remains on the "held" parent. */
 .bs-pill.is-open .bs-head { text-shadow: none; }
-.bs-pill.is-open .bs-head img { filter: drop-shadow(0 0 6px rgba(255,255,255,0.35)); }
+.bs-pill.is-open .bs-head img { filter: none; }
 /* Sound mute slash — .site-utility-nav__sound-control::after port
    (muted: slash at .9, icon dimmed to .45). */
 #bs-sound::after {
@@ -538,14 +576,13 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    ~27px of air between elements. */
 #bs-pill-account .bs-tray-item { height: calc(45px * var(--icons-scale)); }
 @media (hover: hover) and (pointer: fine) {
-  /* Word token everywhere in scope — rule 6's normalization rides the
-     per-element --wg-f* vars (0 for every live tray string: 2-char is
-     the tray context's own norm). */
-  .bs-tray-item:hover { color: #fff; text-shadow: var(--glow-text-icons-word); }
-  .bs-tray-item:hover img { filter: var(--glow-icon-hover); }
+  /* HOTNESS LAW: the tray texts light on the one ring set at their solved
+     intensity (EN 2.32 · ZH 2.55 · JA 2.76 · ES 2.55 — the BLOOM table). */
+  .bs-tray-item:hover { color: #fff; text-shadow: var(--bloom-lit); }
+  .bs-tray-item:hover img { filter: var(--bloom-icon); }
 }
-.bs-tray-item:focus-visible, .bs-tray-item.kb-hover { color: #fff; outline: none; text-shadow: var(--glow-text-icons-word); }
-.bs-tray-item:focus-visible img, .bs-tray-item.kb-hover img { filter: var(--glow-icon-hover); }
+.bs-tray-item:focus-visible, .bs-tray-item.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
+.bs-tray-item:focus-visible img, .bs-tray-item.kb-hover img { filter: var(--bloom-icon); }
 .bs-tray-item.is-current { color: #fff; }
 /* Volume bar (mockup 1:1): a track filling the pill below the speaker,
    with a white capsule fill anchored at the bottom, glowing. */
@@ -608,7 +645,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   line-height: calc(15px * var(--ui-scale));
   letter-spacing: 0;
   text-align: left; white-space: nowrap;
-  text-shadow: var(--glow-text);
+  /* HOTNESS LAW: no resting glow on a hoverable item (Eric, Sept 3). */
   background: none; border: 0; padding: 0;
   display: flex; align-items: center;   /* re-centers the label in the taller hit box */
   position: relative;
@@ -633,13 +670,13 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    only cursor drifts from the machine the moment focus is cleared
    programmatically (idle reset under a parked pointer, Escape, sticky
    touch suppression on hybrid laptops). One focus variable, ruthlessly. */
-.bs-item.kb-hover { color: #fff; text-shadow: var(--glow-text-hover); }
+.bs-item.kb-hover { color: #fff; text-shadow: var(--bloom-lit); }
 .bs-item.kb-hover > span { transform: translateX(var(--side-menu-shift-x)); }
 .bs-item.kb-hover::before { opacity: 1; }
-.bs-item:focus-visible { color: #fff; outline: none; text-shadow: var(--glow-text-hover); }
+.bs-item:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
 /* Committed lock — held out, dot on, glow held (weight already 600 at
    rest, as in the demo's home menu). */
-.bs-item.active { color: #fff; text-shadow: var(--glow-text-hover); }
+.bs-item.active { color: #fff; text-shadow: var(--bloom-lit); }
 .bs-item.active > span { transform: translateX(var(--side-menu-shift-x)); }
 .bs-item.active::before { opacity: 1; }
 
@@ -694,13 +731,13 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .site-round-button svg,
 .site-primary-nav__forward-button svg {
   width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale));
-  filter: drop-shadow(0 0 6px rgba(255,255,255,0.35));
+  /* HOTNESS LAW: no resting glow on hoverable glyphs (Eric, Sept 3). */
   transition: filter 0.2s ease;
 }
 .site-round-button:hover, .site-round-button:focus-visible,
 .site-round-button.kb-hover { color: #fff; outline: none; }
 .site-round-button:hover svg, .site-round-button:focus-visible svg,
-.site-round-button.kb-hover svg { filter: var(--glow-icon-hover); }
+.site-round-button.kb-hover svg { filter: var(--bloom-icon); }
 /* The primary pill — a cluster-size circle that grows into a capsule.
    Witness transition .19s on the house curve → the tempo tokens. */
 .site-primary-nav {
@@ -711,7 +748,6 @@ a#bs-wordmark-link:focus-visible { outline: none; }
      circles; the expanded texts reverted — they took too much space). */
   --site-primary-nav-expanded-w: min(calc(523px * var(--ui-scale)), calc(100vw - 130px * var(--ui-scale) - 59px * var(--icons-scale)));
   width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
-  text-shadow: var(--glow-text);
   pointer-events: auto;
   background: rgba(0,0,0,0.24);
   border: 0.3px solid var(--ink);
@@ -729,8 +765,8 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    The mouse path stays glowless automatically: hover OPENS the pill,
    and an open pill hands its glow off to the tray (state-ladder
    discipline — the glow lives in exactly one place). */
-.site-primary-nav.kb-hover .site-primary-nav__forward-button svg { filter: var(--glow-icon-hover); }
-.site-primary-nav.kb-hover.is-open .site-primary-nav__forward-button svg { filter: drop-shadow(0 0 6px rgba(255,255,255,0.35)); }
+.site-primary-nav.kb-hover .site-primary-nav__forward-button svg { filter: var(--bloom-icon); }
+.site-primary-nav.kb-hover.is-open .site-primary-nav__forward-button svg { filter: none; }
 .site-primary-nav__forward-button {
   width: calc(35px * var(--icons-scale)); height: 100%;
   color: inherit; cursor: var(--cursor-target); pointer-events: auto;
@@ -758,7 +794,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   font-size: calc(14px * var(--ui-scale));
   line-height: calc(15px * var(--ui-scale));
   letter-spacing: 0; white-space: nowrap;
-  text-shadow: var(--glow-text-word);   /* rule 6: rest rides the word token (f=0 = certified) */
+  /* HOTNESS LAW: no resting glow (hoverable). */
   cursor: var(--cursor-target);
   opacity: 0; pointer-events: none;
   transform: translateX(calc(-7px * var(--ui-scale)));
@@ -781,7 +817,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    everything inside the icon bars, and its tray texts bloom on this
    chain. */
 .site-primary-nav__link:hover, .site-primary-nav__link:focus-visible,
-.site-primary-nav__link.kb-hover { color: #fff; outline: none; text-shadow: var(--glow-text-icons-word); }
+.site-primary-nav__link.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
 /* "You are here" — the committed rung, rendered per the witness: full
    ink at weight 600, aria-current, and the dot deliberately struck
    (the witness carries content:none!important armor on this state —
@@ -793,7 +829,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    glow remains. Applies to the keyboard twin too (pixel parity). */
 .site-primary-nav__link.is-active-nav:hover,
 .site-primary-nav__link.is-active-nav:focus-visible,
-.site-primary-nav__link.is-active-nav.kb-hover { text-shadow: var(--glow-text-word); }
+.site-primary-nav__link.is-active-nav.kb-hover { text-shadow: none; }
 
 /* ══════════════════════════════════════════════════════════════════════
    bs-window — THE panel. No page writes a bespoke one.
@@ -1066,7 +1102,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   font-size: calc(12px * var(--ui-scale));
   line-height: calc(14px * var(--ui-scale));
   letter-spacing: 0; white-space: nowrap; text-align: left;
-  text-shadow: var(--glow-text-word);
+  /* HOTNESS LAW: no resting glow (hoverable). */
   cursor: var(--cursor-target);
   /* LABELED PERF DEVIATION (measured on /support, now the SHARED
      default): text-shadow is NOT transitioned — the glow SNAPS on (one
@@ -1074,22 +1110,13 @@ a#bs-wordmark-link:focus-visible { outline: none; }
      growing shadows per frame across a swept list). */
   transition: color .16s;
 }
-/* The hover chain is --glow-text-icons-word VERBATIM minus its 184px
-   ring — the swept-surface rider (canon §5.5): the 184px kernel was
-   profiled as the entire lag on /support's list (14.6→8.5 ms/frame),
-   and every .bs-subitem surface is a swept list by construction. The
-   TOKEN is untouched; the trim is the class's own. */
+/* HOTNESS LAW: the sub-item lights on the one ring set (46px max — the
+   swept-surface perf rider is satisfied by construction; the 184px ring
+   is gone house-wide). Intensity ≈1.96 (two copies of the tight rings)
+   for the 300-weight rows; per string via the BLOOM table. */
 .bs-subitem.kb-hover, .bs-subitem:focus-visible {
   color: #fff; outline: none;
-  text-shadow:
-    0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1),
-    0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95),
-    0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75),
-    0 0 96px rgba(255,255,255,0.5),
-    0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))),
-    0 0 9.6px rgb(255 255 255 / calc(min(1, var(--wg-fh, 0)))),
-    0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95))),
-    0 0 24px rgb(255 255 255 / calc(min(0.95, var(--wg-fh, 0) * 0.95)));
+  text-shadow: var(--bloom-lit);   /* THE HOTNESS LAW — the 184px swept-surface trim is moot: the ring set tops out at 46px */
 }
 .bs-subitem.is-chosen { color: #fff; font-weight: 600; }
 /* THE HOLLOW RING — vocabulary member three: a chosen sub-item carries
@@ -1160,10 +1187,10 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .bs-plate.is-open::after { opacity: 1; }
 .bs-plate.kb-hover, .bs-plate:focus-visible { outline: none; background: #fefefe24; }
 .bs-plate.kb-hover .bs-plate-title, .bs-plate:focus-visible .bs-plate-title {
-  color: #fff; text-shadow: var(--glow-text);
+  color: #fff; text-shadow: var(--bloom-lit);
 }
 .bs-plate.is-open .bs-plate-title {
-  color: var(--ink); font-weight: 600; text-shadow: var(--glow-text);
+  color: var(--ink); font-weight: 600;   /* HOTNESS LAW: open = bold, not lit (the glow marks the cursor) */
 }
 /* The downward expansion: 0fr → 1fr travels to the content's OWN height
    — the one way to animate to `auto` honestly. House tempo, no local
@@ -1276,13 +1303,13 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   font-size: calc(13px * var(--ui-scale));
   line-height: calc(27px * var(--ui-scale));
   letter-spacing: 0;
-  text-shadow: var(--glow-text);
+  /* HOTNESS LAW: no resting glow (hoverable). */
   cursor: var(--cursor-target);
   transition: color .16s, text-shadow .2s ease;
 }
 .bs-option.kb-hover, .bs-option:focus-visible {
   color: #fff; outline: none;
-  text-shadow: var(--glow-text-hover);
+  text-shadow: var(--bloom-lit);
 }
 .bs-option.is-chosen { color: #fff; }
 .bs-foot {
@@ -1297,7 +1324,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   font-size: calc(11px * var(--ui-scale));
   line-height: 1.5;
 }
-.bs-note.is-said { color: var(--ink); text-shadow: var(--glow-text); }
+.bs-note.is-said { color: var(--ink); text-shadow: var(--bloom-rest); }   /* standing copy */
 /* Submit — the one INVERTED control in the interface: light plate, dark
    ink, exactly as the frames draw it. */
 .bs-submit {
