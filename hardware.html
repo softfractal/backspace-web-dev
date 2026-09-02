@@ -482,7 +482,11 @@
     display: flex; align-items: baseline; justify-content: space-between;
     gap: calc(18px * var(--ui-scale));
     width: 100%; max-width: none;
+    /* the whole row is ONE target (Eric, Sept 2) — dims included */
+    cursor: var(--cursor-target);
   }
+  .hw-sizerow:hover .hw-opt { color: #fff; text-shadow: var(--glow-text); }
+  .hw-sizerow:hover .hw-sizedims { color: #fff; }
   .hw-sizedims {
     color: var(--bs-label);
     font-family: var(--font-ui); font-weight: 300;
@@ -1760,7 +1764,13 @@ function buildPanelContent(){
       var row = el('div', 'hw-sizerow');
       var b = el('button', 'hw-opt', sz.key);
       b.type = 'button';
-      b.addEventListener('click', function(){
+      var dims = el('span', 'hw-sizedims');
+      dims.textContent = dimsText(sz);
+      row.appendChild(b); row.appendChild(dims);
+      // ONE item, whole-row target (Eric, Sept 2): the title and its
+      // dims are the same choice — the ROW carries the click; the
+      // button stays for keyboard (its native Enter bubbles here).
+      row.addEventListener('click', function(){
         wake();
         if (!clickOk()) return;
         SEL.size.preset = si;
@@ -1769,9 +1779,6 @@ function buildPanelContent(){
         SoundBus.play('commit'); hapticTick();
         refreshPanel();
       });
-      var dims = el('span', 'hw-sizedims');
-      dims.textContent = dimsText(sz);
-      row.appendChild(b); row.appendChild(dims);
       list.appendChild(row);
       sizeEls.push(b); sizeRowEls.push(row); dimEls.push(dims);
     });
