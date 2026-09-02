@@ -516,6 +516,22 @@ function pillFloor(pill){
   }
   var boxes = document.querySelectorAll('img, svg, input, textarea, select, video');
   for (var j = 0; j < boxes.length; j++) { if (chrome(boxes[j]) || !visible(boxes[j])) continue; consider(boxes[j].getBoundingClientRect()); }
+  // DRAWN BOXES ARE CONTENT TOO (Eric, Sept 3: "divider lines are still
+  // contents") — any element that paints a background, a border, a shadow
+  // or an image (the cart's 0.5px rule and rail, plates, windows). The page
+  // grounds (boxes covering most of the viewport) and the stage canvas are
+  // not content.
+  var all = document.body.getElementsByTagName('*'), area = window.innerWidth * window.innerHeight;
+  for (var k = 0; k < all.length; k++) {
+    var b = all[k]; if (b.tagName === 'CANVAS' || b.tagName === 'SCRIPT' || b.tagName === 'STYLE' || chrome(b)) continue;
+    var br = b.getBoundingClientRect(); if (br.width <= 0 || br.height <= 0 || br.width * br.height > area * 0.6) continue;
+    if (br.right <= x0 || br.left >= x1 || br.top < yTop || br.top >= floor) continue;   // cheap rejects before the style read
+    if (!visible(b)) continue;
+    var cs = getComputedStyle(b);
+    var painted = (cs.backgroundColor !== 'rgba(0, 0, 0, 0)' && cs.backgroundColor !== 'transparent') || cs.backgroundImage !== 'none' || cs.boxShadow !== 'none' ||
+      ((parseFloat(cs.borderTopWidth) || parseFloat(cs.borderBottomWidth) || parseFloat(cs.borderLeftWidth) || parseFloat(cs.borderRightWidth)) && cs.borderTopColor !== 'rgba(0, 0, 0, 0)');
+    if (painted) consider(br);
+  }
   return floor;
 }
 function fitPill(pill){
