@@ -457,11 +457,11 @@ function buildUtilityCluster(){
   var mount = document.getElementById('bs-icons');
   if (!mount) return;
   mount.innerHTML =
-    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-lang" data-open="209" style="--open-h: calc(209px * var(--icons-scale))">' +
+    '<div class="bs-hit"><div class="bs-pill bs-pill--text" id="bs-pill-lang">' +
       '<button class="bs-head" id="bs-lang" type="button" aria-label="Language" aria-haspopup="true" aria-expanded="false">EN</button>' +
       '<div class="bs-tray" id="bs-lang-tray"></div>' +
     '</div></div>' +
-    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-sound" data-open="209" style="--open-h: calc(209px * var(--icons-scale))">' +
+    '<div class="bs-hit"><div class="bs-pill bs-pill--slider" id="bs-pill-sound">' +
       '<button class="bs-head" id="bs-sound" type="button" aria-label="Sound" aria-haspopup="true" aria-expanded="false">' +
         '<img src="assets/ui/icon-figma-brand-awareness.png" alt="" aria-hidden="true">' +
       '</button>' +
@@ -474,7 +474,7 @@ function buildUtilityCluster(){
     '<div class="bs-hit"><button class="bs-round" id="bs-cart" type="button" aria-label="Cart">' +
       '<img src="assets/ui/icon-cart-checkout.svg" alt="" aria-hidden="true">' +
     '</button></div>' +
-    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-account" data-open="209" style="--open-h: calc(209px * var(--icons-scale))">' +
+    '<div class="bs-hit"><div class="bs-pill bs-pill--glyph" id="bs-pill-account">' +
       '<button class="bs-head" id="bs-account" type="button" aria-label="Account" aria-haspopup="true" aria-expanded="false">' +
         '<img src="assets/ui/icon-figma-person.png" alt="" aria-hidden="true">' +
       '</button>' +
@@ -536,13 +536,23 @@ function pillFloor(pill){
   }
   return floor;
 }
+/* A length token resolved to px by the engine itself (the tokens nest calc()
+   — --icons-scale is calc(var(--ui-scale) * 1.25) — so a regex cannot read
+   them): a hidden ruler inside the pill takes the token as its height and
+   reports the used value. */
+var _ruler = null;
+function tokenPx(el, name, wrap){
+  if (!_ruler) { _ruler = document.createElement('div'); _ruler.setAttribute('aria-hidden', 'true'); _ruler.style.cssText = 'position:absolute;left:0;top:0;width:0;visibility:hidden;pointer-events:none;'; }
+  if (_ruler.parentNode !== el) el.appendChild(_ruler);
+  _ruler.style.height = wrap ? wrap.replace('$', 'var(' + name + ')') : 'var(' + name + ')';
+  return parseFloat(getComputedStyle(_ruler).height) || 0;
+}
 function fitPill(pill){
-  var nominal = parseFloat(pill.getAttribute('data-open') || '0'); if (!nominal) return;
-  var ui = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale')) || 1, icons = ui * 1.25;
-  var gap = 24 * icons, headH = 35 * icons, rowH = (pill.id === 'bs-pill-account' ? 45 : 38) * icons;   // the rows' MINIMUM heights (they fill the common height when there is room)
+  var want = tokenPx(pill, '--bs-pill-h'); if (!want) return;                       // the standard open height
+  var gap = tokenPx(pill, '--bs-pill-gap'), headH = tokenPx(pill, '--icons-scale', 'calc(35px * $)');
+  var rowH = tokenPx(pill, pill.classList.contains('bs-pill--glyph') ? '--bs-pill-row-glyph' : '--bs-pill-row-text');   // the cap's floor: the head + one row
   var top = pill.getBoundingClientRect().top;
   var avail = pillFloor(pill) - gap - top;
-  var want = nominal * icons;
   var cap = Math.min(want, Math.max(headH + rowH, avail));
   if (cap < want - 0.5) { pill.style.setProperty('--open-h-cap', cap.toFixed(2) + 'px'); pill.classList.add('is-capped'); }
   else { pill.style.removeProperty('--open-h-cap'); pill.classList.remove('is-capped'); }
@@ -626,7 +636,7 @@ function renderTray(){
     document.getElementById('bs-vol-track').classList.add('kb-hover');   // the slider arms as a whole
     return;
   }
-  trayItems(iconLock).forEach(function(b, i){ b.classList.toggle('kb-hover', i === trayIdx); if (i === trayIdx && b.scrollIntoView && b.closest('.bs-pill.is-capped')) b.scrollIntoView({ block: 'nearest' }); });
+  trayItems(iconLock).forEach(function(b, i){ b.classList.toggle('kb-hover', i === trayIdx); if (i === trayIdx && b.scrollIntoView) b.scrollIntoView({ block: 'nearest' }); });
 }
 function lockPill(i){
   var c = ICONS[i];
@@ -821,8 +831,8 @@ function bindWheel(){
     // The page may own this wheel outright (a locked panel's native
     // scroll) — asked BEFORE preventDefault, or the scroll is already dead.
     if (PAGE.wheelNative(e)) return;
-    // A CAPPED pill tray under the pointer scrolls natively (the expansion floor).
-    if (e.target && e.target.closest && e.target.closest('.bs-pill.is-capped .bs-tray')) return;
+    // A scrollable pill tray under the pointer scrolls natively (the pill component / the expansion floor).
+    var tray = e.target && e.target.closest && e.target.closest('.bs-tray'); if (tray && tray.scrollHeight > tray.clientHeight + 1) return;
     e.preventDefault();
     wake();
     if (PAGE.isLocked()){ PAGE.denyLocked(); return; }

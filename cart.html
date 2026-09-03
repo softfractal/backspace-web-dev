@@ -175,9 +175,7 @@
     grid-template-columns: repeat(4, 1fr);
     gap: calc(15px * var(--ui-scale)) calc(25px * var(--ui-scale));
     overflow: hidden auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: #ffffff5c transparent;
+    overscroll-behavior: contain;   /* the house scrollbar (the pair) */
     z-index: 4;
   }
   .ct-thumb {
@@ -393,9 +391,7 @@
     display: grid; gap: calc(15px * var(--ui-scale));
     grid-auto-rows: max-content;
     overflow: hidden auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: #ffffff5c transparent;
+    overscroll-behavior: contain;   /* the house scrollbar (the pair) */
   }
   .ct-card {
     position: relative;
@@ -624,8 +620,7 @@
        padding is its lane — it never overlaps a saved address */
     padding-right: calc(16px * var(--ui-scale));
     overflow: hidden auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin; scrollbar-color: #ffffff5c transparent;
+    overscroll-behavior: contain;   /* the house scrollbar (the pair) rides in the padding lane */
     opacity: 0; visibility: hidden;
     transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
   }

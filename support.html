@@ -203,15 +203,8 @@
     position: absolute; inset: 0;
     padding: var(--sup-pad-t) var(--sup-pad-x) var(--sup-pad-b);
     overflow: hidden auto;
-    overscroll-behavior: contain;   /* the panel's scroll never leaks to the page */
-    scrollbar-width: thin;
-    scrollbar-color: #ffffff5c transparent;
+    overscroll-behavior: contain;   /* the panel's scroll never leaks to the page; the house scrollbar (the pair) draws the lane */
   }
-  #bs-panel .sup-body::-webkit-scrollbar { width: calc(5px * var(--ui-scale)); }
-  #bs-panel .sup-body::-webkit-scrollbar-thumb {
-    background: #ffffff5c;
-  }
-  #bs-panel .sup-body::-webkit-scrollbar-track { background: transparent; }
   .sup-view[hidden] { display: none; }
 
   /* Kicker + marker — the 1-2 grammar: dim right-aligned label, the warm

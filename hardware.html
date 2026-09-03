@@ -362,13 +362,8 @@
        lives OUTSIDE now — no cleared band at the foot. */
     padding: calc(18px * var(--ui-scale));
     overflow: hidden auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: #ffffff5c transparent;
+    overscroll-behavior: contain;   /* the house scrollbar (the pair) draws the lane */
   }
-  #hw-panel .hw-body::-webkit-scrollbar { width: calc(5px * var(--ui-scale)); }
-  #hw-panel .hw-body::-webkit-scrollbar-thumb { background: #ffffff5c; }
-  #hw-panel .hw-body::-webkit-scrollbar-track { background: transparent; }
 
   /* Section head — the p1 reference's grammar: lowercase head, hairline
      rule below spanning the panel. */
@@ -849,14 +844,9 @@
     display: flex; gap: calc(25px * var(--ui-scale));
     overflow-x: auto; overflow-y: hidden;
     padding-bottom: calc(6px * var(--ui-scale));
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: #ffffff5c transparent;
+    overscroll-behavior: contain;   /* the house scrollbar (the pair) draws the lane */
     pointer-events: auto;
   }
-  #hw-slots::-webkit-scrollbar { height: calc(5px * var(--ui-scale)); }
-  #hw-slots::-webkit-scrollbar-thumb { background: #ffffff5c; }
-  #hw-slots::-webkit-scrollbar-track { background: transparent; }
   .hw-slot {
     position: relative;
     flex: none;
