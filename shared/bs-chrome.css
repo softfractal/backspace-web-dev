@@ -541,10 +541,13 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    the height adapts per page and window. The cap arrives inline as
    --open-h-cap; without one the pill opens to the standard --bs-pill-h. */
 .bs-pill.is-open { height: var(--open-h-cap, var(--bs-pill-h)); }
-/* The variants' trays: rows at the variant's padding; the tray is at most
-   the pill's height under the head, scrolling when the rows exceed it (the
-   overflow continues below the edge; wheel, keys and touch scroll it; the
-   house scrollbar shows). The foot rides at the end of the content. */
+/* The list variants are SCROLL CONTAINERS by definition (Eric, Sept 3:
+   "scrollable doesn't only apply to overflow" — more languages never need a
+   taller pill). Rows sit at the variant's padding; the tray is at most the
+   pill's height under the head and scrolls whenever the list is longer —
+   capped by the expansion floor or not (the cap only shortens the same
+   container). Wheel, keys and touch scroll it; the house scrollbar shows;
+   the foot rides at the end of the content. */
 .bs-pill--text .bs-tray, .bs-pill--glyph .bs-tray {
   max-height: calc(var(--open-h-cap, var(--bs-pill-h)) - 35px * var(--icons-scale));
   overflow-y: auto; overscroll-behavior: contain;

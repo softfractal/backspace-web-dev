@@ -499,7 +499,9 @@ function buildUtilityCluster(){
    inputs — never the chrome, never the stage canvas) and cap the open
    height so the pill's bottom edge sits --bs-pill-gap above it. The gap is
    the standard; the height adapts to the page and the window. A capped
-   list pill scrolls its tray (is-capped); the volume track just shortens.
+   list pill's tray scrolls as it always does — scrollability is the list
+   variants' own property (Eric, Sept 3), the cap only shortens the same
+   container; the volume track just shortens.
    Below one tray row the cap stops shrinking — a page whose content sits
    that high must move it. Re-fitted on resize while open. */
 function pillFloor(pill){
