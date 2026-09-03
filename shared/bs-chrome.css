@@ -151,12 +151,9 @@
   --bs-pill-row-text:  calc(38px  * var(--icons-scale));   /* a word row */
   --bs-pill-row-glyph: calc(45px  * var(--icons-scale));   /* a glyph row (breathing parity: ~27px of air like the words) */
   --bs-pill-foot:      calc(8px   * var(--icons-scale));   /* under the last row */
-  /* THE HOUSE SCROLLBAR (Eric, Sept 3): wherever a scrollbar appears it is
-     a grey 2px line set just in from the edge — never the browser default,
-     which breaks the composition. */
-  --bs-scrollbar:       #ffffff5c;   /* the lane grey the pages already used */
-  --bs-scrollbar-w:     2px;
-  --bs-scrollbar-inset: 3px;
+  /* NO SCROLLBAR ANYWHERE (Eric, Sept 3, superseding the same day's 2px
+     line: "having it doesn't work for a lot of frames"). Every scroll
+     container still scrolls — wheel, keys, touch — with no bar drawn. */
   --font-display: "Syncopate", "Chill Duan Sans", ui-sans-serif, system-ui, sans-serif;
   --font-ui:      "Chill Duan Sans Wide", "Chill Duan Sans", ui-sans-serif, system-ui, sans-serif;
   /* --font-sans omits Octarine until G-Octarine clears. */
@@ -373,23 +370,13 @@ body[data-bs-page="home"] .bs-item { --bloom-g: .907; }
 .site-primary-nav__forward-button svg { --bloom-g: .877; }                       /* › in the open capsule (solved) */
 .site-primary-nav:not(.is-open) .site-primary-nav__forward-button svg { --bloom-g: 2.406; }   /* › in the closed circle — the circle clips its halo (solved) */
 
-/* THE HOUSE SCROLLBAR — every scroll container, every page: a 2px grey line
-   inset from the edge (Eric, Sept 3). WebKit/Blink: the pseudo-elements —
-   a 5px lane whose thumb paints a 2px line 3px in from the edge
-   (background-clip on a transparent border). Chrome disables these
-   pseudo-elements wherever the standard scrollbar-width/-color are set, so
-   NO element in the house sets those; Firefox, which has no
-   pseudo-elements, gets the standard thin bar in the same grey via the
-   @supports branch. Overlay scrollbars (macOS default) show it only while
-   scrolling — that is the OS's call. */
-*::-webkit-scrollbar { width: calc(var(--bs-scrollbar-w) + var(--bs-scrollbar-inset)); height: calc(var(--bs-scrollbar-w) + var(--bs-scrollbar-inset)); background: transparent; }
-*::-webkit-scrollbar-track, *::-webkit-scrollbar-corner { background: transparent; }
-*::-webkit-scrollbar-thumb { background: var(--bs-scrollbar); background-clip: padding-box; border: 0 solid transparent; border-radius: 0; }
-*::-webkit-scrollbar-thumb:vertical   { border-right-width: var(--bs-scrollbar-inset); }
-*::-webkit-scrollbar-thumb:horizontal { border-bottom-width: var(--bs-scrollbar-inset); }
-@supports not selector(::-webkit-scrollbar) {
-  * { scrollbar-width: thin; scrollbar-color: var(--bs-scrollbar) transparent; }
-}
+/* NO SCROLLBAR ANYWHERE (Eric, Sept 3): every scroll container, every page,
+   scrolls without a bar — wheel, keys and touch move it; the lane is gone
+   from every frame. The standard property hides it in Chrome 121+, Firefox
+   and Safari 18.2+; the WebKit pseudo-element covers older Safari. No
+   element in the house sets scrollbar-width to anything else. */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* Retina cut for the ring cursor where cursor+image-set parses (the
    spec's own progressive pattern: unsupporting engines keep the plain
@@ -546,8 +533,8 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    taller pill). Rows sit at the variant's padding; the tray is at most the
    pill's height under the head and scrolls whenever the list is longer —
    capped by the expansion floor or not (the cap only shortens the same
-   container). Wheel, keys and touch scroll it; the house scrollbar shows;
-   the foot rides at the end of the content. */
+   container). Wheel, keys and touch scroll it — no bar is drawn anywhere
+   in the house; the foot rides at the end of the content. */
 .bs-pill--text .bs-tray, .bs-pill--glyph .bs-tray {
   max-height: calc(var(--open-h-cap, var(--bs-pill-h)) - 35px * var(--icons-scale));
   overflow-y: auto; overscroll-behavior: contain;
