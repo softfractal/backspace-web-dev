@@ -265,12 +265,14 @@ var STR = {
   },
   zh: { /* populated when CN content lands; lookups fall back to en */ },
   ja: {},
-  es: {}
+  es: {},
+  fr: {}   /* French joins the picker (Eric, Sept 3); copy falls back to en until it lands */
 };
 // ISO 639-1 codes (the mockup's SP corrected to ES per Eric). Offering all
-// four in the picker is the ratified design; only EN carries content yet.
-var LANGS = ['en','zh','ja','es'];
-var LANG_ATTR = { en:'en', zh:'zh-CN', ja:'ja', es:'es' };
+// five in the picker is the ratified design (FR added Sept 3); only EN
+// carries content yet.
+var LANGS = ['en','zh','ja','es','fr'];
+var LANG_ATTR = { en:'en', zh:'zh-CN', ja:'ja', es:'es', fr:'fr' };
 var lang = 'en';
 function T(key){ return (STR[lang] && STR[lang][key]) || STR.en[key] || key; }
 // Every visible string flows from a key — the data-str render pass pages
@@ -455,7 +457,7 @@ function buildUtilityCluster(){
   var mount = document.getElementById('bs-icons');
   if (!mount) return;
   mount.innerHTML =
-    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-lang" data-open="157" style="--open-h: calc(157px * var(--icons-scale))">' +
+    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-lang" data-open="209" style="--open-h: calc(209px * var(--icons-scale))">' +
       '<button class="bs-head" id="bs-lang" type="button" aria-label="Language" aria-haspopup="true" aria-expanded="false">EN</button>' +
       '<div class="bs-tray" id="bs-lang-tray"></div>' +
     '</div></div>' +
@@ -472,7 +474,7 @@ function buildUtilityCluster(){
     '<div class="bs-hit"><button class="bs-round" id="bs-cart" type="button" aria-label="Cart">' +
       '<img src="assets/ui/icon-cart-checkout.svg" alt="" aria-hidden="true">' +
     '</button></div>' +
-    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-account" data-open="178" style="--open-h: calc(178px * var(--icons-scale))">' +
+    '<div class="bs-hit"><div class="bs-pill" id="bs-pill-account" data-open="209" style="--open-h: calc(209px * var(--icons-scale))">' +
       '<button class="bs-head" id="bs-account" type="button" aria-label="Account" aria-haspopup="true" aria-expanded="false">' +
         '<img src="assets/ui/icon-figma-person.png" alt="" aria-hidden="true">' +
       '</button>' +
@@ -537,7 +539,7 @@ function pillFloor(pill){
 function fitPill(pill){
   var nominal = parseFloat(pill.getAttribute('data-open') || '0'); if (!nominal) return;
   var ui = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale')) || 1, icons = ui * 1.25;
-  var gap = 24 * icons, headH = 35 * icons, rowH = (pill.id === 'bs-pill-account' ? 45 : 38) * icons;
+  var gap = 24 * icons, headH = 35 * icons, rowH = (pill.id === 'bs-pill-account' ? 45 : 38) * icons;   // the rows' MINIMUM heights (they fill the common height when there is room)
   var top = pill.getBoundingClientRect().top;
   var avail = pillFloor(pill) - gap - top;
   var want = nominal * icons;
@@ -947,7 +949,7 @@ var BLOOM = {
   menuHome:  { HARDWARE: 0.861, SOFTWARE: 0.897, COMMUNITY: 0.916, SUPPORT: 0.933 },
   capsule:   { HARDWARE: 1.68, SOFTWARE: 1.79, COMMUNITY: 1.839, SUPPORT: 1.885 },
   social:    { Instagram: 1.791, YouTube: 2.038, TikTok: 2.127, X: 3.57, Discord: 1.968, Facebook: 1.854 },
-  lang:      { EN: 2.315, ZH: 2.546, JA: 2.757, ES: 2.548 },
+  lang:      { EN: 2.315, ZH: 2.546, JA: 2.757, ES: 2.548, FR: 2.457 },
   // weight-keyed: the hovered sub-item is Wide 300, the SELECTED one (is-chosen / is-live) is 600 — denser ink, its own values
   sub:       { 300: { overview: 1.963, 'industrial design': 1.863, specifications: 1.854, ecosystem: 1.84, support: 1.99, size: 2.084, desktop: 1.766, desklegs: 1.664 },
                600: { overview: 1.041, 'industrial design': 0.918, specifications: 0.924, ecosystem: 0.933, support: 0.979, size: 1.192, desktop: 0.913, desklegs: 0.916 } },

@@ -513,6 +513,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .bs-pill.is-capped .bs-tray {
   max-height: calc(var(--open-h-cap) - 35px * var(--icons-scale));
   overflow-y: auto; overscroll-behavior: contain;
+  padding-bottom: 0;                      /* the foot yields to the scroll under a cap */
   scrollbar-width: none;                 /* the 35px×icons capsule has no lane for a bar; wheel, keys and touch scroll it */
 }
 .bs-pill.is-capped .bs-tray::-webkit-scrollbar { display: none; }
@@ -583,8 +584,21 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   transition: opacity var(--pop-fade), transform var(--pop-motion);
 }
 .bs-pill.is-open .bs-tray > * { opacity: 1; transform: none; }
+/* ONE OPEN HEIGHT (Eric, Sept 3): the three pills share 209px×icons (the
+   volume pill's own — the tallest, so the track keeps its 1:1 length). The
+   list trays FILL it: a column whose rows grow evenly from their minimum
+   (38px×icons for the language words, 45 for the account glyphs — the
+   breathing-parity rungs) to the common height, over an 8px×icons foot.
+   Under the expansion floor's cap the rows sit at their minimum and the
+   tray scrolls (is-capped). Any number of languages adapts. */
+#bs-pill-lang .bs-tray, #bs-pill-account .bs-tray {
+  display: flex; flex-direction: column;
+  height: calc(var(--open-h-cap, var(--open-h)) - 35px * var(--icons-scale));
+  padding-bottom: calc(8px * var(--icons-scale)); box-sizing: border-box;
+}
+#bs-pill-lang .bs-tray-item, #bs-pill-account .bs-tray-item { flex: 1 0 auto; height: auto; }
 .bs-tray-item {
-  width: 100%; height: calc(38px * var(--icons-scale));
+  width: 100%; height: calc(38px * var(--icons-scale)); min-height: calc(38px * var(--icons-scale));
   display: flex; align-items: center; justify-content: center;
   color: var(--text-soft); background: transparent; border: 0; padding: 0;
   font-family: var(--font-sans); font-weight: 300;   /* Chill Duan Sans light — matches the icons' weight feel */
@@ -604,7 +618,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    account rows 23px glyphs — equal 38px rows leave the icons visually
    tighter. Deeper rows for the icon tray give both pills the same
    ~27px of air between elements. */
-#bs-pill-account .bs-tray-item { height: calc(45px * var(--icons-scale)); }
+#bs-pill-account .bs-tray-item { min-height: calc(45px * var(--icons-scale)); }
 @media (hover: hover) and (pointer: fine) {
   /* HOTNESS LAW: the tray texts light on the one ring set at their solved
      intensity (EN 2.32 · ZH 2.55 · JA 2.76 · ES 2.55 — the BLOOM table). */
