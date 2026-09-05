@@ -515,16 +515,16 @@
     background: none; border: 0; padding: 0 calc(2px * var(--ui-scale));
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(8px * var(--ui-scale));   /* THE TYPE PASS: the unit conversion is their 8 — the smallest rung */
+    font-size: calc(10px * var(--ui-scale));   /* Eric, Sept 5: the unit toggle is RULED AT 10 (their 8 sat at the glow cap — accepted, then re-rung) */
     line-height: calc(12px * var(--ui-scale));
     letter-spacing: .06em;
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .hw-unit button { --bloom-g: 4; }                  /* THE CHILDREN LAW: the focused unit stays 300 and only glows. AT THE CAP: an 8px Light string with every paste on reads 0.955 of the reference in the shipped state (IN at g=4: 48.3 / 50.6; g=3 reads 0.74) — within tolerance, but with no headroom; flagged to Eric */
+  .hw-unit button { --bloom-g: 3.17; }               /* THE CHILDREN LAW: the focused unit stays 300 and only glows — solved in the shipped state at the 10 rung (IN: 3.165 → 0.996); the cap is behind it */
   .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }   /* glow only — bold is the LIVE unit's mark */
   .hw-unit button.is-live { color: var(--ink); font-weight: 600; }   /* HOTNESS LAW: selected = bold; the glow marks the cursor only */
-  .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(8px * var(--ui-scale)); }
+  .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(10px * var(--ui-scale)); }   /* rides the toggle's rung */
   /* THE PILL FIELDS (Eric, Aug 28 fourth word, p2: "size dimension
      inputs happen within a pill") — the design team's capsule: hairline
      outline, full radius, label inside-left, the value bold right, the
