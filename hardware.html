@@ -82,7 +82,7 @@
     --hw-right-top: 21.70vh;
     /* The options panel (diagonal bs-window), right-anchored: right
        edge = the tray's right rail = ONE 3.30vw rail (x1671). */
-    --hw-panel-right: 3.30vw;
+    --hw-panel-right: var(--hw-text-inset);   /* Sept 5 (Eric: "investigate"): the add row and the panel end where the RIGHT MENU'S TEXTS end — the text inset (65.7px at the frame), not the frames' 3.30vw (57px) that left them 8.7px past the texts and the collapsed bar */
     --hw-panel-top: 38.94vh;
     --hw-panel-w: 26.33vw;
     --hw-panel-maxh: 37.69vh;
@@ -852,7 +852,7 @@
   .hw-tray-rule { left: 1.91vw; right: 1.91vw; top: 87.11vh; height: 1px; }
   .hw-tray-rail { width: 1px; top: 84.51vh; height: 13.61vh; }
   .hw-tray-rail--l   { left: max(clamp(34px, 3.8vw, 68px), 3.76vw); }
-  .hw-tray-rail--r   { right: 3.30vw; }
+  .hw-tray-rail--r   { right: var(--hw-text-inset); }   /* the expanded frame's right rail: the same text inset (Sept 5) */
   .hw-tray-rail--div { left: 70.78vw; }
   /* THE LABEL (Eric, Aug 29, off the design's p2): the design centers it
      HIGH in the rail-to-rule window (~16px of air above the line), so it
@@ -985,7 +985,7 @@
     transition: filter .2s ease;
   }
   .hw-tray-price {
-    position: absolute; left: 74.07vw; right: 6.66vw; top: 89.79vh;
+    position: absolute; left: 74.07vw; right: calc(var(--hw-text-inset) + 3.36vw); top: 89.79vh;   /* keeps the frames' 3.36vw from the right rail as the rail moves to the text inset (Sept 5) */
     pointer-events: auto;
   }
   .hw-total-row {
