@@ -357,10 +357,11 @@ body * {
 /* re-solved Sept 3 after THE TYPE PASS (reference desk: 12 rung, lit 50.6 / rest 15.0) */
 .bs-item { --bloom-g: .93; }
 body[data-bs-page="home"] .bs-item, body[data-bs-page="support"] .bs-item { --bloom-g: .8; }
-.site-primary-nav__link { --bloom-g: .8; }        /* focused = WideSemiBold now */
+.site-primary-nav__link { --bloom-g: 1.62; }      /* TYPE 2: the hover (Light) mean; per string + weight in BLOOM.capsule */
 .bs-tray-item, #bs-lang { --bloom-g: 3.0; }        /* 10 WideLight */
 .bs-subitem { --bloom-g: 1.89; }                    /* THE CHILDREN LAW: a FOCUSED child stays 300 and only glows — this is the 300 value (solved on /support's children; /hardware's per string in BLOOM). Selected = 600, its own value below. */
-.bs-plate-title { --bloom-g: .93; }                 /* the entry title, focused 600 (provisional: the sub-item's value) */
+.bs-plate-title { --bloom-g: 2.29; }                /* TYPE 2 hover at Light: the mean of three plates solved live (2.19–2.38); lorem strings, so the default stands */
+.bs-plate.is-open .bs-plate-title { --bloom-g: 1.09; }   /* TYPE 2 open, SemiBold, standing: the mean solved live (1.05–1.15) */
 .bs-option { --bloom-g: .99; }
 .bs-round img, .bs-head img, .site-round-button svg { --bloom-g: 1; }   /* per glyph via the BLOOM table (sound 2.57 · cart .84 · account .93 · ‹ 1.01) */
 /* Custom properties INHERIT: a glyph inside a text surface would take the
@@ -643,7 +644,6 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 }
 .bs-tray-item:focus-visible, .bs-tray-item.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
 .bs-tray-item:focus-visible img, .bs-tray-item.kb-hover img { filter: var(--bloom-icon); }
-.bs-tray-item.is-current { color: #fff; }
 /* Volume bar (mockup 1:1): a track filling the pill below the speaker,
    with a white capsule fill anchored at the bottom, glowing. */
 #bs-vol-track {
@@ -877,19 +877,13 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    everything inside the icon bars, and its tray texts bloom on this
    chain. */
 .site-primary-nav__link:hover, .site-primary-nav__link:focus-visible,
-.site-primary-nav__link.kb-hover { color: #fff; outline: none; font-weight: 600; text-shadow: var(--bloom-lit); }   /* THE TYPE PASS: focused = WideSemiBold */
+.site-primary-nav__link.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }   /* TYPE 2 (Eric, Sept 5): hover = glow only */
 /* "You are here" — the committed rung, rendered per the witness: full
    ink at weight 600, aria-current, and the dot deliberately struck
    (the witness carries content:none!important armor on this state —
    kept verbatim). Ink routes through the accent-committed seam token. */
-.site-primary-nav__link.is-active-nav { font-weight: 600; color: var(--committed-ink); }
+.site-primary-nav__link.is-active-nav { font-weight: 600; color: var(--committed-ink); text-shadow: var(--bloom-lit); }   /* TYPE 2 (Eric, Sept 5): selected = bold + STANDING glow (the Aug 22 no-glow reading of the committed rung is superseded) */
 .site-primary-nav__link.is-active-nav::after { content: none !important; display: none !important; }
-/* The already-selected item does NOT take the hover glow (Eric, Aug 22)
-   — it holds its committed rendering under the cursor; only its resting
-   glow remains. Applies to the keyboard twin too (pixel parity). */
-.site-primary-nav__link.is-active-nav:hover,
-.site-primary-nav__link.is-active-nav:focus-visible,
-.site-primary-nav__link.is-active-nav.kb-hover { text-shadow: none; }
 
 /* ══════════════════════════════════════════════════════════════════════
    bs-window — THE panel. No page writes a bespoke one.
@@ -1252,10 +1246,10 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .bs-plate.is-open::after { opacity: 1; }
 .bs-plate.kb-hover, .bs-plate:focus-visible { outline: none; background: #fefefe24; }
 .bs-plate.kb-hover .bs-plate-title, .bs-plate:focus-visible .bs-plate-title {
-  color: #fff; font-weight: 600; text-shadow: var(--bloom-lit);
+  color: #fff; text-shadow: var(--bloom-lit);   /* TYPE 2 (Eric, Sept 5): hover = glow only */
 }
 .bs-plate.is-open .bs-plate-title {
-  color: var(--ink); font-weight: 600;   /* HOTNESS LAW: open = bold, not lit (the glow marks the cursor) */
+  color: #fff; font-weight: 600; text-shadow: var(--bloom-lit);   /* TYPE 2: the open entry is bold AND glows, standing */
 }
 /* The downward expansion: 0fr → 1fr travels to the content's OWN height
    — the one way to animate to `auto` honestly. House tempo, no local
@@ -1488,4 +1482,55 @@ a#bs-wordmark-link:focus-visible { outline: none; }
     top: calc(100px * var(--ui-scale));
     width: 104px;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE STATE TYPES (Eric, Sept 5 — "now onto declaring classes"). Every
+   hoverable item in a list declares ONE of three grammars on its markup
+   or in its builder. The type rules weight and glow per state; the
+   surface keeps its own geometry, colour and dot drawing. Hover is the
+   one focus variable (.kb-hover / :focus-visible; raw :hover only where a
+   surface already carries it); SELECTED is the surface's own hook, listed
+   below so the vocabulary reads in one place.
+
+   TYPE 1  .bs-type-1   rest Light · hover: glow + OUTLINE dot
+                        · selected: bold + glow + FILLED dot
+           /hardware class items (.bs-item.active, red) · /hardware product
+           children (.bs-subitem.is-live, blue — the page draws the dot)
+           · /support menu items (.bs-item.active, red)
+   TYPE 2  .bs-type-2   rest Light · hover: glow only · selected: bold + glow
+           the capsule links (.is-active-nav) · /support entry plates
+           (.bs-plate.is-open — the title follows through the plate rules;
+           the plate's own warm MARKER keeps its Aug 25 ranking, dim at
+           rest / full under the pointer and open — flagged to Eric)
+           · /support children (.bs-subitem.is-chosen) · the customization
+           options (.hw-opt.is-chosen) and the unit toggle (.is-live)
+   TYPE 3  .bs-type-3   rest Light · hover: glow only · NO selected state
+           the account tray glyphs · the language tray rows
+   SPECIAL the /home main menu (.bs-item at 600 rest) stands outside the
+           types, as is.
+   Hotness: a type-1 / type-2 item carries TWO solved values — the 300
+   column for its hover, the 600 column for its selected standing glow —
+   keyed by computed weight in BLOOM (bloomOne). ────────────────────── */
+.bs-type-1, .bs-type-2, .bs-type-3 { font-weight: 300; }
+.bs-type-1.kb-hover, .bs-type-1:focus-visible,
+.bs-type-2.kb-hover, .bs-type-2:focus-visible,
+.bs-type-3.kb-hover, .bs-type-3:focus-visible { font-weight: 300; }   /* hover never bolds */
+.bs-type-1.active, .bs-type-1.is-live,
+.bs-type-2.is-chosen, .bs-type-2.is-active-nav, .bs-type-2.is-live {
+  font-weight: 600; text-shadow: var(--bloom-lit);   /* selected: bold + standing glow */
+}
+/* the entry plate's selected hook (.is-open) is NOT in that list on purpose:
+   the plate is a container — text-shadow inherits, and a glow on the plate
+   leaked into its body copy (the adversarial pass, Sept 5). The plate's
+   title takes bold + glow through the plate rules above. */
+.bs-plate-copy { text-shadow: none; }   /* body copy never glows — belt and braces */
+/* type 1's red dot (.bs-item::before): OUTLINE under the pointer, FILLED
+   when selected — the /hardware class menu's own reading, now the type's */
+.bs-type-1.bs-item.kb-hover:not(.active)::before,
+.bs-type-1.bs-item:focus-visible:not(.active)::before {
+  background: transparent;
+  border: 1px solid var(--color-signal-red);
+  box-sizing: border-box;
+  box-shadow: 0 0 8px rgba(157, 31, 0, .35);
 }

@@ -479,13 +479,13 @@ function buildUtilityCluster(){
         '<img src="assets/ui/icon-figma-person.png" alt="" aria-hidden="true">' +
       '</button>' +
       '<div class="bs-tray">' +
-        '<button class="bs-tray-item" id="bs-acct-signin" type="button" aria-label="Sign in">' +
+        '<button class="bs-tray-item bs-type-3" id="bs-acct-signin" type="button" aria-label="Sign in">' +
           '<img src="assets/ui/bs_icon_signin.png" alt="" aria-hidden="true">' +
         '</button>' +
-        '<button class="bs-tray-item" id="bs-acct-details" type="button" aria-label="Account details">' +
+        '<button class="bs-tray-item bs-type-3" id="bs-acct-details" type="button" aria-label="Account details">' +
           '<img src="assets/ui/bs_icon_account_details.png" alt="" aria-hidden="true">' +
         '</button>' +
-        '<button class="bs-tray-item" id="bs-acct-orders" type="button" aria-label="Order lookup">' +
+        '<button class="bs-tray-item bs-type-3" id="bs-acct-orders" type="button" aria-label="Order lookup">' +
           '<img src="assets/ui/bs_icon_order_lookup.png" alt="" aria-hidden="true">' +
         '</button>' +
       '</div>' +
@@ -957,10 +957,13 @@ function setLang(code){
    next step once calibrated). Re-runs at every STR render. */
 var BLOOM = {
   // re-solved Sept 3 after THE TYPE PASS: the reference `desk` is now a 12 rung — lit 50.6 / rest 15.0 (reports/harness/2026-09-03/resolve_all.json)
-  menu:      { desk: 1.00, module: 0.962, keyboard: 0.927, mouse: 1.001, light: 0.989, powerbank: 0.906, watercup: 0.94, headset: 0.906, speakers: 0.93,
-               'CONTACT US': 0.871, FAQ: 0.893, WARRANTY: 0.784, 'RETURN & REFUND POLICY': 0.796, 'PRODUCT GUIDES': 0.804, 'BUSINESS REQUEST': 0.753 },
+  menu:      { 300: { desk: 1.963, module: 2, keyboard: 1.824, mouse: 2.032, light: 1.909, powerbank: 1.827, watercup: 1.876, headset: 1.817, speakers: 1.726,
+                      'CONTACT US': 1.83, FAQ: 1.823, WARRANTY: 1.532, 'RETURN & REFUND POLICY': 1.644, 'PRODUCT GUIDES': 1.705, 'BUSINESS REQUEST': 1.545 },   // TYPE 1 hover (Eric, Sept 5): glow at Light — solved live
+               600: { desk: 1.0, module: 0.962, keyboard: 0.927, mouse: 1.001, light: 0.989, powerbank: 0.906, watercup: 0.94, headset: 0.906, speakers: 0.93,
+                      'CONTACT US': 0.871, FAQ: 0.893, WARRANTY: 0.784, 'RETURN & REFUND POLICY': 0.796, 'PRODUCT GUIDES': 0.804, 'BUSINESS REQUEST': 0.753 } },  // TYPE 1 selected: the standing glow at SemiBold
   menuHome:  { HARDWARE: 0.753, SOFTWARE: 0.802, COMMUNITY: 0.819, SUPPORT: 0.834 },
-  capsule:   { HARDWARE: 0.75, SOFTWARE: 0.801, COMMUNITY: 0.811, SUPPORT: 0.812 },          // focused = WideSemiBold now (the type pass)
+  capsule:   { 300: { HARDWARE: 1.486, SOFTWARE: 1.574, COMMUNITY: 1.606, SUPPORT: 1.679 },   // TYPE 2 hover (Eric, Sept 5): glow at Light — solved live
+               600: { HARDWARE: 0.75, SOFTWARE: 0.801, COMMUNITY: 0.811, SUPPORT: 0.812 } },   // TYPE 2 selected: the current page's standing glow (HARDWARE 1.001 · SUPPORT .987 in place)
   social:    { Instagram: 1.573, YouTube: 1.814, TikTok: 1.852, X: 3.13, Discord: 1.739, Facebook: 1.64 },
   lang:      { EN: 2.774, ZH: 3.017, JA: 3.54, ES: 2.946, FR: 2.891 },                          // 10 WideLight (8×icons)
   // weight-keyed: a sub-item is Wide 300 at rest and 600 when focused OR selected (the type pass) — the 600 column is the live one
@@ -970,6 +973,8 @@ var BLOOM = {
                600: { overview: 0.988, 'industrial design': 0.905, specifications: 0.915, ecosystem: 0.919, support: 0.957, size: 1.16, desktop: 0.908, desklegs: 0.9 } },
   head:      { INTRODUCTION: 0.871, CUSTOM: 0.887 },   // the heads at 14 (Eric, Sept 5) — solved in the shipped state
   traylabel: { 300: { CART: 2.434 }, 600: { CART: 1.055 } },   // collapsed WideLight / expanded SemiBold (Eric, Sept 5; the 300 solved in the shipped state)
+  platetitle: { 300: {}, 600: {} },   // the entry plates carry lorem placeholders — the CSS defaults stand (300 hover 2.29 · 600 open 1.09, the means of three plates solved live)
+  unit:      { 300: { CM: 3, IN: 3.493 }, 600: { CM: 1.557, IN: 1.835 } },   // the unit toggle, per string and weight — solved live over the plate (Sept 5)
   option:    { 'product consulting': 0.977, 'order & delivery': 1.003, 'warranty & repair': 0.997 },
   door:      { 'fill out form': 2.455 },
   glyph:     { 'bs-sound': 1.284, 'bs-cart': 0.768, 'bs-account': 0.858, 'corner-back': 0.927,   // the 4-pass chain; the › chevron's two states live in the CSS
@@ -979,7 +984,7 @@ var BLOOM_SCOPE = [
   ['.bs-item', function(el){ return document.body.getAttribute('data-bs-page') === 'home' ? 'menuHome' : 'menu'; }],
   ['.site-primary-nav__link', 'capsule'], ['.bs-social-link', 'social'], ['.bs-tray-item, #bs-lang', 'lang'],
   ['.bs-subitem', 'sub'], ['.hw-head', 'head'], ['.hw-tray-label', 'traylabel'],
-  ['.bs-option', 'option'], ['.sup-door-label', 'door'], ['.ct-crumb-btn', 'crumb'], ['.hw-opt', 'hwopt']
+  ['.bs-option', 'option'], ['.sup-door-label', 'door'], ['.ct-crumb-btn', 'crumb'], ['.hw-opt', 'hwopt'], ['.bs-plate-title', 'platetitle'], ['.hw-unit button', 'unit']
 ];
 function bloomOne(el, surface){
   if (el.querySelector('img')) return;                            // glyph heads are handled by id below
@@ -1071,7 +1076,7 @@ function buildLangTray(){
     if (code === lang) return;                 // the head IS the current entry
     var b = document.createElement('button');
     b.type = 'button';
-    b.className = 'bs-tray-item';
+    b.className = 'bs-tray-item bs-type-3';   // THE STATE TYPES: a language row is TYPE 3
     b.textContent = code.toUpperCase();
     b.setAttribute('aria-label', 'Switch language: ' + code.toUpperCase());
     b.addEventListener('click', function(){
@@ -1262,7 +1267,7 @@ function buildSlots(menuEl, items, cb){
     slot.className = 'bs-menu-slot';
     var b = document.createElement('button');
     b.type = 'button';
-    b.className = 'bs-item';
+    b.className = 'bs-item' + (cb.itemType === null ? '' : ' ' + (cb.itemType || 'bs-type-1'));   // THE STATE TYPES: a section menu item is TYPE 1 unless the page says otherwise (null = untyped)
     if (cb.itemId) b.id = cb.itemId(idx);
     var span = document.createElement('span');
     span.className = 'bs-nav-label';
@@ -1289,7 +1294,7 @@ function buildSlots(menuEl, items, cb){
       ss.forEach(function(sub, sIdx){
         var sb = document.createElement('button');
         sb.type = 'button';
-        sb.className = 'bs-subitem';
+        sb.className = 'bs-subitem ' + (cb.subType || 'bs-type-2');   // THE STATE TYPES: a child built here is TYPE 2 (/support's children)
         sb.setAttribute('data-str', sub.key);
         sb.tabIndex = -1;
         sb.addEventListener('mouseenter', function(){
@@ -1329,7 +1334,7 @@ function buildPlates(stackEl, rows, cb){
   rows.forEach(function(r, i){
     var btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'bs-plate';
+    btn.className = 'bs-plate bs-type-2';   // THE STATE TYPES: an entry plate is TYPE 2 (its title follows through the plate rules)
     btn.setAttribute('aria-expanded', 'false');
     var title = document.createElement('span');
     title.className = 'bs-plate-title';

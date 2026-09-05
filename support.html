@@ -179,9 +179,7 @@
   }
 
   #bs-support-menu .bs-item { font-weight: 300; }
-  #bs-support-menu .bs-item.kb-hover,
-  #bs-support-menu .bs-item:focus-visible,
-  #bs-support-menu .bs-item.active { font-weight: 600; }
+  #bs-support-menu .bs-item.active { font-weight: 600; }   /* TYPE 1 (Eric, Sept 5): hover never bolds — glow + outline dot; selected = bold + glow + filled dot */
 
   /* ── The window — the MERGED bs-window subsystem, placed and sized ────
      Frame rect x[577,1137] top 243 -> left 33.39vw, width 32.47vw. The
@@ -495,10 +493,10 @@
     <button class="site-primary-nav__forward-button" type="button" aria-label="Open section navigation">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
     </button>
-    <button class="site-primary-nav__link site-primary-nav__link--hardware" type="button" data-section="hardware">HARDWARE</button>
-    <button class="site-primary-nav__link site-primary-nav__link--software" type="button" data-section="software">SOFTWARE</button>
-    <button class="site-primary-nav__link site-primary-nav__link--community" type="button" data-section="community">COMMUNITY</button>
-    <button class="site-primary-nav__link site-primary-nav__link--support is-active is-active-nav" type="button" aria-current="page" data-section="support">SUPPORT</button>
+    <button class="site-primary-nav__link bs-type-2 site-primary-nav__link--hardware" type="button" data-section="hardware">HARDWARE</button>
+    <button class="site-primary-nav__link bs-type-2 site-primary-nav__link--software" type="button" data-section="software">SOFTWARE</button>
+    <button class="site-primary-nav__link bs-type-2 site-primary-nav__link--community" type="button" data-section="community">COMMUNITY</button>
+    <button class="site-primary-nav__link bs-type-2 site-primary-nav__link--support is-active is-active-nav" type="button" aria-current="page" data-section="support">SUPPORT</button>
   </nav></div>
 </div>
 
