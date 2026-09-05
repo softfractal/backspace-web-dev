@@ -405,11 +405,11 @@
     letter-spacing: 0;
     /* HOTNESS LAW: no resting glow (hoverable); the LIT ring set on hover,
        intensity 2.359 (small 300-weight rows need two pastes). */
-    --bloom-g: 2.04;   /* THE CHILDREN LAW (Eric, Sept 5): the focused option stays 300 and only glows — solved IN THE SHIPPED STATE (solve_live.js): compact 2.04 · wide 1.95 · studio 2.06 · metallic silver 1.93 · red 2.21 → the mean */
+    --bloom-g: 2.19;   /* THE CHILDREN LAW (Eric, Sept 5): the focused option stays 300 and only glows — the default is the MEAN of all sixteen option strings solved LIVE over the window's plate (2.04–2.44); each string carries its own value from BLOOM.hwopt[300] */
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .hw-sizerow.is-chosen .hw-opt, .hw-colrow.is-chosen .hw-opt { --bloom-g: .92; }   /* the CHOSEN row under the pointer: 600 + glow (solved in the shipped state: standard .916) */
+  .hw-opt.is-chosen { --bloom-g: 1.12; }   /* the CHOSEN option (600 + standing glow): the mean of all sixteen strings solved LIVE over the window's plate (1.03–1.32); per string from BLOOM.hwopt[600]. ON THE OPT, not the row — the material and finish options have no row, and at the row-only rule they sat at the 300 value: 1.6–1.7× the reference with a wider halo (Eric's eye, Sept 5) */
   .hw-opt.kb-hover, .hw-opt:hover, .hw-opt:focus-visible {
     color: #fff; outline: none;   /* glow only — bold is the CHOSEN option's mark (Aug 28 law, restated Sept 5) */
     text-shadow: var(--bloom-lit);
@@ -522,9 +522,9 @@
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .hw-unit button { --bloom-g: 3.17; }               /* THE CHILDREN LAW: the focused unit stays 300 and only glows — solved in the shipped state at the 10 rung (IN: 3.165 → 0.996); the cap is behind it */
+  .hw-unit button { --bloom-g: 3.53; }               /* THE CHILDREN LAW: the focused unit stays 300 and only glows — solved LIVE at the 10 rung over the plate (IN: 3.529 → 0.993); the cap is behind it */
   .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }   /* glow only — bold is the LIVE unit's mark */
-  .hw-unit button.is-live { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); --bloom-g: 1.4; }   /* Eric, Sept 5: options are children — the LIVE unit is bold AND glows, standing (600 value solved in the shipped state: CM 1.403 → 0.997) */
+  .hw-unit button.is-live { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); --bloom-g: 1.59; }   /* Eric, Sept 5: options are children — the LIVE unit is bold AND glows, standing (600 value solved LIVE over the plate: CM 1.591 → 1.011) */
   .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(10px * var(--ui-scale)); }   /* rides the toggle's rung */
   /* THE PILL FIELDS (Eric, Aug 28 fourth word, p2: "size dimension
      inputs happen within a pill") — the design team's capsule: hairline

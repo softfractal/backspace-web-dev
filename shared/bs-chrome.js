@@ -964,6 +964,8 @@ var BLOOM = {
   social:    { Instagram: 1.573, YouTube: 1.814, TikTok: 1.852, X: 3.13, Discord: 1.739, Facebook: 1.64 },
   lang:      { EN: 2.774, ZH: 3.017, JA: 3.54, ES: 2.946, FR: 2.891 },                          // 10 WideLight (8×icons)
   // weight-keyed: a sub-item is Wide 300 at rest and 600 when focused OR selected (the type pass) — the 600 column is the live one
+  hwopt:     { 300: { compact: 2.278, standard: 2.1, wide: 2.217, studio: 2.259, 'stainless steel': 2.073, 'aluminum alloy': 2.269, 'walnut wood': 2.183, brushed: 2.147, PVD: 2.418, 'powder-coated': 2.036, 'metallic silver': 2.193, 'black & white': 2.1, red: 2.436, orange: 2.036, yellow: 2.225, green: 2.041 },
+               600: { compact: 1.116, standard: 1.06, wide: 1.16, studio: 1.142, 'stainless steel': 1.065, 'aluminum alloy': 1.119, 'walnut wood': 1.094, brushed: 1.109, PVD: 1.19, 'powder-coated': 1.025, 'metallic silver': 1.137, 'black & white': 1.069, red: 1.31, orange: 1.069, yellow: 1.146, green: 1.1 } },   // the customization options (Sept 5): FOCUSED = 300, CHOSEN = 600 — every string solved LIVE on the shipped page (over the window's plate)
   sub:       { 300: { overview: 1.923, 'industrial design': 1.829, specifications: 1.845, ecosystem: 1.813, support: 1.925, size: 2.263, desktop: 1.75, desklegs: 1.64 },
                600: { overview: 0.988, 'industrial design': 0.905, specifications: 0.915, ecosystem: 0.919, support: 0.957, size: 1.16, desktop: 0.908, desklegs: 0.9 } },
   head:      { INTRODUCTION: 1.099, CUSTOM: 1.141 },
@@ -977,7 +979,7 @@ var BLOOM_SCOPE = [
   ['.bs-item', function(el){ return document.body.getAttribute('data-bs-page') === 'home' ? 'menuHome' : 'menu'; }],
   ['.site-primary-nav__link', 'capsule'], ['.bs-social-link', 'social'], ['.bs-tray-item, #bs-lang', 'lang'],
   ['.bs-subitem', 'sub'], ['.hw-head', 'head'], ['.hw-tray-label', 'traylabel'],
-  ['.bs-option', 'option'], ['.sup-door-label', 'door'], ['.ct-crumb-btn', 'crumb']
+  ['.bs-option', 'option'], ['.sup-door-label', 'door'], ['.ct-crumb-btn', 'crumb'], ['.hw-opt', 'hwopt']
 ];
 function bloomOne(el, surface){
   if (el.querySelector('img')) return;                            // glyph heads are handled by id below
