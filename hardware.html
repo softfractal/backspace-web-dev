@@ -342,8 +342,11 @@
   }
 
   /* ── The options panel — THE diagonal window, right-anchored on the
-     shared 3.30vw rail. Height is measured from content, capped at the
-     frame's 37.69vh; the interior scrolls natively (wheelNative). ─────── */
+     shared 3.30vw rail. ONE HEIGHT FOR EVERY VIEW (Eric, Sept 5: "they
+     should all possess the same height, if the contents don't fill it
+     all the way down, it's okay"): the frame's full window, 37.69vh —
+     content no longer measures it; short content leaves air at the
+     foot, tall content scrolls natively inside (wheelNative). ────────── */
   #hw-panel {
     position: fixed;
     right: var(--hw-panel-right);
@@ -356,7 +359,7 @@
     bottom: 23.37vh;
     width: var(--hw-panel-w);
     min-width: calc(320px * var(--ui-scale));  /* usability floor (proposal) */
-    height: calc(180px * var(--ui-scale));     /* boot value; the machine measures */
+    height: var(--hw-panel-maxh);              /* the one height (Eric, Sept 5) — the frame's window, top at 38.94vh */
     z-index: 18;
     color: var(--text-soft);
   }
@@ -1586,16 +1589,14 @@ function addToCart(from){
   slotsEl.scrollLeft = slotsEl.scrollWidth;       // the new slot arrives in view
 }
 
-// ── The options panel — measured height, diagonal redraw discipline ─────
-function measurePanel(){
-  var cs = getComputedStyle(panelBody);
-  var pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
-  var h = panelBody.scrollHeight;              // includes padding via border-box? measured live
-  h = panelBody.firstChild ? panelBody.scrollHeight : pad;
-  var cap = window.innerHeight * 37.69 / 100;
-  return Math.ceil(Math.min(h, cap));
-}
-function sizePanel(){ panel.style.height = measurePanel() + 'px'; }
+// ── The options panel — ONE height, diagonal redraw discipline ──────────
+// Eric, Sept 5: every view shares the frame's window (37.69vh, the CSS
+// token); content no longer measures the panel — the size view's first
+// draw used to come up short (its own content) and only grew after a
+// visit to a colour view. sizePanel() now only clears any inline height
+// a previous era left behind.
+function measurePanel(){ return Math.ceil(window.innerHeight * 37.69 / 100); }
+function sizePanel(){ panel.style.removeProperty('height'); }
 function drawPanel(){
   panel.classList.add('hw-nofx');
   panel.classList.remove('is-open');
