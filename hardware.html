@@ -86,6 +86,7 @@
     --hw-panel-top: 38.94vh;
     --hw-panel-w: 26.33vw;
     --hw-panel-maxh: 37.69vh;
+    --hw-text-inset: max(clamp(34px, 3.8vw, 68px), 3.76vw);   /* where the TEXTS sit from the window edge — OASIS's x and INTRODUCTION's right edge (65.7px at the frame, both sides): the left rail's own expression (Eric, Sept 5) */
     /* Introduction plates: 19.04 / 39.58 / 60.19vw · top 31.51vh ·
        w 19.27vw · aspect locked 333/309 (proposal, on the record). */
     --hw-plate-top: 31.51vh;
@@ -660,8 +661,11 @@
   #hw-tray { position: fixed; inset: 0; z-index: 14; pointer-events: none; }
   #hw-tray-strip {
     position: absolute;
-    left: 18.63vw; top: 95.34vh;
-    width: 61.17vw; height: calc(100vh - 95.34vh);
+    /* Eric, Sept 5: the collapsed bar EXTENDS to the text insets — its
+       sides sit where OASIS begins and INTRODUCTION ends, no longer the
+       stage's 18.63..79.80vw center span. */
+    left: var(--hw-text-inset); right: var(--hw-text-inset); top: 95.34vh;
+    height: calc(100vh - 95.34vh);
     background: var(--bsw-fill);
     border: 0; padding: 0;
     pointer-events: auto;
@@ -696,7 +700,8 @@
   }
   /* THE EXPANSION CHOREOGRAPHY (thirteenth word, Eric, Aug 29): the
      strip's translucent box FADES · the line GROWS horizontally at the
-     strip's own height · then PULLS UP to the band rule's 87.11vh while
+     strip's own height (scaleX .96 — the text-inset strip against the
+     1.91vw band rule, at the frame; was .62 for the center span) · then PULLS UP to the band rule's 87.11vh while
      the two rails DRAW · and the full row's contents reveal. One clock,
      keyframe percentage splits — the waterfall's own discipline; tempo
      tokens only, zero local durations. The close stays a plain fade
@@ -718,7 +723,7 @@
   #hw-tray-band > * { pointer-events: auto; }
   @keyframes hw-rule-in {
     0% {
-      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.62);
+      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.96);
       animation-timing-function: var(--expand-curve);
     }
     45% {
@@ -776,7 +781,7 @@
       transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(1);
       animation-timing-function: var(--expand-curve);
     }
-    100% { transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.62); }
+    100% { transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.96); }
   }
   #hw-tray.is-closing .hw-tray-rule {
     animation: hw-rule-out var(--pop-duration) var(--pop-fade-duration) both;
