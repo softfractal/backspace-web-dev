@@ -320,8 +320,12 @@
     box-sizing: border-box;
     box-shadow: 0 0 8px rgba(157, 31, 0, .35);
   }
-  /* THE TYPE PASS (Eric, Sept 3): the focused child carries NO dot — the glow
-     alone marks focus; the filled dot marks the selection. */
+  /* THE BLUE OUTLINE DOT IS BACK on the hovered child (Eric, Sept 5 —
+     reversing the type pass's Sept 3 strike, as he starts declaring the
+     children's CSS classes): the popped-unselected child under the
+     pointer or the cursor wears the hollow ring; selection FILLS it. */
+  #hw-product-menu .bs-subitem.kb-hover::after,
+  #hw-product-menu .bs-subitem:focus-visible::after,
   #hw-product-menu .bs-subitem.is-live::after { opacity: 1; }
   /* The chosen-ring stays available in this menu for CHOSEN semantics
      (none in phase one — the ring belongs to the panel's options). */
