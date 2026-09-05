@@ -90,8 +90,8 @@
     /* THE CART'S TOP EDGE drives the panel and the add row (Eric, Sept 5:
        "when cart is collapsed, the customization interface and add to cart
        bar gets dropped ... when cart is expanded [they] get pushed up" —
-       the SAME gap to the cart in both states). Collapsed: the strip's
-       top. Expanded (body.hw-cart-open): the rails' top. */
+       the SAME gap to the cart in both states): berthed off the rails' top
+       (84.51vh) and dropped by --hw-cart-drop while collapsed. */
     /* THE CART PAD (Eric, Sept 5): ONE padding for the label's air above the
        line — the design's expanded reading, 87.11vh − 85.29vh — reused
        collapsed for label → line AND line → window bottom; the collapsed
@@ -99,23 +99,32 @@
        upper two, the rule one pad above the bottom). */
     --hw-cart-pad: calc(87.11vh - 85.29vh);
     --hw-strip-top: calc(100vh - 3 * var(--hw-cart-pad));   /* the collapsed bar's top (94.54vh) — CONSTANT: the bar never moves, it only fades */
-    --hw-cart-top: var(--hw-strip-top);                       /* collapsed: the cart's top edge is the bar's top */
+    /* THE CART'S TRAVEL IS A TRANSFORM (Eric, Sept 5, "it shortens for a bit
+       then instantly jumps"): every moving part rides the compositor —
+       translate / scale / opacity only, never a layout property or a clip
+       that waits on the main thread. The panel and the add row sit at
+       their EXPANDED berths and are translated DOWN by --hw-cart-drop
+       while collapsed (the bar's top minus the rails' top). */
+    --hw-cart-drop: calc(var(--hw-strip-top) - 84.51vh);
     --hw-cart-gap: 4.745vh;          /* add row bottom → cart top: the frame's 53px (944 − 891) */
     --hw-panel-lift: 0.716vh;        /* panel bottom → add row top: the frame's 8px (856 → 864) */
     --hw-cart-delay: var(--pop-fade-duration);   /* every travelling part waits ONE FADE both ways (Eric, Sept 5): opening, the strip's box fades out first; closing, the band's contents fade out first — then the action */
     /* THE ONE LINE (Eric, Sept 5: "cart expand and collapse animation have
-       the long divider line overlapping"): the band rule's opening and
-       closing extent IS the strip rule's — clip insets from the same
-       tokens, exact by construction (a centered scaleX could only
-       approximate it, and the two lines read as two). */
+       the long divider line overlapping"): the band rule's collapsed
+       extent IS the strip rule's. The travel is a TRANSFORM about the
+       band rule's left end — translate(dx, dy) scaleX(s) — whose numbers
+       fitLine() MEASURES from the two rules (--hw-line-dx / -dy rounded
+       to whole pixels so the travelling line lands on the strip rule's
+       own painted row and column; --hw-line-s from the computed widths,
+       fractional and transform-independent). This token is the CSS
+       fallback for dx before the script runs. */
     --hw-strip-rule-l: calc(var(--hw-text-inset) + 30px * var(--ui-scale) - 1.91vw);
-    --hw-strip-rule-r: calc(var(--hw-text-inset) + 35px * var(--ui-scale) - 1.91vw);   /* where the TEXTS sit from the window edge — OASIS's x and INTRODUCTION's right edge (65.7px at the frame, both sides): the left rail's own expression (Eric, Sept 5) */
     /* Introduction plates: 19.04 / 39.58 / 60.19vw · top 31.51vh ·
        w 19.27vw · aspect locked 333/309 (proposal, on the record). */
     --hw-plate-top: 31.51vh;
     --hw-plate-w: 19.27vw;
   }
-  body.hw-cart-open { --hw-cart-top: 84.51vh; }
+  body.hw-cart-open .hw-addrow, body.hw-cart-open #hw-panel { translate: 0 0; }   /* expanded: at the berth; collapsed: dropped */
 
   /* ── The stage — the flexing center. The BALL canvas fills it; the
      coming-soon notice replaces it for unreal classes. ────────────────── */
@@ -386,21 +395,22 @@
        864); short content hugs the row, and a face switch travels the
        TOP edge on the tempo. The 38.94vh frame top is the full-height
        cap's far end (measurePanel). */
-    /* Sept 5: the bottom FOLLOWS THE CART — 23.37vh with the cart expanded
-       (unchanged), 12.5vh lower with it collapsed. */
-    bottom: calc(100vh - var(--hw-cart-top) + var(--hw-cart-gap) + 30px * var(--ui-scale) + var(--hw-panel-lift));
+    /* Sept 5: the EXPANDED berth (23.37vh — the frames'), translated down by
+       --hw-cart-drop while the cart is collapsed; the travel is a transform. */
+    bottom: calc(100vh - 84.51vh + var(--hw-cart-gap) + 30px * var(--ui-scale) + var(--hw-panel-lift));
+    translate: 0 var(--hw-cart-drop);
     transition:
       height     var(--pop-duration) var(--expand-curve),
       opacity    var(--pop-fade),
       visibility 0s,
-      bottom     var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s);
+      translate  var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s);
     width: var(--hw-panel-w);
     min-width: calc(320px * var(--ui-scale));  /* usability floor (proposal) */
     height: var(--hw-panel-maxh);              /* the one height (Eric, Sept 5) — the frame's window, top at 38.94vh */
     z-index: 18;
     color: var(--text-soft);
   }
-  #hw-panel.is-hidden { transition: height var(--pop-duration) var(--expand-curve), opacity var(--pop-fade), visibility 0s var(--pop-fade-duration), bottom var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s); }   /* the pair's hidden list + the cart-following bottom */
+  #hw-panel.is-hidden { transition: height var(--pop-duration) var(--expand-curve), opacity var(--pop-fade), visibility 0s var(--pop-fade-duration), translate var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s); }   /* the pair's hidden list + the cart-following travel */
   #hw-panel .hw-body {
     position: absolute; inset: 0;
     /* Frame interior: content inset ~14-22 of 455 wide; 18px×ui the
@@ -625,19 +635,20 @@
   .hw-addrow {
     position: fixed;
     right: var(--hw-panel-right);
-    /* Sept 5: berthed off the cart's top edge (77.35vh with the cart
-       expanded — the frames' berth, unchanged; lower with it collapsed). */
-    bottom: calc(100vh - var(--hw-cart-top) + var(--hw-cart-gap));
+    /* Sept 5: the EXPANDED berth (the frames' 77.35vh top), translated down
+       by --hw-cart-drop while the cart is collapsed; the travel is a transform. */
+    bottom: calc(100vh - 84.51vh + var(--hw-cart-gap));
+    translate: 0 var(--hw-cart-drop);
     width: var(--hw-panel-w);
     min-width: calc(320px * var(--ui-scale));
     height: calc(30px * var(--ui-scale));
     display: flex; align-items: stretch;
     z-index: 17;
-    transition: opacity var(--pop-fade), visibility 0s, bottom var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s);
+    transition: opacity var(--pop-fade), visibility 0s, translate var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s);
   }
   .hw-addrow.is-off {
     opacity: 0; visibility: hidden; pointer-events: none;
-    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration), bottom var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s);
+    transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration), translate var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s);
   }
   .hw-addrow .hw-add-chip {
     flex: none;
@@ -704,7 +715,7 @@
        sides sit where OASIS begins and INTRODUCTION ends, no longer the
        stage's 18.63..79.80vw center span. */
     left: var(--hw-text-inset); right: var(--hw-text-inset);
-    top: var(--hw-strip-top);   /* its OWN constant — never --hw-cart-top, which flips to the rails' top the moment the row opens and sent the fading bar leaping up (Eric, Sept 5: "jumps up to a random position") */
+    top: var(--hw-strip-top);   /* its OWN constant — never a state token: the bar once read the cart-top berth, which flips when the row opens, and leapt up mid-fade (Eric, Sept 5: "jumps up to a random position") */
     height: calc(3 * var(--hw-cart-pad));   /* taller for the collapsed look (Eric, Sept 5): label · pad · line · pad · bottom */
     background: var(--bsw-fill);
     border: 0; padding: 0;
@@ -740,7 +751,9 @@
      rise): FIRST the strip's translucent box and triangle FADE (the line
      itself stays — the band's rule stands on it); THEN, in a single eased
      motion on --pop-duration, the line EXTENDS from the strip rule's exact
-     extent to the band rule's full length AND RISES to 87.11vh, the three
+     extent (scale + translate by the MEASURED ratio, compositor-driven — a
+     clip waited on the main thread and jumped under load) to the band
+     rule's full length AND RISES to 87.11vh, the three
      rails DRAW from where the landed line crosses them, the label TRAVELS
      from its perch above the strip's line to the design's spot, and the
      panel and add row rise with it. Then the row's contents reveal. Tempo
@@ -761,26 +774,16 @@
     transition: opacity 0s, visibility 0s;   /* the children carry the entrance */
   }
   #hw-tray-band > * { pointer-events: auto; }
-  @keyframes hw-rule-in {
-    0% {
-      transform: translateY(calc(100vh - var(--hw-cart-pad) - 87.11vh));
-      clip-path: inset(0 var(--hw-strip-rule-r) 0 var(--hw-strip-rule-l));   /* = the strip's own rule */
-    }
-    100% { transform: translateY(0); clip-path: inset(0 0 0 0); }
-  }
-  #hw-tray.is-open .hw-tray-rule { animation: hw-rule-in var(--pop-duration) var(--expand-curve) var(--pop-fade-duration) both; }   /* after the strip's fade */
-  @keyframes hw-rail-in {
-    0%   { transform: scaleY(0); }
-    100% { transform: scaleY(1); }
-  }
-  #hw-tray.is-open .hw-tray-rail--l,
-  #hw-tray.is-open .hw-tray-rail--r,
-  #hw-tray.is-open .hw-tray-rail--div {
-    /* the rails draw out from where the landed rule crosses them:
-       (87.11 − 84.51) / 13.61 of their own height — in the same action */
-    transform-origin: 50% 19.1%;
-    animation: hw-rail-in var(--pop-duration) var(--expand-curve) var(--pop-fade-duration) both;   /* after the strip's fade */
-  }
+  /* THE TRAVEL IS A TRANSITION between two states (Sept 5, after the
+     adversarial pass): the line's REST transform is the collapsed one
+     (on the strip rule, exactly — see .hw-tray-rule), its OPEN transform
+     is none; the rails rest at scaleY(0) and open at 1. A transition,
+     never keyframes, so an interrupted travel reverses from where it is
+     instead of restarting from a keyframe. Both wait one fade
+     (--pop-fade-duration): opening, the strip's box fades first; closing,
+     the contents fade first. */
+  #hw-tray.is-open .hw-tray-rule { transform: none; }
+  #hw-tray.is-open .hw-tray-rail { transform: scaleY(1); }
   /* the contents wait for the action to land — the waterfall's own
      content grammar (delays drink from the token, never local). */
   #hw-tray-band #hw-slots,
@@ -806,53 +809,48 @@
     transition: none;
   }
   #hw-tray.is-closing #hw-tray-band > * { pointer-events: none; }
-  @keyframes hw-rule-out {
-    0%   { transform: translateY(0); clip-path: inset(0 0 0 0); }
-    100% {
-      transform: translateY(calc(100vh - var(--hw-cart-pad) - 87.11vh));
-      clip-path: inset(0 var(--hw-strip-rule-r) 0 var(--hw-strip-rule-l));   /* home: the strip's own rule */
-    }
-  }
-  #hw-tray.is-closing .hw-tray-rule {
-    animation: hw-rule-out var(--pop-duration) var(--expand-curve) var(--pop-fade-duration) both;
-  }
-  @keyframes hw-rail-out {
-    0%   { transform: scaleY(1); }
-    100% { transform: scaleY(0); }
-  }
-  #hw-tray.is-closing .hw-tray-rail--l,
-  #hw-tray.is-closing .hw-tray-rail--r,
-  #hw-tray.is-closing .hw-tray-rail--div {
-    transform-origin: 50% 19.1%;
-    animation: hw-rail-out var(--pop-duration) var(--expand-curve) var(--pop-fade-duration) both;
-  }
+  /* the close needs no rule of its own: with .is-open gone the line and
+     the rails transition back to their rest transforms after one fade,
+     while .is-closing keeps the band visible for the journey */
   /* the strip returns only after the line has come home */
   #hw-tray.is-closing #hw-tray-strip {
     transition-delay: calc(var(--pop-fade-duration) + var(--pop-duration));
   }
   @media (prefers-reduced-motion: reduce) {
-    #hw-tray.is-open .hw-tray-rule,
-    #hw-tray.is-open .hw-tray-rail--l,
-    #hw-tray.is-open .hw-tray-rail--r,
-    #hw-tray.is-open .hw-tray-rail--div,
-    #hw-tray.is-closing .hw-tray-rule,
-    #hw-tray.is-closing .hw-tray-rail--l,
-    #hw-tray.is-closing .hw-tray-rail--r,
-    #hw-tray.is-closing .hw-tray-rail--div { animation: none; }
-    .hw-tray-label { transition: color .16s, font-weight 0s; }
+    /* no travel: the line, the rails, the label, the panel and the add row
+       SNAP between their states (the pass found the old label rule losing
+       the cascade to its base rule, and the panel / add row travelling) */
+    #hw-tray .hw-tray-rule, #hw-tray .hw-tray-rail { transition: none; }
+    #hw-tray .hw-tray-label { transition: color .16s, font-weight 0s; }
+    #hw-panel, #hw-panel.is-hidden, .hw-addrow, .hw-addrow.is-off { transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration); }
     #hw-tray.is-open #hw-tray-band #hw-slots,
     #hw-tray.is-open #hw-tray-band .hw-tray-price { transition-delay: 0s; }
-    #hw-tray.is-closing #hw-tray-band {
-      opacity: 0; visibility: hidden;
-      transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration);
-    }
+    /* closing: the band vanishes at once and the strip's own rule stands
+       from the same frame — never a moment with no line */
+    #hw-tray.is-closing #hw-tray-band { opacity: 0; visibility: hidden; transition: none; }
+    #hw-tray.is-closing .hw-strip-rule { opacity: 1; }
     #hw-tray.is-closing #hw-tray-strip { transition-delay: 0s; }
   }
   .hw-tray-rule, .hw-tray-rail {
     position: absolute; background: var(--panel-line); pointer-events: none;
   }
-  .hw-tray-rule { left: 1.91vw; right: 1.91vw; top: 87.11vh; height: 1px; }
-  .hw-tray-rail { width: 1px; top: 84.51vh; height: 13.61vh; }
+  .hw-tray-rule {
+    left: 1.91vw; right: 1.91vw; top: 87.11vh; height: 1px;
+    /* REST = the collapsed line, on the strip rule exactly: translate by the
+       measured whole-pixel deltas (CSS fallbacks before the script), scale
+       from the LEFT END by the measured width ratio. OPEN = none. */
+    transform-origin: 0 50%;
+    transform: translate(var(--hw-line-dx, var(--hw-strip-rule-l)), var(--hw-line-dy, calc(100vh - var(--hw-cart-pad) - 87.11vh))) scaleX(var(--hw-line-s, 1));
+    transition: transform var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, var(--pop-fade-duration));   /* one fade's wait — zeroed by the script for a mid-travel interrupt */
+  }
+  .hw-tray-rail {
+    width: 1px; top: 84.51vh; height: 13.61vh;
+    /* the rails draw out from where the landed rule crosses them:
+       (87.11 − 84.51) / 13.61 of their own height */
+    transform-origin: 50% 19.1%;
+    transform: scaleY(0);
+    transition: transform var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, var(--pop-fade-duration));
+  }
   .hw-tray-rail--l   { left: max(clamp(34px, 3.8vw, 68px), 3.76vw); }
   .hw-tray-rail--r   { right: var(--hw-text-inset); }   /* the expanded frame's right rail: the same text inset (Sept 5) */
   .hw-tray-rail--div { left: 70.78vw; }
@@ -1030,10 +1028,12 @@
   /* THE REDRAW'S SILENT FRAME — the /support discipline for the diag
      variant: collapse instantly (host clip + traveler + content all
      silenced for exactly one frame), then draw out on the tempo. */
-  #hw-panel.hw-nofx,
   #hw-panel.hw-nofx::before,
   #hw-panel.hw-nofx::after,
   #hw-panel.hw-nofx > * { transition: none; animation: none; }
+  /* the host's silent frame keeps its cart TRAVEL alive (the pass caught a
+     face switch mid-travel snapping the panel to its far berth) */
+  #hw-panel.hw-nofx { transition: height 0s, opacity 0s, visibility 0s, translate var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s); animation: none; }
 
   /* Commit-arrival resolve for browsers WITHOUT view transitions. */
   @keyframes bs-arrive { from { opacity: 0; } }
@@ -1479,10 +1479,36 @@ var toggleEl = document.getElementById('hw-tray-toggle');
 var slotsEl  = document.getElementById('hw-slots');
 var totalEl  = document.getElementById('hw-total');
 var trayOpen = false;
+// THE LINE'S RATIO (Eric, Sept 5): the band rule's collapsed extent is the strip
+// rule's, exactly. The travel is a transform (compositor-driven), which needs the
+// width ratio as a NUMBER — CSS cannot divide two lengths — so it is measured
+// from the two rules' computed layout widths at boot, at fonts-ready (after the
+// chrome's scale settles), on every resize, and again at the moment of every toggle.
+var lineRuleEl  = document.querySelector('.hw-tray-rule');
+var stripRuleEl = document.querySelector('.hw-strip-rule');
+function fitLine(){
+  // computed widths: the used layout px, fractional, untouched by any transform
+  // (the pass caught getBoundingClientRect reading a finished animation's scale)
+  var sw = parseFloat(getComputedStyle(stripRuleEl).width), bw = parseFloat(getComputedStyle(lineRuleEl).width);
+  if (!(sw > 0 && bw > 0)) return;
+  trayEl.style.setProperty('--hw-line-s', (sw / bw).toFixed(6));
+  // whole-pixel deltas: the travelling line lands on the strip rule's own
+  // painted row and column (a fractional translate rendered as a two-row smear)
+  var sx = stripEl.offsetLeft + stripRuleEl.offsetLeft, sy = stripEl.offsetTop + stripRuleEl.offsetTop;
+  trayEl.style.setProperty('--hw-line-dx', Math.round(sx - lineRuleEl.offsetLeft) + 'px');
+  trayEl.style.setProperty('--hw-line-dy', Math.round(sy - lineRuleEl.offsetTop) + 'px');
+}
+fitLine();
 function saveCart(){ C.cartStore.save(CART); }
 var _trayCloseT = null;
 var _trayBloomT = null;
 function setTrayOpen(on){
+  fitLine();   // measure the line's ratio NOW — boot may precede the scale's settling; a toggle never does
+  // A MID-TRAVEL INTERRUPT reverses at once: the one-fade wait exists for the
+  // strip's box (opening) and the band's contents (closing), and neither is
+  // on stage while the line is still moving. From rest, the wait stands.
+  var midTravel = lineRuleEl.getAnimations && lineRuleEl.getAnimations().some(function(a){ return a.playState === 'running'; });
+  if (midTravel) document.body.style.setProperty('--hw-cart-delay', '0s'); else document.body.style.removeProperty('--hw-cart-delay');
   trayOpen = !!on;
   document.body.classList.toggle('hw-cart-open', trayOpen);   // the panel + add row follow the cart's top edge (Eric, Sept 5)
   clearTimeout(_trayCloseT); clearTimeout(_trayBloomT);
@@ -2281,6 +2307,7 @@ C.init({
       document.title = T2('hardwareTitle');
     },
     onFontsReady:   function(){
+      fitLine();   // the chrome's scale has settled by now; the boot call ran before it
       measurePitch();
       alignPanelMarkers();
       if (panelView !== null) sizePanel();
@@ -2352,6 +2379,7 @@ render();
 })();
 
 window.addEventListener('resize', function(){
+  fitLine();                                      // the line's collapsed ratio follows the viewport
   alignPanelMarkers();
   if (panelView !== null) sizePanel();
   layoutIntroStage();                             // the balanced group re-centers
