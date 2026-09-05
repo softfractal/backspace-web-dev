@@ -968,7 +968,7 @@ var BLOOM = {
                600: { compact: 1.116, standard: 1.06, wide: 1.16, studio: 1.142, 'stainless steel': 1.065, 'aluminum alloy': 1.119, 'walnut wood': 1.094, brushed: 1.109, PVD: 1.19, 'powder-coated': 1.025, 'metallic silver': 1.137, 'black & white': 1.069, red: 1.31, orange: 1.069, yellow: 1.146, green: 1.1 } },   // the customization options (Sept 5): FOCUSED = 300, CHOSEN = 600 — every string solved LIVE on the shipped page (over the window's plate)
   sub:       { 300: { overview: 1.923, 'industrial design': 1.829, specifications: 1.845, ecosystem: 1.813, support: 1.925, size: 2.263, desktop: 1.75, desklegs: 1.64 },
                600: { overview: 0.988, 'industrial design': 0.905, specifications: 0.915, ecosystem: 0.919, support: 0.957, size: 1.16, desktop: 0.908, desklegs: 0.9 } },
-  head:      { INTRODUCTION: 1.099, CUSTOM: 1.141 },
+  head:      { INTRODUCTION: 0.871, CUSTOM: 0.887 },   // the heads at 14 (Eric, Sept 5) — solved in the shipped state
   traylabel: { 300: { CART: 2.434 }, 600: { CART: 1.055 } },   // collapsed WideLight / expanded SemiBold (Eric, Sept 5; the 300 solved in the shipped state)
   option:    { 'product consulting': 0.977, 'order & delivery': 1.003, 'warranty & repair': 0.997 },
   door:      { 'fill out form': 2.455 },

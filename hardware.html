@@ -79,7 +79,7 @@
     /* Right menu: INTRODUCTION top 242.4/1117 (matches /support's
        21.76vh to 0.7px — ported as drawn, NOT harmonized); text rail
        inset 64/1728, the near-mirror of the left rail. */
-    --hw-right-top: 21.70vh;
+    --hw-right-top: var(--hw-left-top);   /* Sept 5 (Eric: "in the design they are aligned horizontally"): INTRODUCTION sits on OASIS's own line — one top for both column heads (was 21.70vh, 4px above) */
     /* The options panel (diagonal bs-window), right-anchored: right
        edge = the tray's right rail = ONE 3.30vw rail (x1671). */
     --hw-panel-right: var(--hw-text-inset);   /* Sept 5 (Eric: "investigate"): the add row and the panel end where the RIGHT MENU'S TEXTS end — the text inset (65.7px at the frame), not the frames' 3.30vw (57px) that left them 8.7px past the texts and the collapsed bar */
@@ -229,15 +229,16 @@
        fifth word's halving, which his eye read as too small): 17 × 0.75
        = 12.75px×ui, letterspaced caps sitting between the title and the
        item rows. The §5.1 live-text confirm still closes the rung class. */
-    /* THE TYPE PASS (Sept 3): Eric's own rung for these heads — 10.5 (their
-       14 read too big for the balance); 75% of OASIS still. */
-    font-size: calc(10.5px * var(--ui-scale));
-    line-height: calc(11px * var(--ui-scale));
+    /* THE TYPE PASS (Sept 3) set Eric's own 10.5; Sept 5 he adopts the
+       design team's 14 — "currently they look too small comparing to the
+       OASIS text" — the heads now share OASIS's rung and line (14 / 15). */
+    font-size: calc(14px * var(--ui-scale));
+    line-height: calc(15px * var(--ui-scale));
     letter-spacing: .08em;
     text-align: right; white-space: nowrap;
     /* HOTNESS LAW: no resting glow (hoverable); lit on the one ring set,
        intensity 1.052 (the harness's median for the two heads). */
-    --bloom-g: 1.12;   /* re-solved on the 10.5 rung (INTRODUCTION 1.10 · CUSTOM 1.14 per string) */
+    --bloom-g: .88;   /* re-solved on the 14 rung in the shipped state (INTRODUCTION .871 · CUSTOM .887 per string in BLOOM) */
     cursor: var(--cursor-target);
     transition: color .16s;
   }
