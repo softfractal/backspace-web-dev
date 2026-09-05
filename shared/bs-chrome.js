@@ -1060,9 +1060,9 @@ function bootDomCursor(){
   document.body.appendChild(el);
   document.documentElement.classList.add('bs-cursor-live');
   function track(e){
-    if (e.pointerType && e.pointerType !== 'mouse') { el.classList.remove('is-on'); return; }
+    if (e.pointerType && e.pointerType !== 'mouse') { if (el.classList.contains('is-on')) el.classList.remove('is-on'); return; }
     el.style.transform = 'translate3d(' + e.clientX + 'px,' + e.clientY + 'px,0)';
-    el.classList.add('is-on');
+    if (!el.classList.contains('is-on')) el.classList.add('is-on');   // an unchanged class re-set still queues a mutation record — both observers were firing on every pointer move (Sept 5)
   }
   document.addEventListener('pointermove', track, { passive: true });
   document.addEventListener('pointerdown', track, { passive: true });

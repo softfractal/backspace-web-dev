@@ -247,7 +247,7 @@
        intensity 1.052 (the harness's median for the two heads). */
     --bloom-g: .88;   /* re-solved on the 14 rung in the shipped state (INTRODUCTION .871 · CUSTOM .887 per string in BLOOM) */
     cursor: var(--cursor-target);
-    transition: color .16s;
+    transition: none;
   }
   .hw-head.kb-hover, .hw-head:focus-visible {
     color: #fff; outline: none;
@@ -450,7 +450,7 @@
        intensity 2.359 (small 300-weight rows need two pastes). */
     --bloom-g: 2.19;   /* THE CHILDREN LAW (Eric, Sept 5): the focused option stays 300 and only glows — the default is the MEAN of all sixteen option strings solved LIVE over the window's plate (2.04–2.44); each string carries its own value from BLOOM.hwopt[300] */
     cursor: var(--cursor-target);
-    transition: color .16s;
+    transition: none;
   }
   .hw-opt.is-chosen { --bloom-g: 1.12; }   /* the CHOSEN option (600 + standing glow): the mean of all sixteen strings solved LIVE over the window's plate (1.03–1.32); per string from BLOOM.hwopt[600]. ON THE OPT, not the row — the material and finish options have no row, and at the row-only rule they sat at the 300 value: 1.6–1.7× the reference with a wider halo (Eric's eye, Sept 5) */
   .hw-opt.kb-hover, .hw-opt:hover, .hw-opt:focus-visible {
@@ -510,23 +510,29 @@
     left: var(--hw-tick-x);
     bottom: calc(2px * var(--ui-scale));
     width: 1px; height: calc(7px * var(--ui-scale));
-    background: color-mix(in srgb, #fefefe2e, #ffffff var(--hw-heat-pct));
-    opacity: calc(.55 + var(--hw-heat) * .45);
+    /* THE TEETH'S WHITE IS CAPPED (Sept 5, the hotness law reaches the bar):
+       at full heat a tooth peaked at +211 luma against a text glow's +78 —
+       2.7x the house hotness. The mix tops out at 40% white, the opacity
+       at .75, the halo at .2 alpha (measured: the bar's hover now adds
+       ~1.2x a size-row hover's light, peak near a text glow's). */
+    background: color-mix(in srgb, #fefefe2e, #ffffff calc(var(--hw-heat-pct) * .4));
+    opacity: calc(.55 + var(--hw-heat) * .2);
     transform: translateX(-50%) scaleY(calc(1 + var(--hw-heat) * 1.55));
     transform-origin: bottom;
-    box-shadow: 0 0 calc(12px * var(--hw-heat) * var(--ui-scale)) rgba(255, 255, 255, .4);
-    /* NO TRANSITIONS on the teeth (Eric, Sept 5, the lag): heat is re-set on
-       every pointer move anyway, and four transitioned properties on 64
-       teeth spawned 256 running animations per move — the main thread
-       spent half its time on them. The pointer's own cadence is the ramp. */
+    box-shadow: 0 0 calc(12px * var(--hw-heat) * var(--ui-scale)) rgba(255, 255, 255, .2);
+    /* the teeth transition the cheap trio only — never box-shadow (Sept 5,
+       the lag): a transitioned blur re-rasterized every heated tooth every
+       frame; measured headed, dropping it alone took the scrub 34 → 120Hz */
+    transition: background .12s, opacity .12s, transform .12s;
     pointer-events: none;
   }
   .hw-tick.is-lit { background: color-mix(in srgb, #fefefe59, #ffffff var(--hw-heat-pct)); }
   .hw-colrow.is-chosen .hw-tick.is-lit { background: color-mix(in srgb, #fefefeb8, #ffffff var(--hw-heat-pct)); }
   /* HOVER: the bar glows WITH its text (Eric, Aug 31) */
   .hw-colrow:hover .hw-opt { color: #fff; text-shadow: var(--bloom-lit); }   /* glow only (the chosen row is bold by its own rule) */
+  .hw-scrub { will-change: filter; }   /* the hover blur is applied on the compositor, not at raster (Sept 5, the lag) */
   .hw-colrow:hover .hw-scrub {
-    filter: drop-shadow(0 0 calc(6px * var(--ui-scale)) rgba(255, 255, 255, .35));
+    filter: drop-shadow(0 0 calc(6px * var(--ui-scale)) rgba(255, 255, 255, .18));   /* .35 → .18: the bar's share of the row's light, capped with the teeth */
   }
 
   /* Size view — presets (label + dims readout) then the custom inputs:
@@ -547,7 +553,7 @@
     font-size: calc(12px * var(--ui-scale));   /* THE TYPE PASS: the dims column rides the options' 12 */
     letter-spacing: .04em;
     white-space: nowrap;
-    transition: color .16s;
+    transition: none;
   }
   /* The chosen preset bolds label AND dims (the design's own reading). */
   .hw-sizerow.is-chosen .hw-sizedims { color: var(--ink); font-weight: 600; }
@@ -566,7 +572,7 @@
     line-height: calc(12px * var(--ui-scale));
     letter-spacing: .06em;
     cursor: var(--cursor-target);
-    transition: color .16s;
+    transition: none;
   }
   .hw-unit button { --bloom-g: 3; }               /* the hover default (Light); per string + weight in BLOOM.unit (Sept 5) */
   .hw-unit button:hover, .hw-unit button:focus-visible, .hw-unit button.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }   /* wired to the one focus variable too (the pass) */   /* glow only — bold is the LIVE unit's mark */
@@ -599,7 +605,7 @@
     padding: 0 calc(12px * var(--ui-scale));
     border: 1px solid var(--panel-line);
     border-radius: 999px;
-    transition: border-color .16s, box-shadow .2s ease;
+    transition: border-box-shadow .2s ease;
   }
   .hw-pill-field:focus-within {
     border-color: #fefefe73;
@@ -717,7 +723,7 @@
     pointer-events: auto;
     cursor: var(--cursor-target);
     opacity: 1;
-    transition: opacity var(--pop-fade), visibility 0s, background .16s;
+    transition: opacity var(--pop-fade), visibility 0s;
   }
   #hw-tray-strip:hover, #hw-tray-strip:focus-visible { background: #fefefe24; outline: none; }
   #hw-tray.is-open #hw-tray-strip {
@@ -816,7 +822,7 @@
        SNAP between their states (the pass found the old label rule losing
        the cascade to its base rule, and the panel / add row travelling) */
     #hw-tray .hw-tray-rule, #hw-tray .hw-tray-rail { transition: none; }
-    #hw-tray .hw-tray-label { transition: color .16s, font-weight 0s; }
+    #hw-tray .hw-tray-label { transition: font-weight 0s; }
     #hw-panel, #hw-panel.is-hidden, .hw-addrow, .hw-addrow.is-off { transition: opacity var(--pop-fade), visibility 0s var(--pop-fade-duration); }
     #hw-tray.is-open #hw-tray-band #hw-slots,
     #hw-tray.is-open #hw-tray-band .hw-tray-price { transition-delay: 0s; }
@@ -871,7 +877,7 @@
     letter-spacing: .08em;
     --bloom-g: 1.055;   /* HOTNESS LAW: no resting glow (hoverable); lit intensity re-solved on the 12 rung */
     cursor: var(--cursor-target);
-    transition: color .16s, translate var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s), font-weight 0s var(--hw-cart-delay, 0s);   /* the weight snaps as the travel begins */
+    transition: translate var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s), font-weight 0s var(--hw-cart-delay, 0s);   /* the weight snaps as the travel begins */
   }
   #hw-tray.is-open .hw-tray-label { translate: 0 0; font-weight: 600; }
   .hw-tray-label:hover, .hw-tray-label:focus-visible {
@@ -895,7 +901,7 @@
     width: calc(160px * var(--ui-scale)); height: calc(90px * var(--ui-scale));
     background: #4a4a4a5c;
     border: 0; padding: 0;
-    transition: background .16s;
+    transition: none;
   }
   .hw-slot.is-filled { cursor: var(--cursor-target); }   /* body click = preview */
   /* Photo hover lifts THROUGH the render (sixteenth word — the grey
@@ -918,7 +924,7 @@
     cursor: var(--cursor-target);
     z-index: 2;
     opacity: .6;
-    transition: color .16s, opacity .16s;
+    transition: opacity .16s;
   }
   /* The dash is DRAWN, not typeset (Eric, Aug 29: the glyph read
      off-center — a dash's ink is wide and short, so a centered box

@@ -509,7 +509,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   display: flex; align-items: center; justify-content: center;
   color: rgba(255,255,255,0.94); background: rgba(0,0,0,0.04);   /* demo resolved rest values */
   cursor: var(--cursor-target);
-  transition: color 0.16s;
+  transition: none;
   position: relative;
 }
 /* ── Expanding pill (右上icon展开 mockup): the circle outline grows into
@@ -558,7 +558,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   font-size: calc(8px * var(--icons-scale));
   line-height: 1;
   cursor: var(--cursor-target);
-  transition: color 0.16s;
+  transition: none;
   position: relative;
 }
 /* Icon sizes + glow per the demo: sound/account rasters 23px, cart 20px,
@@ -625,7 +625,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   /* The full list: this shorthand REPLACES the .bs-tray > * transition
      on these items (tie broken by source order), so the entrance
      opacity/transform must be carried here too or they snap. */
-  transition: color 0.16s,
+  transition: 
               opacity var(--pop-fade), transform var(--pop-motion);
 }
 /* Sub icons match the head glyphs' size (Eric: they read undersized in
@@ -710,11 +710,11 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   display: flex; align-items: center;   /* re-centers the label in the taller hit box */
   position: relative;
   cursor: var(--cursor-target);
-  transition: color 0.16s;
+  transition: none;
 }
 .bs-item > span {
   display: inline-block;
-  transition: color .16s ease, opacity .16s ease, transform var(--side-menu-motion);
+  transition: opacity .16s ease, transform var(--side-menu-motion);
 }
 .bs-item::before {
   content: ''; position: absolute; top: 50%; left: 0;
@@ -725,11 +725,16 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   opacity: 0; transition: opacity var(--side-menu-fade);
 }
 /* THE GLOW SNAPS (Eric, Sept 5, "hovering ... makes the mouse movement
-   lag"): a transitioned text-shadow re-rasterizes a nine-ring blurred
-   halo every frame for 200ms per hover change — at retina density, with
-   the WebGL ball drawing beside it, that is what stalls the pointer.
-   The children's law already snapped the glow on; now every surface
-   does — colour still fades on its .16s, the halo lands at once. */
+   lag"): ANY transition on glowing text — colour, background or the
+   shadow itself — keeps its tiles invalidated for the fade's length, and
+   every frame re-rasterizes the nine-ring halo at retina density. The
+   page's own cursor advances only on main-thread commits, which the
+   compositor withholds while that raster is outstanding — so the pointer
+   lags although the main thread is idle (measured headed on an M4 at
+   120Hz: colour rows 50Hz, the scrub 34Hz, the plates 73Hz; every one
+   returns to 120Hz with the text snapping). So: hoverable glowing text
+   carries NO transition on colour, background or shadow — the state
+   lands at once. Entrances (opacity / transform) keep their tempo. */
 /* ONE visual channel for the cursor: the pop-out renders ONLY through
    .kb-hover, which mouseenter and the keyboard both drive via THE focus
    variable. Raw :hover rules were deliberately removed — a second CSS-
@@ -786,7 +791,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   border-radius: 50%;
   display: grid; place-items: center;
   padding: 0;
-  transition: color 0.16s;
+  transition: none;
 }
 /* Corner glyphs run on the utility cluster's GLOBAL icon grammar (Eric,
    Aug 22): the head-glyph size (23px×icons — the witness's 46%/42%
@@ -839,7 +844,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   background: transparent; border: 0; padding: 0;
   display: grid; place-items: center;
   position: absolute; top: 0; left: 0;
-  transition: color 0.16s;
+  transition: none;
 }
 .site-primary-nav__forward-button:hover, .site-primary-nav__forward-button:focus-visible { color: #fff; outline: none; }
 /* Cursor twin on the pill head: the bar cursor GLOWS the head; Enter is
@@ -866,7 +871,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   transform: translateX(calc(-7px * var(--ui-scale)));
   background: transparent; border: 0; padding: 0;
   /* Witness: opacity .16s + transform .18s house-curve → tempo tokens. */
-  transition: color .16s,
+  transition: 
               opacity var(--pop-fade), transform var(--pop-motion);
 }
 /* Witness link stops — exact stylesheet values (ui-scale, the last
@@ -1172,7 +1177,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
      default): text-shadow is NOT transitioned — the glow SNAPS on (one
      paint of the finished chain; the certified .2s ease repainted twelve
      growing shadows per frame across a swept list). */
-  transition: color .16s;
+  transition: none;
 }
 /* HOTNESS LAW: the sub-item lights on the one ring set (46px max — the
    swept-surface perf rider is satisfied by construction; the 184px ring
@@ -1219,7 +1224,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   padding: calc(20px * var(--ui-scale)) calc(34px * var(--ui-scale));
   text-align: left;
   cursor: var(--cursor-target);
-  transition: background .16s;
+  transition: none;
 }
 .bs-plate-title {
   display: block;
@@ -1230,7 +1235,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   font-size: calc(12px * var(--ui-scale));
   line-height: calc(17px * var(--ui-scale));
   letter-spacing: .01em;
-  transition: color .16s;
+  transition: none;
 }
 /* The plate's marker — on the RIGHT (the company, Aug 25): the warm
    marker with the fitted halo, ranked dim at rest / full on the plate
@@ -1290,7 +1295,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    kickstarter. ── */
 .bs-fillpill {
   cursor: var(--cursor-target);
-  transition: background .16s, color .16s, box-shadow .2s ease;
+  transition: box-shadow .2s ease;
 }
 .bs-fillpill:hover, .bs-fillpill:focus-visible {
   outline: none;
@@ -1370,7 +1375,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   letter-spacing: 0;
   /* HOTNESS LAW: no resting glow (hoverable). */
   cursor: var(--cursor-target);
-  transition: color .16s;
+  transition: none;
 }
 .bs-option.kb-hover, .bs-option:focus-visible {
   color: #fff; outline: none;
@@ -1403,7 +1408,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   letter-spacing: .04em;
   cursor: var(--cursor-target);
   box-shadow: 0 0 calc(18px * var(--ui-scale)) rgba(255,255,255,.20);
-  transition: background .16s, box-shadow .2s ease;
+  transition: box-shadow .2s ease;
 }
 .bs-submit:hover, .bs-submit:focus-visible, .bs-submit.kb-hover {
   background: #fff; outline: none;
@@ -1432,10 +1437,10 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .bs-shake { animation: bs-deny-blink 0.4s ease; }
-  .bs-item > span { transition: color .16s ease, opacity .16s ease; } /* pop-out lands instantly */
+  .bs-item > span { transition: opacity .16s ease; } /* pop-out lands instantly */
   .bs-pill { transition: none; }
   .site-primary-nav { transition: none; }
-  .site-primary-nav__link { transition: color .16s; }
+  .site-primary-nav__link { transition: none; }
 }
 
 /* ── Cross-page morph — the home↔away nav morph and the wordmark's
