@@ -92,7 +92,13 @@
        bar gets dropped ... when cart is expanded [they] get pushed up" —
        the SAME gap to the cart in both states). Collapsed: the strip's
        top. Expanded (body.hw-cart-open): the rails' top. */
-    --hw-cart-top: 95.34vh;
+    /* THE CART PAD (Eric, Sept 5): ONE padding for the label's air above the
+       line — the design's expanded reading, 87.11vh − 85.29vh — reused
+       collapsed for label → line AND line → window bottom; the collapsed
+       frame is built from it: three pads tall (label centered in the
+       upper two, the rule one pad above the bottom). */
+    --hw-cart-pad: calc(87.11vh - 85.29vh);
+    --hw-cart-top: calc(100vh - 3 * var(--hw-cart-pad));   /* collapsed: the strip's top (94.54vh) */
     --hw-cart-gap: 4.745vh;          /* add row bottom → cart top: the frame's 53px (944 − 891) */
     --hw-panel-lift: 0.716vh;        /* panel bottom → add row top: the frame's 8px (856 → 864) */
     --hw-cart-delay: var(--pop-fade-duration);   /* the DESCENT waits for the band's contents to fade, like the rule; the ascent is immediate */
@@ -695,8 +701,9 @@
     /* Eric, Sept 5: the collapsed bar EXTENDS to the text insets — its
        sides sit where OASIS begins and INTRODUCTION ends, no longer the
        stage's 18.63..79.80vw center span. */
-    left: var(--hw-text-inset); right: var(--hw-text-inset); top: 95.34vh;
-    height: calc(100vh - 95.34vh);
+    left: var(--hw-text-inset); right: var(--hw-text-inset);
+    top: var(--hw-cart-top);
+    height: calc(3 * var(--hw-cart-pad));   /* taller for the collapsed look (Eric, Sept 5): label · pad · line · pad · bottom */
     background: var(--bsw-fill);
     border: 0; padding: 0;
     pointer-events: auto;
@@ -718,7 +725,7 @@
   .hw-strip-rule {
     position: absolute;
     left: calc(30px * var(--ui-scale)); right: calc(35px * var(--ui-scale));
-    top: calc(25px * var(--ui-scale));
+    top: calc(2 * var(--hw-cart-pad));   /* one pad above the window bottom */
     height: 1px; background: var(--panel-line);
   }
   /* THE HAND-OFF: while the band's rule animates it stands exactly on this
@@ -752,7 +759,7 @@
   #hw-tray-band > * { pointer-events: auto; }
   @keyframes hw-rule-in {
     0% {
-      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh));
+      transform: translateY(calc(100vh - var(--hw-cart-pad) - 87.11vh));
       clip-path: inset(0 var(--hw-strip-rule-r) 0 var(--hw-strip-rule-l));   /* = the strip's own rule */
     }
     100% { transform: translateY(0); clip-path: inset(0 0 0 0); }
@@ -798,7 +805,7 @@
   @keyframes hw-rule-out {
     0%   { transform: translateY(0); clip-path: inset(0 0 0 0); }
     100% {
-      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh));
+      transform: translateY(calc(100vh - var(--hw-cart-pad) - 87.11vh));
       clip-path: inset(0 var(--hw-strip-rule-r) 0 var(--hw-strip-rule-l));   /* home: the strip's own rule */
     }
   }
@@ -828,7 +835,7 @@
     #hw-tray.is-closing .hw-tray-rail--l,
     #hw-tray.is-closing .hw-tray-rail--r,
     #hw-tray.is-closing .hw-tray-rail--div { animation: none; }
-    .hw-tray-label { transition: color .16s; }
+    .hw-tray-label { transition: color .16s, font-weight 0s; }
     #hw-tray.is-open #hw-tray-band #hw-slots,
     #hw-tray.is-open #hw-tray-band .hw-tray-price { transition-delay: 0s; }
     #hw-tray.is-closing #hw-tray-band {
@@ -858,18 +865,18 @@
     position: absolute; left: 5.50vw; top: 85.29vh;   /* the EXPANDED spot */
     transform: translateY(-50%);
     translate: calc(var(--hw-text-inset) + 31px * var(--ui-scale) - 5.50vw)
-               calc(95.34vh + 12.5px * var(--ui-scale) - 85.29vh);   /* the COLLAPSED perch */
+               calc(100vh - 2 * var(--hw-cart-pad) - 85.29vh);   /* the COLLAPSED perch: one pad above the strip's line, as expanded */
     pointer-events: auto;
     color: var(--ink);
     background: none; border: 0; padding: 0;
-    font-family: var(--font-ui); font-weight: 600;
+    font-family: var(--font-ui); font-weight: 300;   /* collapsed: WideLight (Eric, Sept 5); expanded: 600 below */
     font-size: calc(12px * var(--ui-scale));   /* THE TYPE PASS: the cart button is their 12 */
     letter-spacing: .08em;
     --bloom-g: 1.055;   /* HOTNESS LAW: no resting glow (hoverable); lit intensity re-solved on the 12 rung */
     cursor: var(--cursor-target);
-    transition: color .16s, translate var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s);
+    transition: color .16s, translate var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s), font-weight 0s var(--hw-cart-delay, 0s);   /* the weight snaps as the travel begins */
   }
-  #hw-tray.is-open .hw-tray-label { translate: 0 0; }
+  #hw-tray.is-open .hw-tray-label { translate: 0 0; font-weight: 600; }
   .hw-tray-label:hover, .hw-tray-label:focus-visible {
     color: #fff; outline: none; text-shadow: var(--bloom-lit);
   }
@@ -1475,8 +1482,12 @@ function setTrayOpen(on){
   document.body.classList.toggle('hw-cart-open', trayOpen);   // the panel + add row follow the cart's top edge (Eric, Sept 5)
   clearTimeout(_trayCloseT);
   if (trayOpen){
+    trayEl.classList.remove('is-open');   // (no-op normally) so a re-open restarts nothing stale
     trayEl.classList.remove('is-closing');
     trayEl.classList.add('is-open');
+    // the label's weight snaps to 600 now — re-solve its hotness for the new weight
+    // (the bloom observer watches the element's own class, not the tray's)
+    if (C.normalizeBloom) C.normalizeBloom();
   } else if (trayEl.classList.contains('is-open')){
     trayEl.classList.remove('is-open');
     trayEl.classList.add('is-closing');
@@ -1487,6 +1498,8 @@ function setTrayOpen(on){
     var fade = (parseFloat(cs.getPropertyValue('--pop-fade-duration')) || 0.41) * 1000;
     // contents fade + line reverse + the strip's own return, then release
     _trayCloseT = setTimeout(function(){ trayEl.classList.remove('is-closing'); }, fade + dur + fade + 60);
+    // the weight snaps back to 300 when the descent begins (after the contents' fade) — re-solve then
+    setTimeout(function(){ if (C.normalizeBloom) C.normalizeBloom(); }, fade + 40);
   }
   stripEl.setAttribute('aria-expanded', String(trayOpen));
   toggleEl.setAttribute('aria-expanded', String(trayOpen));

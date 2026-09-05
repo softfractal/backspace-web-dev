@@ -969,7 +969,7 @@ var BLOOM = {
   sub:       { 300: { overview: 1.923, 'industrial design': 1.829, specifications: 1.845, ecosystem: 1.813, support: 1.925, size: 2.263, desktop: 1.75, desklegs: 1.64 },
                600: { overview: 0.988, 'industrial design': 0.905, specifications: 0.915, ecosystem: 0.919, support: 0.957, size: 1.16, desktop: 0.908, desklegs: 0.9 } },
   head:      { INTRODUCTION: 1.099, CUSTOM: 1.141 },
-  traylabel: { CART: 1.055 },
+  traylabel: { 300: { CART: 2.434 }, 600: { CART: 1.055 } },   // collapsed WideLight / expanded SemiBold (Eric, Sept 5; the 300 solved in the shipped state)
   option:    { 'product consulting': 0.977, 'order & delivery': 1.003, 'warranty & repair': 0.997 },
   door:      { 'fill out form': 2.455 },
   glyph:     { 'bs-sound': 1.284, 'bs-cart': 0.768, 'bs-account': 0.858, 'corner-back': 0.927,   // the 4-pass chain; the › chevron's two states live in the CSS
