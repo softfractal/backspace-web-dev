@@ -95,7 +95,14 @@
     --hw-cart-top: 95.34vh;
     --hw-cart-gap: 4.745vh;          /* add row bottom → cart top: the frame's 53px (944 − 891) */
     --hw-panel-lift: 0.716vh;        /* panel bottom → add row top: the frame's 8px (856 → 864) */
-    --hw-cart-delay: var(--pop-fade-duration);   /* the DESCENT waits for the band's contents to fade, like the rule; the ascent is immediate */   /* where the TEXTS sit from the window edge — OASIS's x and INTRODUCTION's right edge (65.7px at the frame, both sides): the left rail's own expression (Eric, Sept 5) */
+    --hw-cart-delay: var(--pop-fade-duration);   /* the DESCENT waits for the band's contents to fade, like the rule; the ascent is immediate */
+    /* THE ONE LINE (Eric, Sept 5: "cart expand and collapse animation have
+       the long divider line overlapping"): the band rule's opening and
+       closing extent IS the strip rule's — clip insets from the same
+       tokens, exact by construction (a centered scaleX could only
+       approximate it, and the two lines read as two). */
+    --hw-strip-rule-l: calc(var(--hw-text-inset) + 30px * var(--ui-scale) - 1.91vw);
+    --hw-strip-rule-r: calc(var(--hw-text-inset) + 35px * var(--ui-scale) - 1.91vw);   /* where the TEXTS sit from the window edge — OASIS's x and INTRODUCTION's right edge (65.7px at the frame, both sides): the left rail's own expression (Eric, Sept 5) */
     /* Introduction plates: 19.04 / 39.58 / 60.19vw · top 31.51vh ·
        w 19.27vw · aspect locked 333/309 (proposal, on the record). */
     --hw-plate-top: 31.51vh;
@@ -710,6 +717,11 @@
     top: calc(25px * var(--ui-scale));
     height: 1px; background: var(--panel-line);
   }
+  /* THE HAND-OFF: while the band's rule animates it stands exactly on this
+     rule's line, so this one leaves INSTANTLY at open and returns INSTANTLY
+     when .is-closing releases (the band vanishes on that same frame) —
+     never two lines. The strip's box, triangle and label still fade. */
+  #hw-tray.is-open .hw-strip-rule, #hw-tray.is-closing .hw-strip-rule { opacity: 0; }
   .hw-strip-label {
     position: absolute;
     left: calc(31px * var(--ui-scale)); top: calc(33px * var(--ui-scale));
@@ -720,8 +732,8 @@
   }
   /* THE EXPANSION CHOREOGRAPHY (thirteenth word, Eric, Aug 29): the
      strip's translucent box FADES · the line GROWS horizontally at the
-     strip's own height (scaleX .96 — the text-inset strip against the
-     1.91vw band rule, at the frame; was .62 for the center span) · then PULLS UP to the band rule's 87.11vh while
+     strip's own height (clipped to the strip rule's own extent by the
+     shared tokens — exact, so the two lines are one at the hand-off) · then PULLS UP to the band rule's 87.11vh while
      the two rails DRAW · and the full row's contents reveal. One clock,
      keyframe percentage splits — the waterfall's own discipline; tempo
      tokens only, zero local durations. The close stays a plain fade
@@ -743,14 +755,16 @@
   #hw-tray-band > * { pointer-events: auto; }
   @keyframes hw-rule-in {
     0% {
-      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.96);
+      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh));
+      clip-path: inset(0 var(--hw-strip-rule-r) 0 var(--hw-strip-rule-l));   /* = the strip's own rule */
       animation-timing-function: var(--expand-curve);
     }
     45% {
-      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(1);
+      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh));
+      clip-path: inset(0 0 0 0);
       animation-timing-function: var(--expand-curve);
     }
-    100% { transform: translateY(0) scaleX(1); }
+    100% { transform: translateY(0); clip-path: inset(0 0 0 0); }
   }
   #hw-tray.is-open .hw-tray-rule { animation: hw-rule-in var(--pop-duration) both; }
   @keyframes hw-rail-in {
@@ -794,14 +808,18 @@
   #hw-tray.is-closing #hw-tray-band > * { pointer-events: none; }
   @keyframes hw-rule-out {
     0% {
-      transform: translateY(0) scaleX(1);
+      transform: translateY(0); clip-path: inset(0 0 0 0);
       animation-timing-function: var(--expand-curve);
     }
     55% {
-      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(1);
+      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh));
+      clip-path: inset(0 0 0 0);
       animation-timing-function: var(--expand-curve);
     }
-    100% { transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh)) scaleX(0.96); }
+    100% {
+      transform: translateY(calc(95.34vh + 25px * var(--ui-scale) - 87.11vh));
+      clip-path: inset(0 var(--hw-strip-rule-r) 0 var(--hw-strip-rule-l));   /* home: the strip's own rule */
+    }
   }
   #hw-tray.is-closing .hw-tray-rule {
     animation: hw-rule-out var(--pop-duration) var(--pop-fade-duration) both;
