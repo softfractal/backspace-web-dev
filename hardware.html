@@ -416,11 +416,12 @@
   }
   /* NO DOTS IN THE PANELS (Eric, Aug 28 fourth word, p4: "all
      customization selection indication shouldn't be dots") — the outer
-     GLOW is the focused indicator, BOLD is the selected indicator. The
-     outline-ring vocabulary member survives outside the customization
-     panels (support's sub-items keep it); the menu dots (red, blue)
-     are menu grammar and untouched. */
-  .hw-opt.is-chosen { color: #fff; font-weight: 600; }
+     GLOW is the focused indicator, BOLD is the selected indicator.
+     Sept 5 (Eric: "options do count as children"): THE CHILDREN LAW
+     applies — a focused option only glows (300); the CHOSEN option is
+     bold AND glows, standing, at the 600 value. The menu dots (red,
+     blue) are menu grammar and untouched. */
+  .hw-opt.is-chosen { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); }
 
   /* Color rows — Eric's p1 reference: label left, TICK SCRUBBER filling
      the row's right; the active row is bold+lit; A/D scrubs it. The
@@ -523,7 +524,7 @@
   }
   .hw-unit button { --bloom-g: 3.17; }               /* THE CHILDREN LAW: the focused unit stays 300 and only glows — solved in the shipped state at the 10 rung (IN: 3.165 → 0.996); the cap is behind it */
   .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }   /* glow only — bold is the LIVE unit's mark */
-  .hw-unit button.is-live { color: var(--ink); font-weight: 600; }   /* HOTNESS LAW: selected = bold; the glow marks the cursor only */
+  .hw-unit button.is-live { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); --bloom-g: 1.4; }   /* Eric, Sept 5: options are children — the LIVE unit is bold AND glows, standing (600 value solved in the shipped state: CM 1.403 → 0.997) */
   .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(10px * var(--ui-scale)); }   /* rides the toggle's rung */
   /* THE PILL FIELDS (Eric, Aug 28 fourth word, p2: "size dimension
      inputs happen within a pill") — the design team's capsule: hairline
