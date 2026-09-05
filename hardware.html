@@ -101,7 +101,7 @@
     --hw-cart-top: calc(100vh - 3 * var(--hw-cart-pad));   /* collapsed: the strip's top (94.54vh) */
     --hw-cart-gap: 4.745vh;          /* add row bottom → cart top: the frame's 53px (944 − 891) */
     --hw-panel-lift: 0.716vh;        /* panel bottom → add row top: the frame's 8px (856 → 864) */
-    --hw-cart-delay: var(--pop-fade-duration);   /* the DESCENT waits for the band's contents to fade, like the rule; the ascent is immediate */
+    --hw-cart-delay: var(--pop-fade-duration);   /* every travelling part waits ONE FADE both ways (Eric, Sept 5): opening, the strip's box fades out first; closing, the band's contents fade out first — then the action */
     /* THE ONE LINE (Eric, Sept 5: "cart expand and collapse animation have
        the long divider line overlapping"): the band rule's opening and
        closing extent IS the strip rule's — clip insets from the same
@@ -114,7 +114,7 @@
     --hw-plate-top: 31.51vh;
     --hw-plate-w: 19.27vw;
   }
-  body.hw-cart-open { --hw-cart-top: 84.51vh; --hw-cart-delay: 0s; }
+  body.hw-cart-open { --hw-cart-top: 84.51vh; }
 
   /* ── The stage — the flexing center. The BALL canvas fills it; the
      coming-soon notice replaces it for unreal classes. ────────────────── */
@@ -733,15 +733,17 @@
      when .is-closing releases (the band vanishes on that same frame) —
      never two lines. The strip's box and triangle still fade. */
   #hw-tray.is-open .hw-strip-rule, #hw-tray.is-closing .hw-strip-rule { opacity: 0; }
-  /* THE EXPANSION CHOREOGRAPHY — ONE SMOOTH ACTION (Eric, Sept 5,
-     re-scrutinized; supersedes the Aug 29 two-phase grow-then-rise): the
-     strip's translucent box and triangle FADE, while in a single eased
-     motion on --pop-duration the line EXTENDS from the strip rule's exact
+  /* THE EXPANSION CHOREOGRAPHY — FADE, THEN ONE SMOOTH ACTION (Eric,
+     Sept 5, twice scrutinized; supersedes the Aug 29 two-phase grow-then-
+     rise): FIRST the strip's translucent box and triangle FADE (the line
+     itself stays — the band's rule stands on it); THEN, in a single eased
+     motion on --pop-duration, the line EXTENDS from the strip rule's exact
      extent to the band rule's full length AND RISES to 87.11vh, the three
-     rails DRAW from where the landed line crosses them, and the label
-     TRAVELS from its perch above the strip's line to the design's spot.
-     Then the row's contents reveal. Tempo tokens only, zero local
-     durations. The close mirrors it after the contents' fade. */
+     rails DRAW from where the landed line crosses them, the label TRAVELS
+     from its perch above the strip's line to the design's spot, and the
+     panel and add row rise with it. Then the row's contents reveal. Tempo
+     tokens only, zero local durations. The close mirrors it: contents
+     fade · the action reverses · the strip fades back in. */
   #hw-tray-band {
     position: absolute; inset: 0;
     pointer-events: none;
@@ -764,7 +766,7 @@
     }
     100% { transform: translateY(0); clip-path: inset(0 0 0 0); }
   }
-  #hw-tray.is-open .hw-tray-rule { animation: hw-rule-in var(--pop-duration) var(--expand-curve) both; }
+  #hw-tray.is-open .hw-tray-rule { animation: hw-rule-in var(--pop-duration) var(--expand-curve) var(--pop-fade-duration) both; }   /* after the strip's fade */
   @keyframes hw-rail-in {
     0%   { transform: scaleY(0); }
     100% { transform: scaleY(1); }
@@ -775,7 +777,7 @@
     /* the rails draw out from where the landed rule crosses them:
        (87.11 − 84.51) / 13.61 of their own height — in the same action */
     transform-origin: 50% 19.1%;
-    animation: hw-rail-in var(--pop-duration) var(--expand-curve) both;
+    animation: hw-rail-in var(--pop-duration) var(--expand-curve) var(--pop-fade-duration) both;   /* after the strip's fade */
   }
   /* the contents wait for the action to land — the waterfall's own
      content grammar (delays drink from the token, never local). */
@@ -787,7 +789,7 @@
   #hw-tray.is-open #hw-tray-band #hw-slots,
   #hw-tray.is-open #hw-tray-band .hw-tray-price {
     opacity: 1;
-    transition-delay: var(--pop-duration);
+    transition-delay: calc(var(--pop-fade-duration) + var(--pop-duration));   /* the fade, then the action, then the contents */
   }
   /* THE COLLAPSE MIRRORS IT (fourteenth word, Eric, Aug 29; one action
      since Sept 5): contents fade first · then, in one eased motion, the
@@ -1477,30 +1479,29 @@ var totalEl  = document.getElementById('hw-total');
 var trayOpen = false;
 function saveCart(){ C.cartStore.save(CART); }
 var _trayCloseT = null;
+var _trayBloomT = null;
 function setTrayOpen(on){
   trayOpen = !!on;
   document.body.classList.toggle('hw-cart-open', trayOpen);   // the panel + add row follow the cart's top edge (Eric, Sept 5)
-  clearTimeout(_trayCloseT);
+  clearTimeout(_trayCloseT); clearTimeout(_trayBloomT);
+  // the tempo, read from the tokens — never a local duration
+  var cs = getComputedStyle(document.documentElement);
+  var dur = (parseFloat(cs.getPropertyValue('--pop-duration')) || 0.5) * 1000;
+  var fade = (parseFloat(cs.getPropertyValue('--pop-fade-duration')) || 0.41) * 1000;
   if (trayOpen){
-    trayEl.classList.remove('is-open');   // (no-op normally) so a re-open restarts nothing stale
     trayEl.classList.remove('is-closing');
     trayEl.classList.add('is-open');
-    // the label's weight snaps to 600 now — re-solve its hotness for the new weight
-    // (the bloom observer watches the element's own class, not the tray's)
-    if (C.normalizeBloom) C.normalizeBloom();
   } else if (trayEl.classList.contains('is-open')){
     trayEl.classList.remove('is-open');
     trayEl.classList.add('is-closing');
-    // hold the closing state for the choreography's own length —
-    // derived from the tempo tokens, never a local duration.
-    var cs = getComputedStyle(document.documentElement);
-    var dur = (parseFloat(cs.getPropertyValue('--pop-duration')) || 0.5) * 1000;
-    var fade = (parseFloat(cs.getPropertyValue('--pop-fade-duration')) || 0.41) * 1000;
-    // contents fade + line reverse + the strip's own return, then release
+    // hold the closing state for the choreography's own length:
+    // contents fade + the action's reverse + the strip's own return, then release
     _trayCloseT = setTimeout(function(){ trayEl.classList.remove('is-closing'); }, fade + dur + fade + 60);
-    // the weight snaps back to 300 when the descent begins (after the contents' fade) — re-solve then
-    setTimeout(function(){ if (C.normalizeBloom) C.normalizeBloom(); }, fade + 40);
   }
+  // the label's weight snaps as the action begins — one fade in, both ways;
+  // re-solve its hotness for the new weight then (the bloom observer watches
+  // the element's own class, not the tray's)
+  _trayBloomT = setTimeout(function(){ if (C.normalizeBloom) C.normalizeBloom(); }, fade + 40);
   stripEl.setAttribute('aria-expanded', String(trayOpen));
   toggleEl.setAttribute('aria-expanded', String(trayOpen));
 }
