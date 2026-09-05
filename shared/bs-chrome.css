@@ -625,7 +625,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   /* The full list: this shorthand REPLACES the .bs-tray > * transition
      on these items (tie broken by source order), so the entrance
      opacity/transform must be carried here too or they snap. */
-  transition: color 0.16s, text-shadow 0.2s ease,
+  transition: color 0.16s,
               opacity var(--pop-fade), transform var(--pop-motion);
 }
 /* Sub icons match the head glyphs' size (Eric: they read undersized in
@@ -710,7 +710,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   display: flex; align-items: center;   /* re-centers the label in the taller hit box */
   position: relative;
   cursor: var(--cursor-target);
-  transition: color 0.16s, text-shadow 0.2s ease;
+  transition: color 0.16s;
 }
 .bs-item > span {
   display: inline-block;
@@ -724,6 +724,12 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   transform: translateY(-50%);
   opacity: 0; transition: opacity var(--side-menu-fade);
 }
+/* THE GLOW SNAPS (Eric, Sept 5, "hovering ... makes the mouse movement
+   lag"): a transitioned text-shadow re-rasterizes a nine-ring blurred
+   halo every frame for 200ms per hover change — at retina density, with
+   the WebGL ball drawing beside it, that is what stalls the pointer.
+   The children's law already snapped the glow on; now every surface
+   does — colour still fades on its .16s, the halo lands at once. */
 /* ONE visual channel for the cursor: the pop-out renders ONLY through
    .kb-hover, which mouseenter and the keyboard both drive via THE focus
    variable. Raw :hover rules were deliberately removed — a second CSS-
@@ -860,7 +866,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   transform: translateX(calc(-7px * var(--ui-scale)));
   background: transparent; border: 0; padding: 0;
   /* Witness: opacity .16s + transform .18s house-curve → tempo tokens. */
-  transition: color .16s, text-shadow .2s ease,
+  transition: color .16s,
               opacity var(--pop-fade), transform var(--pop-motion);
 }
 /* Witness link stops — exact stylesheet values (ui-scale, the last
@@ -1224,7 +1230,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   font-size: calc(12px * var(--ui-scale));
   line-height: calc(17px * var(--ui-scale));
   letter-spacing: .01em;
-  transition: color .16s, text-shadow .2s ease;
+  transition: color .16s;
 }
 /* The plate's marker — on the RIGHT (the company, Aug 25): the warm
    marker with the fitted halo, ranked dim at rest / full on the plate
@@ -1364,7 +1370,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   letter-spacing: 0;
   /* HOTNESS LAW: no resting glow (hoverable). */
   cursor: var(--cursor-target);
-  transition: color .16s, text-shadow .2s ease;
+  transition: color .16s;
 }
 .bs-option.kb-hover, .bs-option:focus-visible {
   color: #fff; outline: none;

@@ -515,7 +515,10 @@
     transform: translateX(-50%) scaleY(calc(1 + var(--hw-heat) * 1.55));
     transform-origin: bottom;
     box-shadow: 0 0 calc(12px * var(--hw-heat) * var(--ui-scale)) rgba(255, 255, 255, .4);
-    transition: background .12s, opacity .12s, transform .12s, box-shadow .12s;
+    /* NO TRANSITIONS on the teeth (Eric, Sept 5, the lag): heat is re-set on
+       every pointer move anyway, and four transitioned properties on 64
+       teeth spawned 256 running animations per move — the main thread
+       spent half its time on them. The pointer's own cadence is the ramp. */
     pointer-events: none;
   }
   .hw-tick.is-lit { background: color-mix(in srgb, #fefefe59, #ffffff var(--hw-heat-pct)); }
@@ -1766,13 +1769,22 @@ function buildPanelContent(){
         scrub.appendChild(tk);
         rowTicks.push(tk);
       }
+      // only the teeth within the ramp (±10%) are written; the rest are
+      // touched once, when they cool — 13 writes per move, not 128 (Sept 5)
+      var hot = [];
       function heat(pPct){
+        var next = [];
         rowTicks.forEach(function(tk2){
           var d = pPct === null ? Infinity : Math.abs(Number(tk2.dataset.x) - pPct);
           var h2 = pPct === null ? 0 : Math.max(0, Math.min(1, 1 - d / 10));
-          tk2.style.setProperty('--hw-heat', h2.toFixed(3));
-          tk2.style.setProperty('--hw-heat-pct', Math.round(h2 * 100) + '%');
+          if (h2 > 0){
+            tk2.style.setProperty('--hw-heat', h2.toFixed(3));
+            tk2.style.setProperty('--hw-heat-pct', Math.round(h2 * 100) + '%');
+            next.push(tk2);
+          }
         });
+        hot.forEach(function(tk3){ if (next.indexOf(tk3) < 0){ tk3.style.removeProperty('--hw-heat'); tk3.style.removeProperty('--hw-heat-pct'); } });
+        hot = next;
       }
       // Scrubbing CHOOSES the row and sets its value — one gesture, the
       // volume slider's own pointer grammar.
