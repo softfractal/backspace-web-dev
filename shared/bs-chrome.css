@@ -1150,9 +1150,6 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    clipped list — border-box props a 0-height box open at its own padding
    and breaks the closed-contributes-nothing invariant. */
 .bs-sublist > :last-child { padding-bottom: calc(8px * var(--ui-scale)); }
-.bs-sublist > :last-child.is-chosen::before {
-  top: calc(50% - 4px * var(--ui-scale));
-}
 .bs-sublist > :first-child { margin-top: calc(18px * var(--ui-scale)); }
 .bs-subitem {
   position: relative;
@@ -1191,16 +1188,12 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    its own solved intensity (the BLOOM table's 600 column; default .93). */
 .bs-subitem.is-chosen, .bs-subitem.is-live { text-shadow: var(--bloom-lit); }
 .bs-subitem.is-chosen, .bs-subitem.is-live { --bloom-g: .93; }   /* (same column as the focused 600 state now) */
-/* THE HOLLOW RING — vocabulary member three: a chosen sub-item carries
-   the signal-red OUTLINE ring in the parent's own left gutter. */
-.bs-subitem.is-chosen::before {
-  content: ''; position: absolute; left: 0; top: 50%;
-  width: calc(5px * var(--ui-scale)); height: calc(5px * var(--ui-scale));
-  border: 1px solid var(--color-signal-red);
-  border-radius: 50%;
-  box-shadow: 0 0 calc(9px * var(--ui-scale)) rgba(157, 31, 0, .45);
-  transform: translateY(-50%);
-}
+/* THE HOLLOW RING (vocabulary member three) NO LONGER MARKS A CHOSEN
+   SUB-ITEM — THE TYPE PASS (Eric, Sept 3): "remove the outline dots from
+   the focused state of the children menu items; glow itself is enough".
+   The chosen child is read by its weight (600) and its standing glow
+   alone. The ring stays in the vocabulary for the panel's options
+   (.bs-option) and for the popped-unselected class item. */
 
 /* ── 1b. The plate stack — the right-hand detail column; rows expand
    DOWNWARD in place, one at a time. Container placement is page-side;
