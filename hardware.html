@@ -405,13 +405,13 @@
     letter-spacing: 0;
     /* HOTNESS LAW: no resting glow (hoverable); the LIT ring set on hover,
        intensity 2.359 (small 300-weight rows need two pastes). */
-    --bloom-g: 1.06;   /* the focused row is 600 now (the type pass): compact 1.09 · standard 1.04 */
+    --bloom-g: 2.04;   /* THE CHILDREN LAW (Eric, Sept 5): the focused option stays 300 and only glows — solved IN THE SHIPPED STATE (solve_live.js): compact 2.04 · wide 1.95 · studio 2.06 · metallic silver 1.93 · red 2.21 → the mean */
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .hw-sizerow.is-chosen .hw-opt, .hw-colrow.is-chosen .hw-opt { --bloom-g: 1.04; }
+  .hw-sizerow.is-chosen .hw-opt, .hw-colrow.is-chosen .hw-opt { --bloom-g: .92; }   /* the CHOSEN row under the pointer: 600 + glow (solved in the shipped state: standard .916) */
   .hw-opt.kb-hover, .hw-opt:hover, .hw-opt:focus-visible {
-    color: #fff; outline: none; font-weight: 600;
+    color: #fff; outline: none;   /* glow only — bold is the CHOSEN option's mark (Aug 28 law, restated Sept 5) */
     text-shadow: var(--bloom-lit);
   }
   /* NO DOTS IN THE PANELS (Eric, Aug 28 fourth word, p4: "all
@@ -477,7 +477,7 @@
   .hw-tick.is-lit { background: color-mix(in srgb, #fefefe59, #ffffff var(--hw-heat-pct)); }
   .hw-colrow.is-chosen .hw-tick.is-lit { background: color-mix(in srgb, #fefefeb8, #ffffff var(--hw-heat-pct)); }
   /* HOVER: the bar glows WITH its text (Eric, Aug 31) */
-  .hw-colrow:hover .hw-opt { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); }
+  .hw-colrow:hover .hw-opt { color: #fff; text-shadow: var(--bloom-lit); }   /* glow only (the chosen row is bold by its own rule) */
   .hw-colrow:hover .hw-scrub {
     filter: drop-shadow(0 0 calc(6px * var(--ui-scale)) rgba(255, 255, 255, .35));
   }
@@ -492,8 +492,8 @@
     /* the whole row is ONE target (Eric, Sept 2) — dims included */
     cursor: var(--cursor-target);
   }
-  .hw-sizerow:hover .hw-opt { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); }
-  .hw-sizerow:hover .hw-sizedims { color: #fff; font-weight: 600; }
+  .hw-sizerow:hover .hw-opt { color: #fff; text-shadow: var(--bloom-lit); }   /* glow only (the chosen row is bold by its own rule) */
+  .hw-sizerow:hover .hw-sizedims { color: #fff; }
   .hw-sizedims {
     color: var(--bs-label);
     font-family: var(--font-ui); font-weight: 300;
@@ -521,8 +521,8 @@
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .hw-unit button { --bloom-g: 2.05; }               /* HOTNESS LAW: the focused / live unit is 600 (solved on CM at the 8 rung: 2.03) */
-  .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; font-weight: 600; text-shadow: var(--bloom-lit); }   /* focused = WideSemiBold (the type pass) */
+  .hw-unit button { --bloom-g: 4; }                  /* THE CHILDREN LAW: the focused unit stays 300 and only glows. AT THE CAP: an 8px Light string with every paste on reads 0.955 of the reference in the shipped state (IN at g=4: 48.3 / 50.6; g=3 reads 0.74) — within tolerance, but with no headroom; flagged to Eric */
+  .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }   /* glow only — bold is the LIVE unit's mark */
   .hw-unit button.is-live { color: var(--ink); font-weight: 600; }   /* HOTNESS LAW: selected = bold; the glow marks the cursor only */
   .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(8px * var(--ui-scale)); }
   /* THE PILL FIELDS (Eric, Aug 28 fourth word, p2: "size dimension

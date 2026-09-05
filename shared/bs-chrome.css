@@ -359,7 +359,7 @@ body * {
 body[data-bs-page="home"] .bs-item, body[data-bs-page="support"] .bs-item { --bloom-g: .8; }
 .site-primary-nav__link { --bloom-g: .8; }        /* focused = WideSemiBold now */
 .bs-tray-item, #bs-lang { --bloom-g: 3.0; }        /* 10 WideLight */
-.bs-subitem { --bloom-g: .93; }                     /* focused and selected are both 600 now */
+.bs-subitem { --bloom-g: 1.89; }                    /* THE CHILDREN LAW: a FOCUSED child stays 300 and only glows — this is the 300 value (solved on /support's children; /hardware's per string in BLOOM). Selected = 600, its own value below. */
 .bs-plate-title { --bloom-g: .93; }                 /* the entry title, focused 600 (provisional: the sub-item's value) */
 .bs-option { --bloom-g: .99; }
 .bs-round img, .bs-head img, .site-round-button svg { --bloom-g: 1; }   /* per glyph via the BLOOM table (sound 2.57 · cart .84 · account .93 · ‹ 1.01) */
@@ -1179,15 +1179,15 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    is gone house-wide). Intensity ≈1.96 (two copies of the tight rings)
    for the 300-weight rows; per string via the BLOOM table. */
 .bs-subitem.kb-hover, .bs-subitem:focus-visible {
-  color: #fff; outline: none; font-weight: 600;   /* THE TYPE PASS (Sept 3): children focused = WideSemiBold */
+  color: #fff; outline: none;   /* THE CHILDREN LAW (Eric, Sept 5): a focused child ONLY GLOWS — its weight stays 300; bold is the SELECTED child's mark ("I confused focused with selected") */
   text-shadow: var(--bloom-lit);   /* THE HOTNESS LAW — the 184px swept-surface trim is moot: the ring set tops out at 46px */
 }
-.bs-subitem.is-chosen { color: #fff; font-weight: 600; }
+.bs-subitem.is-chosen { color: #fff; font-weight: 600; }   /* THE CHILDREN LAW: selected = glow AND bold */
 /* HOTNESS LAW (Eric, Sept 3): a SELECTED sub-item keeps its glow, like the
    selected class item; bold ink is denser, so the selected state carries
    its own solved intensity (the BLOOM table's 600 column; default .93). */
 .bs-subitem.is-chosen, .bs-subitem.is-live { text-shadow: var(--bloom-lit); }
-.bs-subitem.is-chosen, .bs-subitem.is-live { --bloom-g: .93; }   /* (same column as the focused 600 state now) */
+.bs-subitem.is-chosen, .bs-subitem.is-live { --bloom-g: .93; }   /* the 600 column (the selected child) */
 /* THE HOLLOW RING (vocabulary member three) NO LONGER MARKS A CHOSEN
    SUB-ITEM — THE TYPE PASS (Eric, Sept 3): "remove the outline dots from
    the focused state of the children menu items; glow itself is enough".
