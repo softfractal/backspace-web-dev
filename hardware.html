@@ -98,7 +98,8 @@
        frame is built from it: three pads tall (label centered in the
        upper two, the rule one pad above the bottom). */
     --hw-cart-pad: calc(87.11vh - 85.29vh);
-    --hw-cart-top: calc(100vh - 3 * var(--hw-cart-pad));   /* collapsed: the strip's top (94.54vh) */
+    --hw-strip-top: calc(100vh - 3 * var(--hw-cart-pad));   /* the collapsed bar's top (94.54vh) — CONSTANT: the bar never moves, it only fades */
+    --hw-cart-top: var(--hw-strip-top);                       /* collapsed: the cart's top edge is the bar's top */
     --hw-cart-gap: 4.745vh;          /* add row bottom → cart top: the frame's 53px (944 − 891) */
     --hw-panel-lift: 0.716vh;        /* panel bottom → add row top: the frame's 8px (856 → 864) */
     --hw-cart-delay: var(--pop-fade-duration);   /* every travelling part waits ONE FADE both ways (Eric, Sept 5): opening, the strip's box fades out first; closing, the band's contents fade out first — then the action */
@@ -702,7 +703,7 @@
        sides sit where OASIS begins and INTRODUCTION ends, no longer the
        stage's 18.63..79.80vw center span. */
     left: var(--hw-text-inset); right: var(--hw-text-inset);
-    top: var(--hw-cart-top);
+    top: var(--hw-strip-top);   /* its OWN constant — never --hw-cart-top, which flips to the rails' top the moment the row opens and sent the fading bar leaping up (Eric, Sept 5: "jumps up to a random position") */
     height: calc(3 * var(--hw-cart-pad));   /* taller for the collapsed look (Eric, Sept 5): label · pad · line · pad · bottom */
     background: var(--bsw-fill);
     border: 0; padding: 0;
