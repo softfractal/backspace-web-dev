@@ -985,10 +985,15 @@
     font-size: calc(12px * var(--ui-scale));
     letter-spacing: .04em;
   }
+  /* Eric, Sept 5 (the design's own plate): the PRICE sits in the white
+     plate at the row's right — where checkout stood; checkout takes the
+     full second row — where view cart stood; view cart leaves the tray
+     (the corner cart glyph is the way to /cart). */
   #hw-total {
-    margin-left: auto;
-    margin-right: calc(111px * var(--ui-scale));   /* clears the checkout plate */
-    color: var(--ink); font-weight: 600;
+    position: absolute; top: 0; right: 0;
+    width: calc(99px * var(--ui-scale)); height: calc(30px * var(--ui-scale));
+    display: grid; place-items: center;
+    background: #ededed; color: #040402; font-weight: 600;
   }
   .hw-tray-btn {
     position: absolute;
@@ -1001,10 +1006,6 @@
   /* bloom/cursor/transitions ride .bs-fillpill; the lift stays here */
   .hw-tray-btn:hover, .hw-tray-btn:focus-visible { background: #fff; }
   #hw-checkout {
-    top: 0; right: 0;
-    width: calc(99px * var(--ui-scale)); height: calc(30px * var(--ui-scale));
-  }
-  #hw-viewcart {
     /* the frames' second row: 1048/1117 → 4.03vh below the total row */
     top: calc(93.82vh - 89.79vh); left: 0; right: 0;
     height: calc(30px * var(--ui-scale));
@@ -1128,8 +1129,8 @@
 </div>
 
 <!-- THE CART ROW — always on stage (page anatomy, every frame draws it).
-     Slots are built by the script; view cart + checkout deny to seams
-     until the dedicated cart page and the commerce ruling land. -->
+     Slots are built by the script; checkout denies to a seam until the
+     commerce ruling lands; view cart left the tray (Eric, Sept 5). -->
 <div id="hw-tray" aria-label="Cart">
   <!-- Collapsed: the B-2 strip. Clicking it calls the row up. -->
   <button id="hw-tray-strip" type="button" aria-expanded="false" aria-label="Open cart row">
@@ -1152,7 +1153,6 @@
       <span id="hw-total">—</span>
     </div>
     <button id="hw-checkout" class="hw-tray-btn bs-fillpill" type="button" data-str="hwCheckout"></button>
-    <button id="hw-viewcart" class="hw-tray-btn bs-fillpill" type="button" data-str="hwViewCart"></button>
   </div>
   </div><!-- /hw-tray-band -->
 </div>
@@ -2128,17 +2128,10 @@ panel.addEventListener('keydown', function(e){
     if (clickOk()) addToCart(b);
   });
 })();
-// VIEW CART commits — the cart page landed (Eric's sixth word) and
-// ROUTES.cart carries it; CHECKOUT stays a deny seam until the commerce
-// wiring ruling (phase 2+).
+// VIEW CART left the tray (Eric, Sept 5 — the design's plate is total +
+// price, then checkout); the corner cart glyph routes to /cart. CHECKOUT
+// stays a deny seam until the commerce wiring ruling (phase 2+).
 (function(){
-  var vc = document.getElementById('hw-viewcart');
-  vc.addEventListener('click', function(e){
-    e.stopPropagation();
-    wake();
-    if (!C.ROUTES.cart){ denyOn(vc); return; }
-    if (clickOk()) C.nav.commit('cart');
-  });
   var co = document.getElementById('hw-checkout');
   co.addEventListener('click', function(e){
     e.stopPropagation();
