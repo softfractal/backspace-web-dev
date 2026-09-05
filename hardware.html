@@ -146,12 +146,15 @@
        confirms the seventh word's balance: OASIS at 17px×ui, the
        INTRODUCTION/CUSTOM heads at −25% (12.75). This pairing is now
        twice-ruled; treat it as settled. */
-    font-size: calc(17px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
-    line-height: calc(18px * var(--ui-scale));
+    /* THE TYPE PASS (Eric, Sept 3, from the design team's Figma): OASIS shares
+       the 14 rung with the menus (their 14 → our 14, WideSemiBold); the
+       17px×ui of the twelfth word is superseded. */
+    font-size: calc(14px * var(--ui-scale));
+    line-height: calc(15px * var(--ui-scale));
     letter-spacing: .08em;
     /* HOTNESS LAW: a STANDING title (never hovers) — glows at rest at the
        reference's rest hotness; g solved by the harness (Sept 3). */
-    text-shadow: var(--bloom-rest); --bloom-g-rest: .527;
+    text-shadow: var(--bloom-rest); --bloom-g-rest: .514;   /* re-solved on the 14 rung */
   }
   #hw-class-menu {
     position: fixed;
@@ -166,7 +169,7 @@
     gap: calc(15px * var(--ui-scale));
     color: var(--text-soft);
   }
-  #hw-class-menu .bs-item { font-weight: 300; }
+  #hw-class-menu .bs-item { font-weight: 300; font-size: calc(12px * var(--ui-scale)); line-height: calc(13px * var(--ui-scale)); }   /* THE TYPE PASS: their 12 (product category) — the hotness reference re-solved on it */
   #hw-class-menu .bs-item.kb-hover,
   #hw-class-menu .bs-item:focus-visible,
   #hw-class-menu .bs-item.active { font-weight: 600; }
@@ -201,13 +204,15 @@
        fifth word's halving, which his eye read as too small): 17 × 0.75
        = 12.75px×ui, letterspaced caps sitting between the title and the
        item rows. The §5.1 live-text confirm still closes the rung class. */
-    font-size: calc(12.75px * var(--ui-scale));
-    line-height: calc(13.5px * var(--ui-scale));
+    /* THE TYPE PASS (Sept 3): Eric's own rung for these heads — 10.5 (their
+       14 read too big for the balance); 75% of OASIS still. */
+    font-size: calc(10.5px * var(--ui-scale));
+    line-height: calc(11px * var(--ui-scale));
     letter-spacing: .08em;
     text-align: right; white-space: nowrap;
     /* HOTNESS LAW: no resting glow (hoverable); lit on the one ring set,
        intensity 1.052 (the harness's median for the two heads). */
-    --bloom-g: 1.052;
+    --bloom-g: 1.12;   /* re-solved on the 10.5 rung (INTRODUCTION 1.10 · CUSTOM 1.14 per string) */
     cursor: var(--cursor-target);
     transition: color .16s;
   }
@@ -240,8 +245,8 @@
     padding-right: 0;                          /* flush at the rail at rest */
     justify-self: end;
     text-align: right;
-    font-size: calc(14px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
-    line-height: calc(16px * var(--ui-scale));
+    font-size: calc(12px * var(--ui-scale));   /* THE TYPE PASS: their 12 (left-menu children) */
+    line-height: calc(14px * var(--ui-scale));
   }
   #hw-product-menu .bs-subitem .bs-nav-label {
     display: inline-block;
@@ -297,8 +302,8 @@
     box-sizing: border-box;
     box-shadow: 0 0 8px rgba(157, 31, 0, .35);
   }
-  #hw-product-menu .bs-subitem.kb-hover::after,
-  #hw-product-menu .bs-subitem:focus-visible::after,
+  /* THE TYPE PASS (Eric, Sept 3): the focused child carries NO dot — the glow
+     alone marks focus; the filled dot marks the selection. */
   #hw-product-menu .bs-subitem.is-live::after { opacity: 1; }
   /* The chosen-ring stays available in this menu for CHOSEN semantics
      (none in phase one — the ring belongs to the panel's options). */
@@ -371,8 +376,8 @@
     display: block;
     color: var(--ink);
     font-family: var(--font-ui); font-weight: 600;
-    font-size: calc(14px * var(--ui-scale));   /* PROVISIONAL rung (§5.1) */
-    line-height: calc(18px * var(--ui-scale));
+    font-size: calc(12px * var(--ui-scale));   /* THE TYPE PASS: the customization interface is 12 (titles WideSemiBold) */
+    line-height: calc(15px * var(--ui-scale));
     letter-spacing: .02em;
     padding-bottom: calc(8px * var(--ui-scale));
     border-bottom: 1px solid var(--bs-rule);
@@ -395,18 +400,18 @@
     text-align: left;
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(13px * var(--ui-scale));
-    line-height: calc(19px * var(--ui-scale));
+    font-size: calc(12px * var(--ui-scale));   /* THE TYPE PASS: options 12 — rest WideLight, focused WideSemiBold */
+    line-height: calc(17px * var(--ui-scale));
     letter-spacing: 0;
     /* HOTNESS LAW: no resting glow (hoverable); the LIT ring set on hover,
        intensity 2.359 (small 300-weight rows need two pastes). */
-    --bloom-g: 2.359;   /* the 300-weight rows; the CHOSEN row (600) solved to 1.088 below */
+    --bloom-g: 1.06;   /* the focused row is 600 now (the type pass): compact 1.09 · standard 1.04 */
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .hw-sizerow.is-chosen .hw-opt, .hw-colrow.is-chosen .hw-opt { --bloom-g: 1.088; }
+  .hw-sizerow.is-chosen .hw-opt, .hw-colrow.is-chosen .hw-opt { --bloom-g: 1.04; }
   .hw-opt.kb-hover, .hw-opt:hover, .hw-opt:focus-visible {
-    color: #fff; outline: none;
+    color: #fff; outline: none; font-weight: 600;
     text-shadow: var(--bloom-lit);
   }
   /* NO DOTS IN THE PANELS (Eric, Aug 28 fourth word, p4: "all
@@ -472,7 +477,7 @@
   .hw-tick.is-lit { background: color-mix(in srgb, #fefefe59, #ffffff var(--hw-heat-pct)); }
   .hw-colrow.is-chosen .hw-tick.is-lit { background: color-mix(in srgb, #fefefeb8, #ffffff var(--hw-heat-pct)); }
   /* HOVER: the bar glows WITH its text (Eric, Aug 31) */
-  .hw-colrow:hover .hw-opt { color: #fff; text-shadow: var(--bloom-lit); }
+  .hw-colrow:hover .hw-opt { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); }
   .hw-colrow:hover .hw-scrub {
     filter: drop-shadow(0 0 calc(6px * var(--ui-scale)) rgba(255, 255, 255, .35));
   }
@@ -487,12 +492,12 @@
     /* the whole row is ONE target (Eric, Sept 2) — dims included */
     cursor: var(--cursor-target);
   }
-  .hw-sizerow:hover .hw-opt { color: #fff; text-shadow: var(--bloom-lit); }
-  .hw-sizerow:hover .hw-sizedims { color: #fff; }
+  .hw-sizerow:hover .hw-opt { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); }
+  .hw-sizerow:hover .hw-sizedims { color: #fff; font-weight: 600; }
   .hw-sizedims {
     color: var(--bs-label);
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
+    font-size: calc(12px * var(--ui-scale));   /* THE TYPE PASS: the dims column rides the options' 12 */
     letter-spacing: .04em;
     white-space: nowrap;
     transition: color .16s;
@@ -510,17 +515,16 @@
     background: none; border: 0; padding: 0 calc(2px * var(--ui-scale));
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
-    line-height: calc(17px * var(--ui-scale));
+    font-size: calc(8px * var(--ui-scale));   /* THE TYPE PASS: the unit conversion is their 8 — the smallest rung */
+    line-height: calc(12px * var(--ui-scale));
     letter-spacing: .06em;
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .hw-unit button { --bloom-g: 3.784; }              /* HOTNESS LAW: the 300-weight unit (solved on IN) */
-  .hw-unit button.is-live { --bloom-g: 1.604; }      /* the live unit is 600 (solved on CM) */
-  .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
+  .hw-unit button { --bloom-g: 2.05; }               /* HOTNESS LAW: the focused / live unit is 600 (solved on CM at the 8 rung: 2.03) */
+  .hw-unit button:hover, .hw-unit button:focus-visible { color: #fff; outline: none; font-weight: 600; text-shadow: var(--bloom-lit); }   /* focused = WideSemiBold (the type pass) */
   .hw-unit button.is-live { color: var(--ink); font-weight: 600; }   /* HOTNESS LAW: selected = bold; the glow marks the cursor only */
-  .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(11px * var(--ui-scale)); }
+  .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(8px * var(--ui-scale)); }
   /* THE PILL FIELDS (Eric, Aug 28 fourth word, p2: "size dimension
      inputs happen within a pill") — the design team's capsule: hairline
      outline, full radius, label inside-left, the value bold right, the
@@ -535,7 +539,7 @@
   .hw-custom-label {
     color: var(--text-soft);
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(12px * var(--ui-scale));
+    font-size: calc(10px * var(--ui-scale));   /* THE TYPE PASS: "enter the size you want" is their 10 */
     line-height: calc(24px * var(--ui-scale));   /* centers on the first pill */
     letter-spacing: .02em;
     white-space: nowrap;
@@ -558,15 +562,15 @@
     flex: none;
     color: var(--bs-label);
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
+    font-size: calc(10px * var(--ui-scale));   /* THE TYPE PASS: length / width are their 10 */
     letter-spacing: .04em;
   }
-  .hw-pill-field .bs-input { flex: 1; width: auto; }
+  .hw-pill-field .bs-input { flex: 1; width: auto; font-size: calc(12px * var(--ui-scale)); }   /* THE TYPE PASS: the typed number is their 12 WideSemiBold */
   .hw-pill-unit {
     flex: none;
     color: var(--bs-label);
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(10px * var(--ui-scale));
+    font-size: calc(12px * var(--ui-scale));   /* THE TYPE PASS: the unit is their 12 WideLight */
     letter-spacing: .04em;
   }
 
@@ -826,9 +830,9 @@
     color: var(--ink);
     background: none; border: 0; padding: 0;
     font-family: var(--font-ui); font-weight: 600;
-    font-size: calc(11px * var(--ui-scale));
+    font-size: calc(12px * var(--ui-scale));   /* THE TYPE PASS: the cart button is their 12 */
     letter-spacing: .08em;
-    --bloom-g: 1.329;   /* HOTNESS LAW: no resting glow (hoverable); lit intensity solved */
+    --bloom-g: 1.055;   /* HOTNESS LAW: no resting glow (hoverable); lit intensity re-solved on the 12 rung */
     cursor: var(--cursor-target);
     transition: color .16s;
   }
@@ -961,8 +965,8 @@
     position: absolute;
     border: 0; padding: 0;
     background: #ededed; color: #0b0b0a;
-    font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(11px * var(--ui-scale));
+    font-family: var(--font-ui); font-weight: 600;   /* THE TYPE PASS: checkout is their 12 WideSemiBold */
+    font-size: calc(12px * var(--ui-scale));
     letter-spacing: .04em;
   }
   /* bloom/cursor/transitions ride .bs-fillpill; the lift stays here */

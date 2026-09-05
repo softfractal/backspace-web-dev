@@ -111,9 +111,9 @@
      because a blur sitting on thin or small ink is mostly empty.
      HOTNESS = the light the glow ADDS in the first 3px outside the ink
      (the near-halo mean, measured on the real compositor). THE
-     REFERENCE = the hardware class-menu item `desk`: LIT 56.5 (its
-     3-ring recipe on weight 600 / #fff), REST 16.9 (one 9.6px @ .58
-     ring on weight 300). Two classes: HOVERABLE surfaces glow only when
+     REFERENCE = the hardware class-menu item `desk` at its 12 rung (the
+     type pass, Sept 3): LIT 50.6 (its 3-ring recipe on weight 600 /
+     #fff), REST 15.0 (one 9.6px @ .58 ring on weight 300). Two classes: HOVERABLE surfaces glow only when
      lit (no resting glow — Eric, Sept 3); STANDING surfaces (titles that
      never hover: OASIS, ORDER SUMMARY, the current crumb, copy lines)
      glow at rest at the reference's rest hotness.
@@ -125,7 +125,8 @@
      smaller / thinner items get MORE rings, never a wider radius (rule
      3). Solved per element by measurement (the harness in
      reports/tools; the formula: g is the root of hotness(g) = 56.5, two
-     measurements + one secant step land within 3%). Values shipped
+     measurements + one secant step land within 3%; re-solved whenever a
+     rung moves — the type pass re-solved every value). Values shipped
      STATIC in the pair's BLOOM table (bs-chrome.js normalizeBloom:
      per-surface defaults in CSS, per-string values from the harness);
      the runtime canvas solver is the next step once calibrated.
@@ -353,22 +354,24 @@ body * {
 }
 /* Per-surface intensity defaults (the harness's medians, Sept 3); the
    machine's BLOOM table refines them per string (normalizeBloom). */
-.bs-item { --bloom-g: .926; }
-body[data-bs-page="home"] .bs-item { --bloom-g: .907; }
-.site-primary-nav__link { --bloom-g: 1.815; }
-.bs-tray-item, #bs-lang { --bloom-g: 2.547; }
-.bs-subitem { --bloom-g: 1.963; }
-.bs-option { --bloom-g: 1.115; }
+/* re-solved Sept 3 after THE TYPE PASS (reference desk: 12 rung, lit 50.6 / rest 15.0) */
+.bs-item { --bloom-g: .93; }
+body[data-bs-page="home"] .bs-item, body[data-bs-page="support"] .bs-item { --bloom-g: .8; }
+.site-primary-nav__link { --bloom-g: .8; }        /* focused = WideSemiBold now */
+.bs-tray-item, #bs-lang { --bloom-g: 3.0; }        /* 10 WideLight */
+.bs-subitem { --bloom-g: .93; }                     /* focused and selected are both 600 now */
+.bs-plate-title { --bloom-g: .93; }                 /* the entry title, focused 600 (provisional: the sub-item's value) */
+.bs-option { --bloom-g: .99; }
 .bs-round img, .bs-head img, .site-round-button svg { --bloom-g: 1; }   /* per glyph via the BLOOM table (sound 2.57 · cart .84 · account .93 · ‹ 1.01) */
 /* Custom properties INHERIT: a glyph inside a text surface would take the
    text's g (the account tray's icons read 2.6× at the tray words' 2.547 —
    Eric, Sept 3). Every glyph declares its own. */
-.bs-tray-item img { --bloom-g: .76; }   /* the account tray icons (solved .74–.80; per icon via the BLOOM table) */
+.bs-tray-item img { --bloom-g: .69; }   /* the account tray icons (solved .68–.73; per icon via the BLOOM table) */
 /* The › chevron inside the CLOSED pill is clipped by the circle (overflow
    hidden), which eats part of its halo — its closed-state intensity is
    solved separately from the open capsule's. */
-.site-primary-nav__forward-button svg { --bloom-g: .877; }                       /* › in the open capsule (solved) */
-.site-primary-nav:not(.is-open) .site-primary-nav__forward-button svg { --bloom-g: 2.406; }   /* › in the closed circle — the circle clips its halo (solved) */
+.site-primary-nav__forward-button svg { --bloom-g: .807; }                       /* › in the open capsule (solved) */
+.site-primary-nav:not(.is-open) .site-primary-nav__forward-button svg { --bloom-g: 1.006; }   /* › in the closed circle (solved against the 12-rung reference) */
 
 /* NO SCROLLBAR ANYWHERE (Eric, Sept 3): every scroll container, every page,
    scrolls without a bar — wheel, keys and touch move it; the lane is gone
@@ -546,11 +549,12 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
   display: flex; align-items: center; justify-content: center;
   color: rgba(255,255,255,0.94); background: transparent; border: 0; padding: 0;
-  /* Language text sits lighter than the icon glyphs: Chill Duan Sans
-     LIGHT (the non-wide cut), line-height 1 for true optical centering
-     in the circle. */
-  font-family: var(--font-sans); font-weight: 300;
-  font-size: calc(11px * var(--icons-scale));
+  /* THE TYPE PASS (Eric, Sept 3, from the Figma): the language text is their
+     10 WideLight — on the cluster's basis, 8px×icons (= 10px×ui at every
+     scale); supersedes the Aug 22 Sans-Light reading. line-height 1 for
+     true optical centering in the circle. */
+  font-family: var(--font-ui); font-weight: 300;
+  font-size: calc(8px * var(--icons-scale));
   line-height: 1;
   cursor: var(--cursor-target);
   transition: color 0.16s;
@@ -613,8 +617,8 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   width: 100%; height: var(--bs-pill-row-text);
   display: flex; align-items: center; justify-content: center;
   color: var(--text-soft); background: transparent; border: 0; padding: 0;
-  font-family: var(--font-sans); font-weight: 300;   /* Chill Duan Sans light — matches the icons' weight feel */
-  font-size: calc(11px * var(--icons-scale)); letter-spacing: 0.06em;
+  font-family: var(--font-ui); font-weight: 300;   /* THE TYPE PASS: their 10 WideLight (8px×icons) */
+  font-size: calc(8px * var(--icons-scale)); letter-spacing: 0.06em;
   line-height: 1;
   cursor: var(--cursor-target);
   /* The full list: this shorthand REPLACES the .bs-tray > * transition
@@ -873,7 +877,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    everything inside the icon bars, and its tray texts bloom on this
    chain. */
 .site-primary-nav__link:hover, .site-primary-nav__link:focus-visible,
-.site-primary-nav__link.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
+.site-primary-nav__link.kb-hover { color: #fff; outline: none; font-weight: 600; text-shadow: var(--bloom-lit); }   /* THE TYPE PASS: focused = WideSemiBold */
 /* "You are here" — the committed rung, rendered per the witness: full
    ink at weight 600, aria-current, and the dot deliberately struck
    (the witness carries content:none!important armor on this state —
@@ -1178,7 +1182,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    is gone house-wide). Intensity ≈1.96 (two copies of the tight rings)
    for the 300-weight rows; per string via the BLOOM table. */
 .bs-subitem.kb-hover, .bs-subitem:focus-visible {
-  color: #fff; outline: none;
+  color: #fff; outline: none; font-weight: 600;   /* THE TYPE PASS (Sept 3): children focused = WideSemiBold */
   text-shadow: var(--bloom-lit);   /* THE HOTNESS LAW — the 184px swept-surface trim is moot: the ring set tops out at 46px */
 }
 .bs-subitem.is-chosen { color: #fff; font-weight: 600; }
@@ -1186,7 +1190,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    selected class item; bold ink is denser, so the selected state carries
    its own solved intensity (the BLOOM table's 600 column; default .93). */
 .bs-subitem.is-chosen, .bs-subitem.is-live { text-shadow: var(--bloom-lit); }
-.bs-subitem.is-chosen, .bs-subitem.is-live { --bloom-g: .93; }
+.bs-subitem.is-chosen, .bs-subitem.is-live { --bloom-g: .93; }   /* (same column as the focused 600 state now) */
 /* THE HOLLOW RING — vocabulary member three: a chosen sub-item carries
    the signal-red OUTLINE ring in the parent's own left gutter. */
 .bs-subitem.is-chosen::before {
@@ -1227,9 +1231,11 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .bs-plate-title {
   display: block;
   color: var(--text-soft);
-  font-family: var(--font-sans); font-weight: 300;
-  font-size: calc(13px * var(--ui-scale));
-  line-height: calc(18px * var(--ui-scale));
+  /* THE TYPE PASS (Sept 3): the entry title is their 12 Wide — rest Regular
+     (no Regular cut ships: Light stands in), focused SemiBold. */
+  font-family: var(--font-ui); font-weight: 300;
+  font-size: calc(12px * var(--ui-scale));
+  line-height: calc(17px * var(--ui-scale));
   letter-spacing: .01em;
   transition: color .16s, text-shadow .2s ease;
 }
@@ -1253,7 +1259,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .bs-plate.is-open::after { opacity: 1; }
 .bs-plate.kb-hover, .bs-plate:focus-visible { outline: none; background: #fefefe24; }
 .bs-plate.kb-hover .bs-plate-title, .bs-plate:focus-visible .bs-plate-title {
-  color: #fff; text-shadow: var(--bloom-lit);
+  color: #fff; font-weight: 600; text-shadow: var(--bloom-lit);
 }
 .bs-plate.is-open .bs-plate-title {
   color: var(--ink); font-weight: 600;   /* HOTNESS LAW: open = bold, not lit (the glow marks the cursor) */
@@ -1273,7 +1279,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   display: block;
   margin: calc(14px * var(--ui-scale)) 0 0;
   color: var(--text-soft);
-  font-family: var(--font-sans); font-weight: 300;
+  font-family: var(--font-ui); font-weight: 300;   /* THE TYPE PASS: the full entry is their 12 Wide (Regular → Light stands in) */
   font-size: calc(12px * var(--ui-scale));
   line-height: 1.75;
 }

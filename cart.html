@@ -105,11 +105,11 @@
     cursor: var(--cursor-target);
     transition: color .16s;
   }
-  .ct-crumb-btn { --bloom-g: 1.731; }   /* HOTNESS LAW: the away crumb lights on hover (CART 1.13 / CHECKOUT 2.33 per string) */
+  .ct-crumb-btn { --bloom-g: 2.1; }   /* HOTNESS LAW: the away crumb lights on hover at Wide 300 (PROVISIONAL 2.1 — the cart's own type round re-solves it) */
   .ct-crumb-btn:hover, .ct-crumb-btn:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
   .ct-crumb-btn.is-here {
     /* STANDING: the here crumb never hovers — rest glow at the reference's rest hotness (solved .667) */
-    color: var(--ink); font-weight: 600; text-shadow: var(--bloom-rest); --bloom-g-rest: .667;
+    color: var(--ink); font-weight: 600; text-shadow: var(--bloom-rest); --bloom-g-rest: .592;
     pointer-events: none;
   }
   #ct-summary-head {
@@ -121,7 +121,7 @@
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(11px * var(--ui-scale));   /* the old rung stands */
     letter-spacing: 0;
-    text-shadow: var(--bloom-rest); --bloom-g-rest: .599;   /* HOTNESS LAW: standing title, solved */
+    text-shadow: var(--bloom-rest); --bloom-g-rest: .518;   /* HOTNESS LAW: standing title, re-solved */
   }
 
   /* ── The big preview (95,305,715,467) — the selected item's stage ───── */
@@ -317,7 +317,7 @@
     font-family: var(--font-ui); font-weight: 600;
     font-size: calc(14px * var(--ui-scale));
     letter-spacing: .04em;
-    text-shadow: var(--bloom-rest); --bloom-g-rest: .55;   /* HOTNESS LAW: standing title (PROVISIONAL: ORDER SUMMARY's rung) */
+    text-shadow: var(--bloom-rest); --bloom-g-rest: .5;   /* HOTNESS LAW: standing title (PROVISIONAL: near ORDER SUMMARY's) */
   }
   #ct-specs {
     /* the title→info gap: grown 50% then 25% more (Eric, Aug 31):

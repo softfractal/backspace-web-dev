@@ -946,32 +946,32 @@ function setLang(code){
 }
 /* THE HOTNESS LAW (Eric, Sept 2-3, 2026 — supersedes rule 6's whole-word
    equation and its fitted curves). Every bloom item glows at the hotness
-   of the hardware class-menu item `desk` (near-halo 56.5 lit). The pair's
+   of the hardware class-menu item `desk` (near-halo 50.6 lit at its 12 rung, re-solved Sept 3). The pair's
    CSS declares one ring set; each element gets ONE number, --bloom-g
    (intensity, in copies of the tight rings; see the css law block §6).
    The values below were SOLVED BY MEASUREMENT on the real pages by the
-   harness (reports/tools/hotness_study.js): the root of hotness(g) = 56.5
+   harness (reports/tools/resolve_all.js): the root of hotness(g) = 50.6
    per string. Per-surface defaults live in the CSS; this table refines
    them per string. Strings not in the table keep the surface default
    (a locale swap re-runs the harness; the runtime canvas solver is the
    next step once calibrated). Re-runs at every STR render. */
 var BLOOM = {
-  menu:      { desk: 1.00, module: 0.964, keyboard: 0.926, mouse: 0.995, light: 0.968, powerbank: 0.907, watercup: 0.932, headset: 0.908, speakers: 0.924,
-               'CONTACT US': 0.957, FAQ: 0.999, WARRANTY: 0.885, 'RETURN & REFUND POLICY': 0.891, 'PRODUCT GUIDES': 0.899, 'BUSINESS REQUEST': 0.842 },
-  menuHome:  { HARDWARE: 0.861, SOFTWARE: 0.897, COMMUNITY: 0.916, SUPPORT: 0.933 },
-  capsule:   { HARDWARE: 1.68, SOFTWARE: 1.79, COMMUNITY: 1.839, SUPPORT: 1.885 },
-  social:    { Instagram: 1.791, YouTube: 2.038, TikTok: 2.127, X: 3.57, Discord: 1.968, Facebook: 1.854 },
-  lang:      { EN: 2.315, ZH: 2.546, JA: 2.757, ES: 2.548, FR: 2.457 },
-  // weight-keyed: the hovered sub-item is Wide 300, the SELECTED one (is-chosen / is-live) is 600 — denser ink, its own values
-  sub:       { 300: { overview: 1.963, 'industrial design': 1.863, specifications: 1.854, ecosystem: 1.84, support: 1.99, size: 2.084, desktop: 1.766, desklegs: 1.664 },
-               600: { overview: 1.041, 'industrial design': 0.918, specifications: 0.924, ecosystem: 0.933, support: 0.979, size: 1.192, desktop: 0.913, desklegs: 0.916 } },
-  head:      { INTRODUCTION: 1.04, CUSTOM: 1.064 },
-  traylabel: { CART: 1.329 },
-  option:    { 'product consulting': 1.093, 'order & delivery': 1.122, 'warranty & repair': 1.115 },
-  door:      { 'fill out form': 2.795 },
-  crumb:     { CART: 1.132, CHECKOUT: 2.33 },
-  glyph:     { 'bs-sound': 2.567, 'bs-cart': 0.839, 'bs-account': 0.931, 'corner-back': 1.011,   // the 4-pass chain (Sept 3); the › chevron's two states live in the CSS
-               'Sign in': 0.797, 'Account details': 0.745, 'Order lookup': 0.737 }                 // the account tray icons, by their item's aria-label
+  // re-solved Sept 3 after THE TYPE PASS: the reference `desk` is now a 12 rung — lit 50.6 / rest 15.0 (reports/harness/2026-09-03/resolve_all.json)
+  menu:      { desk: 1.00, module: 0.962, keyboard: 0.927, mouse: 1.001, light: 0.989, powerbank: 0.906, watercup: 0.94, headset: 0.906, speakers: 0.93,
+               'CONTACT US': 0.871, FAQ: 0.893, WARRANTY: 0.784, 'RETURN & REFUND POLICY': 0.796, 'PRODUCT GUIDES': 0.804, 'BUSINESS REQUEST': 0.753 },
+  menuHome:  { HARDWARE: 0.753, SOFTWARE: 0.802, COMMUNITY: 0.819, SUPPORT: 0.834 },
+  capsule:   { HARDWARE: 0.75, SOFTWARE: 0.801, COMMUNITY: 0.811, SUPPORT: 0.812 },          // focused = WideSemiBold now (the type pass)
+  social:    { Instagram: 1.573, YouTube: 1.814, TikTok: 1.852, X: 3.13, Discord: 1.739, Facebook: 1.64 },
+  lang:      { EN: 2.774, ZH: 3.017, JA: 3.54, ES: 2.946, FR: 2.891 },                          // 10 WideLight (8×icons)
+  // weight-keyed: a sub-item is Wide 300 at rest and 600 when focused OR selected (the type pass) — the 600 column is the live one
+  sub:       { 300: { overview: 1.923, 'industrial design': 1.829, specifications: 1.845, ecosystem: 1.813, support: 1.925, size: 2.263, desktop: 1.75, desklegs: 1.64 },
+               600: { overview: 0.988, 'industrial design': 0.905, specifications: 0.915, ecosystem: 0.919, support: 0.957, size: 1.16, desktop: 0.908, desklegs: 0.9 } },
+  head:      { INTRODUCTION: 1.099, CUSTOM: 1.141 },
+  traylabel: { CART: 1.055 },
+  option:    { 'product consulting': 0.977, 'order & delivery': 1.003, 'warranty & repair': 0.997 },
+  door:      { 'fill out form': 2.455 },
+  glyph:     { 'bs-sound': 1.284, 'bs-cart': 0.768, 'bs-account': 0.858, 'corner-back': 0.927,   // the 4-pass chain; the › chevron's two states live in the CSS
+               'Sign in': 0.728, 'Account details': 0.681, 'Order lookup': 0.675 }                 // the account tray icons, by their item's aria-label
 };
 var BLOOM_SCOPE = [
   ['.bs-item', function(el){ return document.body.getAttribute('data-bs-page') === 'home' ? 'menuHome' : 'menu'; }],
