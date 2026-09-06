@@ -955,30 +955,30 @@ function setLang(code){
    them per string. Strings not in the table keep the surface default
    (a locale swap re-runs the harness; the runtime canvas solver is the
    next step once calibrated). Re-runs at every STR render. */
-var BLOOM = {
-  // re-solved Sept 3 after THE TYPE PASS: the reference `desk` is now a 12 rung — lit 50.6 / rest 15.0 (reports/harness/2026-09-03/resolve_all.json)
-  menu:      { 300: { desk: 1.963, module: 2, keyboard: 1.824, mouse: 2.032, light: 1.909, powerbank: 1.827, watercup: 1.876, headset: 1.817, speakers: 1.726,
-                      'CONTACT US': 1.83, FAQ: 1.823, WARRANTY: 1.532, 'RETURN & REFUND POLICY': 1.644, 'PRODUCT GUIDES': 1.705, 'BUSINESS REQUEST': 1.545 },   // TYPE 1 hover (Eric, Sept 5): glow at Light — solved live
-               600: { desk: 1.0, module: 0.962, keyboard: 0.927, mouse: 1.001, light: 0.989, powerbank: 0.906, watercup: 0.94, headset: 0.906, speakers: 0.93,
-                      'CONTACT US': 0.871, FAQ: 0.893, WARRANTY: 0.784, 'RETURN & REFUND POLICY': 0.796, 'PRODUCT GUIDES': 0.804, 'BUSINESS REQUEST': 0.753 } },  // TYPE 1 selected: the standing glow at SemiBold
-  menuHome:  { HARDWARE: 0.753, SOFTWARE: 0.802, COMMUNITY: 0.819, SUPPORT: 0.834 },
-  capsule:   { 300: { HARDWARE: 1.486, SOFTWARE: 1.574, COMMUNITY: 1.606, SUPPORT: 1.679 },   // TYPE 2 hover (Eric, Sept 5): glow at Light — solved live
-               600: { HARDWARE: 0.75, SOFTWARE: 0.801, COMMUNITY: 0.811, SUPPORT: 0.812 } },   // TYPE 2 selected: the current page's standing glow (HARDWARE 1.001 · SUPPORT .987 in place)
-  social:    { Instagram: 1.573, YouTube: 1.814, TikTok: 1.852, X: 3.13, Discord: 1.739, Facebook: 1.64 },
-  lang:      { EN: 2.774, ZH: 3.017, JA: 3.54, ES: 2.946, FR: 2.891 },                          // 10 WideLight (8×icons)
-  // weight-keyed: a sub-item is Wide 300 at rest and 600 when focused OR selected (the type pass) — the 600 column is the live one
-  hwopt:     { 300: { compact: 2.278, standard: 2.1, wide: 2.217, studio: 2.259, 'stainless steel': 2.073, 'aluminum alloy': 2.269, 'walnut wood': 2.183, brushed: 2.147, PVD: 2.418, 'powder-coated': 2.036, 'metallic silver': 2.193, 'black & white': 2.1, red: 2.436, orange: 2.036, yellow: 2.225, green: 2.041 },
-               600: { compact: 1.116, standard: 1.06, wide: 1.16, studio: 1.142, 'stainless steel': 1.065, 'aluminum alloy': 1.119, 'walnut wood': 1.094, brushed: 1.109, PVD: 1.19, 'powder-coated': 1.025, 'metallic silver': 1.137, 'black & white': 1.069, red: 1.31, orange: 1.069, yellow: 1.146, green: 1.1 } },   // the customization options (Sept 5): FOCUSED = 300, CHOSEN = 600 — every string solved LIVE on the shipped page (over the window's plate)
-  sub:       { 300: { overview: 1.923, 'industrial design': 1.829, specifications: 1.845, ecosystem: 1.813, support: 1.925, size: 2.263, desktop: 1.75, desklegs: 1.64 },
-               600: { overview: 0.988, 'industrial design': 0.905, specifications: 0.915, ecosystem: 0.919, support: 0.957, size: 1.16, desktop: 0.908, desklegs: 0.9 } },
-  head:      { INTRODUCTION: 0.871, CUSTOM: 0.887 },   // the heads at 14 (Eric, Sept 5) — solved in the shipped state
-  traylabel: { 300: { CART: 2.434 }, 600: { CART: 1.055 } },   // collapsed WideLight / expanded SemiBold (Eric, Sept 5; the 300 solved in the shipped state)
-  platetitle: { 300: {}, 600: {} },   // the entry plates carry lorem placeholders — the CSS defaults stand (300 hover 2.29 · 600 open 1.09, the means of three plates solved live)
-  unit:      { 300: { CM: 3, IN: 3.493 }, 600: { CM: 1.557, IN: 1.835 } },   // the unit toggle, per string and weight — solved live over the plate (Sept 5)
-  option:    { 'product consulting': 0.977, 'order & delivery': 1.003, 'warranty & repair': 0.997 },
-  door:      { 'fill out form': 2.455 },
+var BLOOM = {   // every value re-solved LIVE under THE GLOW IS D (Eric, Sept 7): the 0-3px band = the house 50.56 at the frame, dpr 2; 300 = the hover column, 600 = the selected standing glow
+  menu:      { 300: { module: 1.7, keyboard: 1.55, mouse: 1.7, light: 1.7, powerbank: 1.521, watercup: 1.554, headset: 1.506, speakers: 1.498, desk: 1.633, FAQ: 1.552, WARRANTY: 1.36, 'RETURN & REFUND POLICY': 1.5, 'PRODUCT GUIDES': 1.5, 'BUSINESS REQUEST': 1.386, 'CONTACT US': 1.605 },
+          600: { desk: 0.874, module: 0.846, keyboard: 0.82, mouse: 0.867, light: 0.866, powerbank: 0.819, watercup: 0.827, headset: 0.824, speakers: 0.819, 'CONTACT US': 0.77, FAQ: 0.769, WARRANTY: 0.722, 'RETURN & REFUND POLICY': 0.738, 'PRODUCT GUIDES': 0.728, 'BUSINESS REQUEST': 0.7 } },
+  menuHome:  { HARDWARE: 0.7, SOFTWARE: 0.714, COMMUNITY: 0.73, SUPPORT: 0.734 },   // /home's special menu, 600 at rest
+  capsule:   { 300: { SOFTWARE: 1.4, COMMUNITY: 1.437, SUPPORT: 1.451, HARDWARE: 1.305 },
+             600: { HARDWARE: 0.689, SUPPORT: 0.735, SOFTWARE: 0.711, COMMUNITY: 0.725 } },
+  social:    { Instagram: 1.369, YouTube: 1.565, TikTok: 1.697, X: 2.457, Discord: 1.5, Facebook: 1.44 },   // /community, Light
+  lang:      { EN: 2.22, ZH: 2.506, JA: 2.7, ES: 2.381, FR: 2.411 },   // the language head + rows, 8×icons WideLight
+  sub:       { 300: { overview: 1.653, 'industrial design': 1.631, specifications: 1.61, ecosystem: 1.542, support: 1.7, size: 1.757, desktop: 1.497, desklegs: 1.449 },
+         600: { overview: 0.85, 'industrial design': 0.836, specifications: 0.806, ecosystem: 0.813, support: 0.85, size: 0.918, desktop: 0.825, desklegs: 0.799 } },   // /hardware's product children; /support's lorem children carry the CSS defaults
+  head:      { INTRODUCTION: 0.779, CUSTOM: 0.784 },   // INTRODUCTION / CUSTOM at 14, 600
+  traylabel: { 300: { CART: 2.211 },
+               600: { CART: 0.917 } },   // CART: collapsed Light / expanded SemiBold
+  option:    { 'product consulting': 0.869, 'order & delivery': 0.9, 'warranty & repair': 0.9, 'returns & refunds': 0.9, 'business & wholesale': 0.865 },   // /support's window options
+  door:      { 'fill out form': 2.354 },   // the form door's label
+  plate:     { 'support@pressbackspace.com': 1.925 },   // the support address plate
+  crumb:     { CHECKOUT: 1.8 },   // /cart's away crumb
   glyph:     { 'bs-sound': 1.284, 'bs-cart': 0.768, 'bs-account': 0.858, 'corner-back': 0.927,   // the 4-pass chain; the › chevron's two states live in the CSS
-               'Sign in': 0.728, 'Account details': 0.681, 'Order lookup': 0.675 }                 // the account tray icons, by their item's aria-label
+               'Sign in': 0.728, 'Account details': 0.681, 'Order lookup': 0.675 },   // the glyphs' filter chain — the BAKE's source (assets/ui/glyph-lit); not applied at runtime
+  hwopt:     { 300: { compact: 1.878, wide: 1.909, studio: 1.903, 'aluminum alloy': 1.969, 'walnut wood': 1.854, PVD: 2.049, 'powder-coated': 1.754, 'metallic silver': 1.893, red: 2.048, orange: 1.739, yellow: 1.875, green: 1.739, standard: 1.802, 'stainless steel': 1.795, brushed: 1.9, 'black & white': 1.9 },
+           600: { compact: 0.95, standard: 0.916, wide: 0.985, studio: 0.95, 'stainless steel': 0.917, 'aluminum alloy': 0.95, 'walnut wood': 0.931, brushed: 0.926, PVD: 0.974, 'powder-coated': 0.9, 'metallic silver': 0.95, 'black & white': 0.933, red: 1.068, orange: 0.915, yellow: 0.95, green: 0.936 } },   // the customization options, per string
+  platetitle: { 300: {}, 600: {} },   // lorem placeholders — the CSS defaults stand
+  unit:      { 300: { IN: 3.162, CM: 2.579 },
+          600: { CM: 1.281, IN: 1.515 } }   // the unit toggle
 };
 var BLOOM_SCOPE = [
   ['.bs-item', function(el){ return document.body.getAttribute('data-bs-page') === 'home' ? 'menuHome' : 'menu'; }],

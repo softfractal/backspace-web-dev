@@ -245,7 +245,7 @@
     text-align: right; white-space: nowrap;
     /* HOTNESS LAW: no resting glow (hoverable); lit on the one ring set,
        intensity 1.052 (the harness's median for the two heads). */
-    --bloom-g: .88;   /* re-solved on the 14 rung in the shipped state (INTRODUCTION .871 · CUSTOM .887 per string in BLOOM) */
+    --bloom-g: 0.782;   /* re-solved on the 14 rung in the shipped state (INTRODUCTION .871 · CUSTOM .887 per string in BLOOM) */
     cursor: var(--cursor-target);
     transition: none;
   }
@@ -448,11 +448,11 @@
     letter-spacing: 0;
     /* HOTNESS LAW: no resting glow (hoverable); the LIT ring set on hover,
        intensity 2.359 (small 300-weight rows need two pastes). */
-    --bloom-g: 2.19;   /* THE CHILDREN LAW (Eric, Sept 5): the focused option stays 300 and only glows — the default is the MEAN of all sixteen option strings solved LIVE over the window's plate (2.04–2.44); each string carries its own value from BLOOM.hwopt[300] */
+    --bloom-g: 1.875;   /* THE CHILDREN LAW (Eric, Sept 5): the focused option stays 300 and only glows — the default is the MEAN of all sixteen option strings solved LIVE over the window's plate (2.04–2.44); each string carries its own value from BLOOM.hwopt[300] */
     cursor: var(--cursor-target);
     transition: none;
   }
-  .hw-opt.is-chosen { --bloom-g: 1.12; }   /* the CHOSEN option (600 + standing glow): the mean of all sixteen strings solved LIVE over the window's plate (1.03–1.32); per string from BLOOM.hwopt[600]. ON THE OPT, not the row — the material and finish options have no row, and at the row-only rule they sat at the 300 value: 1.6–1.7× the reference with a wider halo (Eric's eye, Sept 5) */
+  .hw-opt.is-chosen { --bloom-g: 0.947; }   /* the CHOSEN option (600 + standing glow): the mean of all sixteen strings solved LIVE over the window's plate (1.03–1.32); per string from BLOOM.hwopt[600]. ON THE OPT, not the row — the material and finish options have no row, and at the row-only rule they sat at the 300 value: 1.6–1.7× the reference with a wider halo (Eric's eye, Sept 5) */
   .hw-opt.kb-hover, .hw-opt:hover, .hw-opt:focus-visible {
     color: #fff; outline: none;   /* glow only — bold is the CHOSEN option's mark (Aug 28 law, restated Sept 5) */
     text-shadow: var(--bloom-lit);
@@ -574,9 +574,9 @@
     cursor: var(--cursor-target);
     transition: none;
   }
-  .hw-unit button { --bloom-g: 3; }               /* the hover default (Light); per string + weight in BLOOM.unit (Sept 5) */
+  .hw-unit button { --bloom-g: 2.87; }               /* the hover default (Light); per string + weight in BLOOM.unit (Sept 5) */
   .hw-unit button:hover, .hw-unit button:focus-visible, .hw-unit button.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }   /* wired to the one focus variable too (the pass) */   /* glow only — bold is the LIVE unit's mark */
-  .hw-unit button.is-live { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); --bloom-g: 1.557; }   /* the live default (SemiBold); per string in BLOOM.unit */
+  .hw-unit button.is-live { color: #fff; font-weight: 600; text-shadow: var(--bloom-lit); --bloom-g: 1.398; }   /* the live default (SemiBold); per string in BLOOM.unit */
   .hw-unit .hw-unit-slash { color: var(--bs-label); font-size: calc(10px * var(--ui-scale)); }   /* rides the toggle's rung */
   /* THE PILL FIELDS (Eric, Aug 28 fourth word, p2: "size dimension
      inputs happen within a pill") — the design team's capsule: hairline
@@ -875,7 +875,7 @@
     font-family: var(--font-ui); font-weight: 300;   /* collapsed: WideLight (Eric, Sept 5); expanded: 600 below */
     font-size: calc(12px * var(--ui-scale));   /* THE TYPE PASS: the cart button is their 12 */
     letter-spacing: .08em;
-    --bloom-g: 1.055;   /* HOTNESS LAW: no resting glow (hoverable); lit intensity re-solved on the 12 rung */
+    --bloom-g: 2.211;   /* HOTNESS LAW: no resting glow (hoverable); lit intensity re-solved on the 12 rung */
     cursor: var(--cursor-target);
     transition: translate var(--pop-duration) var(--expand-curve) var(--hw-cart-delay, 0s), font-weight 0s var(--hw-cart-delay, 0s);   /* the weight snaps as the travel begins */
   }

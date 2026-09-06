@@ -34,8 +34,8 @@
 /* ── Tokens — ported from the demo stylesheet ──────────────────────────── */
 :root {
   --bg:               #040402;
-  --ink:              #fefefe;
-  --text-soft:        #fefefed1;   /* menu items at rest */
+  --ink:              #fff;   /* ONE WHITE (Eric, Sept 7): the Figma carries one rgb for every text — weight and glow are the only state */
+  --text-soft:        #fff;   /* was #fefefe at 82% — the resting text is full white now (Eric, Sept 7) */
   --mid:              #b8b8ba;     /* urban fog */
   --color-signal-red: #9d1f00;
   --panel-line:       #fefefe42;
@@ -79,7 +79,6 @@
      ═══════════════════════════════════════════════════════════════ */
   /* The HOME MENU's interactive recipe (Aug 20): resting glow + two
      wider, softer halos. The icon bars use the pair below instead. */
-  --glow-text-hover:  0 0 9.6px rgba(255,255,255,0.92), 0 0 24px rgba(255,255,255,0.5), 0 0 46px rgba(255,255,255,0.28);
   /* THE PLATE BLOOM (Eric, Aug 31) — the filled pill's two-rung hover
      halo, tokenized so the fold is one edit. PROVISIONAL member of the
      glow family: the 12/30×ui rungs were ruled by eye against the +
@@ -102,7 +101,6 @@
      alpha to move total light; re-measure both glyphs against the
      anchor; never touch reach without a reach ruling. */
   --glow-icon-hover:  brightness(2) drop-shadow(0 0 3px rgba(255,255,255,1)) drop-shadow(0 0 4px rgba(255,255,255,0.9)) drop-shadow(0 0 7px rgba(255,255,255,0.82)) drop-shadow(0 0 12px rgba(255,255,255,0.18)) drop-shadow(0 0 20px rgba(255,255,255,0.03));
-  --glow-text-icons:  0 0 9.6px rgba(255,255,255,1), 0 0 9.6px rgba(255,255,255,1), 0 0 24px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.95), 0 0 48px rgba(255,255,255,0.75), 0 0 48px rgba(255,255,255,0.75), 0 0 96px rgba(255,255,255,0.5), 0 0 184px rgba(255,255,255,0.3);
   /* ══════════════ 6. THE HOTNESS LAW (Eric, Sept 2-3, 2026) ══════════════
      Supersedes the whole-word normalization (rule 6 in equation form,
      Aug 23) and its fitted curves. Eric's word: "make all bloom items
@@ -305,7 +303,7 @@
   --bs-rule-below: calc(8px  * var(--ui-scale));
   --bs-fld-above:  calc(7px  * var(--ui-scale));
   --bs-fld-below:  calc(4px  * var(--ui-scale));
-  --bs-label: #ffffff94;
+  --bs-label: #fff;   /* ONE WHITE (Sept 7) — labels too */
   /* Witness layout anchors (scene-layer vars, lvw/lvh → vw/vh per the
      certified port convention): */
   --edge-x: max(clamp(34px, 3.8vw, 68px), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
@@ -314,7 +312,7 @@
      Value below is READ FROM THE WITNESS (away nav .is-active: full-white
      ink, weight 600, dot explicitly struck). Eric's one-line ruling
      re-skins the committed rung here and nowhere else. */
-  --committed-ink: #fefefe;
+  --committed-ink: #fff;
 }
 
 /* THE HOTNESS LAW's tokens — declared on EVERY element (declaration-site
@@ -325,16 +323,19 @@
    surfaces; filter: var(--bloom-icon) on glyph icons (the glyph-side
    derivation of the same law: its passes scale by the same g). */
 body * {
+  /* THE GLOW IS D (Eric, Sept 7, chosen on the lab against five sets at
+     equal hotness): a 6px CORE and a single 16px ring; only the core is
+     pasted (copies at g−1, g−2, g−3) — the wide ring never stacks, so
+     neighbouring letters no longer merge into a slab. Five layers, the
+     widest 16px: the raster cost that stalled the pointer is gone with
+     the 46px ring. The 0-3px hotness is the same house number as before
+     (50.56 at the frame, dpr 2); every --bloom-g was re-solved live. */
   --bloom-lit:
-    0 0 9.6px rgb(255 255 255 / calc(min(.92, .92 * var(--bloom-g, 1)))),
-    0 0 24px  rgb(255 255 255 / calc(min(.5,  .5  * var(--bloom-g, 1)))),
-    0 0 46px  rgb(255 255 255 / calc(min(.28, .28 * var(--bloom-g, 1)))),
-    0 0 9.6px rgb(255 255 255 / calc(clamp(0, .92 * (var(--bloom-g, 1) - 1), .92))),
-    0 0 24px  rgb(255 255 255 / calc(clamp(0, .5  * (var(--bloom-g, 1) - 1), .5))),
-    0 0 9.6px rgb(255 255 255 / calc(clamp(0, .92 * (var(--bloom-g, 1) - 2), .92))),
-    0 0 24px  rgb(255 255 255 / calc(clamp(0, .5  * (var(--bloom-g, 1) - 2), .5))),
-    0 0 9.6px rgb(255 255 255 / calc(clamp(0, .92 * (var(--bloom-g, 1) - 3), .92))),
-    0 0 24px  rgb(255 255 255 / calc(clamp(0, .5  * (var(--bloom-g, 1) - 3), .5)));
+    0 0 6px  rgb(255 255 255 / calc(min(.92, .92 * var(--bloom-g, 1)))),
+    0 0 16px rgb(255 255 255 / calc(min(.5,  .5  * var(--bloom-g, 1)))),
+    0 0 6px  rgb(255 255 255 / calc(clamp(0, .92 * (var(--bloom-g, 1) - 1), .92))),
+    0 0 6px  rgb(255 255 255 / calc(clamp(0, .92 * (var(--bloom-g, 1) - 2), .92))),
+    0 0 6px  rgb(255 255 255 / calc(clamp(0, .92 * (var(--bloom-g, 1) - 3), .92)));
   --bloom-rest: 0 0 9.6px rgb(255 255 255 / calc(min(.58, .58 * var(--bloom-g-rest, 1))));
   /* Glyphs: FOUR serial passes (3 / 4 / 7 / 12px), alphas scaled by g and
      capped at 1. Measured Sept 3 (Chrome tracing, the sound glyph toggled
@@ -355,14 +356,14 @@ body * {
 /* Per-surface intensity defaults (the harness's medians, Sept 3); the
    machine's BLOOM table refines them per string (normalizeBloom). */
 /* re-solved Sept 3 after THE TYPE PASS (reference desk: 12 rung, lit 50.6 / rest 15.0) */
-.bs-item { --bloom-g: .93; }
-body[data-bs-page="home"] .bs-item, body[data-bs-page="support"] .bs-item { --bloom-g: .8; }
-.site-primary-nav__link { --bloom-g: 1.62; }      /* TYPE 2: the hover (Light) mean; per string + weight in BLOOM.capsule */
-.bs-tray-item, #bs-lang { --bloom-g: 3.0; }        /* 10 WideLight */
-.bs-subitem { --bloom-g: 1.89; }                    /* THE CHILDREN LAW: a FOCUSED child stays 300 and only glows — this is the 300 value (solved on /support's children; /hardware's per string in BLOOM). Selected = 600, its own value below. */
-.bs-plate-title { --bloom-g: 2.29; }                /* TYPE 2 hover at Light: the mean of three plates solved live (2.19–2.38); lorem strings, so the default stands */
-.bs-plate.is-open .bs-plate-title { --bloom-g: 1.09; }   /* TYPE 2 open, SemiBold, standing: the mean solved live (1.05–1.15) */
-.bs-option { --bloom-g: .99; }
+.bs-item { --bloom-g: 0.799; }
+body[data-bs-page="home"] .bs-item, body[data-bs-page="support"] .bs-item { --bloom-g: 0.72; }
+.site-primary-nav__link { --bloom-g: 1.398; }      /* TYPE 2: the hover (Light) mean; per string + weight in BLOOM.capsule */
+.bs-tray-item, #bs-lang { --bloom-g: 2.444; }        /* 10 WideLight */
+.bs-subitem { --bloom-g: 1.659; }                    /* THE CHILDREN LAW: a FOCUSED child stays 300 and only glows — this is the 300 value (solved on /support's children; /hardware's per string in BLOOM). Selected = 600, its own value below. */
+.bs-plate-title { --bloom-g: 2.065; }                /* TYPE 2 hover at Light: the mean of three plates solved live (2.19–2.38); lorem strings, so the default stands */
+.bs-plate.is-open .bs-plate-title { --bloom-g: 0.927; }   /* TYPE 2 open, SemiBold, standing: the mean solved live (1.05–1.15) */
+.bs-option { --bloom-g: 0.887; }
 .bs-round img, .bs-head img, .site-round-button svg { --bloom-g: 1; }   /* per glyph via the BLOOM table (sound 2.57 · cart .84 · account .93 · ‹ 1.01) */
 /* Custom properties INHERIT: a glyph inside a text surface would take the
    text's g (the account tray's icons read 2.6× at the tray words' 2.547 —
@@ -507,7 +508,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   border: 0.3px solid var(--ink);
   box-shadow: 0 0 calc(15px * var(--icons-scale)) calc(1px * var(--icons-scale)) rgba(255,255,255,0.14);
   display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,0.94); background: rgba(0,0,0,0.04);   /* demo resolved rest values */
+  color: #fff; background: rgba(0,0,0,0.04);   /* demo resolved rest values; ONE WHITE (Sept 7) */
   cursor: var(--cursor-target);
   transition: none;
   position: relative;
@@ -549,7 +550,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .bs-head {
   width: calc(35px * var(--icons-scale)); height: calc(35px * var(--icons-scale));
   display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,0.94); background: transparent; border: 0; padding: 0;
+  color: #fff; background: transparent; border: 0; padding: 0;   /* ONE WHITE (Sept 7) */
   /* THE TYPE PASS (Eric, Sept 3, from the Figma): the language text is their
      10 WideLight — on the cluster's basis, 8px×icons (= 10px×ui at every
      scale); supersedes the Aug 22 Sans-Light reading. line-height 1 for
@@ -771,7 +772,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   z-index: 24;
   display: flex; align-items: flex-start;   /* the cluster's common top line */
   gap: calc(6.4px * var(--icons-scale));   /* 6.4 gap + 2×8.8 pads = the cluster's 24 between circles */
-  color: rgba(255,255,255,0.94);
+  color: #fff;   /* ONE WHITE (Sept 7) */
   view-transition-name: bs-nav;   /* the same nav, away iteration */
 }
 /* The round control ring — the utility circle spec (35px × icons-scale,
@@ -1141,7 +1142,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 /* THE EMISSION AREA (Eric, Sept 3): the inner list's overflow clip exists
    for the 0fr→1fr travel only. Once the open transition has ended the
    machine marks the wrap .is-settled and the clip is released, so the lit
-   glow (46px reach) is no longer cut flush at the rail and 6-13px above
+   glow (16px reach under D) is no longer cut flush at the rail and 6-13px above
    and below the list (measured: desklegs' hard edge). Closing removes
    .is-settled before the collapse starts (bindSublistClip in the js). */
 .bs-sublist-wrap.is-on.is-settled .bs-sublist { overflow: visible; }
@@ -1179,20 +1180,20 @@ a#bs-wordmark-link:focus-visible { outline: none; }
      growing shadows per frame across a swept list). */
   transition: none;
 }
-/* HOTNESS LAW: the sub-item lights on the one ring set (46px max — the
+/* HOTNESS LAW: the sub-item lights on the one ring set (16px max under D — the
    swept-surface perf rider is satisfied by construction; the 184px ring
    is gone house-wide). Intensity ≈1.96 (two copies of the tight rings)
    for the 300-weight rows; per string via the BLOOM table. */
 .bs-subitem.kb-hover, .bs-subitem:focus-visible {
   color: #fff; outline: none;   /* THE CHILDREN LAW (Eric, Sept 5): a focused child ONLY GLOWS — its weight stays 300; bold is the SELECTED child's mark ("I confused focused with selected") */
-  text-shadow: var(--bloom-lit);   /* THE HOTNESS LAW — the 184px swept-surface trim is moot: the ring set tops out at 46px */
+  text-shadow: var(--bloom-lit);   /* THE HOTNESS LAW — the 184px swept-surface trim is moot: the ring set tops out at 16px */
 }
 .bs-subitem.is-chosen { color: #fff; font-weight: 600; }   /* THE CHILDREN LAW: selected = glow AND bold */
 /* HOTNESS LAW (Eric, Sept 3): a SELECTED sub-item keeps its glow, like the
    selected class item; bold ink is denser, so the selected state carries
    its own solved intensity (the BLOOM table's 600 column; default .93). */
 .bs-subitem.is-chosen, .bs-subitem.is-live { text-shadow: var(--bloom-lit); }
-.bs-subitem.is-chosen, .bs-subitem.is-live { --bloom-g: .93; }   /* the 600 column (the selected child) */
+.bs-subitem.is-chosen, .bs-subitem.is-live { --bloom-g: 0.83; }   /* the 600 column (the selected child) */
 /* THE HOLLOW RING (vocabulary member three) NO LONGER MARKS A CHOSEN
    SUB-ITEM — THE TYPE PASS (Eric, Sept 3): "remove the outline dots from
    the focused state of the children menu items; glow itself is enough".
