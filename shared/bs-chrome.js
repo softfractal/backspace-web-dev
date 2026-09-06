@@ -972,8 +972,7 @@ var BLOOM = {   // every value re-solved LIVE under THE GLOW IS D (Eric, Sept 7)
   door:      { 'fill out form': 2.354 },   // the form door's label
   plate:     { 'support@pressbackspace.com': 1.925 },   // the support address plate
   crumb:     { CHECKOUT: 1.8 },   // /cart's away crumb
-  glyph:     { 'bs-sound': 1.284, 'bs-cart': 0.768, 'bs-account': 0.858, 'corner-back': 0.927,   // the 4-pass chain; the › chevron's two states live in the CSS
-               'Sign in': 0.728, 'Account details': 0.681, 'Order lookup': 0.675 },   // the glyphs' filter chain — the BAKE's source (assets/ui/glyph-lit); not applied at runtime
+  glyph:     { 'corner-back': 0.843, 'corner-fwd-closed': 0.905, 'bs-sound': 0.93, 'bs-cart': 0.709, 'bs-account': 0.692, 'Sign in': 0.68, 'Account details': 0.639, 'Order lookup': 0.572 },   // the glyphs' filter chain — the BAKE's source (tools/glyph-bake → assets/ui/glyph-lit; each g solved so the SPRITE reads the house number in the page); not applied at runtime
   hwopt:     { 300: { compact: 1.878, wide: 1.909, studio: 1.903, 'aluminum alloy': 1.969, 'walnut wood': 1.854, PVD: 2.049, 'powder-coated': 1.754, 'metallic silver': 1.893, red: 2.048, orange: 1.739, yellow: 1.875, green: 1.739, standard: 1.802, 'stainless steel': 1.795, brushed: 1.9, 'black & white': 1.9 },
            600: { compact: 0.95, standard: 0.916, wide: 0.985, studio: 0.95, 'stainless steel': 0.917, 'aluminum alloy': 0.95, 'walnut wood': 0.931, brushed: 0.926, PVD: 0.974, 'powder-coated': 0.9, 'metallic silver': 0.95, 'black & white': 0.933, red: 1.068, orange: 0.915, yellow: 0.95, green: 0.936 } },   // the customization options, per string
   platetitle: { 300: {}, 600: {} },   // lorem placeholders — the CSS defaults stand
@@ -984,7 +983,7 @@ var BLOOM_SCOPE = [
   ['.bs-item', function(el){ return document.body.getAttribute('data-bs-page') === 'home' ? 'menuHome' : 'menu'; }],
   ['.site-primary-nav__link', 'capsule'], ['.bs-social-link', 'social'], ['.bs-tray-item, #bs-lang', 'lang'],
   ['.bs-subitem', 'sub'], ['.hw-head', 'head'], ['.hw-tray-label', 'traylabel'],
-  ['.bs-option', 'option'], ['.sup-door-label', 'door'], ['.ct-crumb-btn', 'crumb'], ['.hw-opt', 'hwopt'], ['.bs-plate-title', 'platetitle'], ['.hw-unit button', 'unit']
+  ['.bs-option', 'option'], ['.sup-door-label', 'door'], ['.ct-crumb-btn', 'crumb'], ['.hw-opt', 'hwopt'], ['.bs-plate-title', 'platetitle'], ['.hw-unit button', 'unit'], ['.sup-plate', 'plate']
 ];
 function bloomOne(el, surface){
   if (el.querySelector('img')) return;                            // glyph heads are handled by id below
@@ -1010,6 +1009,26 @@ function normalizeBloom(){
    on demand) are covered by the observer: any childList mutation
    re-runs the pass, debounced. Writing --bloom-g is an attribute
    mutation, not childList, so the observer cannot feed itself. */
+
+/* THE LIT GLYPH IS A SPRITE (Eric, Sept 7) — see the css banner. The
+   manifest is the bake's (tools/glyph-bake/bake_glyphs.js): per glyph its
+   selector, css box and halo margin; the sprite is (box + 2·margin) wide
+   and sits centred on the glyph, placed from the rects (an svg has no
+   offsetWidth), sub-pixel. Re-bake whenever a glyph's --bloom-g or the
+   filter chain changes. */
+var GLYPH_SPRITES = {"corner-back": {"sel": ".site-round-button svg", "w": 25.88, "h": 25.88, "margin": 22, "file": "assets/ui/glyph-lit/corner-back-lit.png"}, "corner-fwd": {"sel": ".site-primary-nav__forward-button svg", "w": 25.88, "h": 25.88, "margin": 22, "file": "assets/ui/glyph-lit/corner-fwd-lit.png"}, "bs-sound": {"sel": "#bs-sound img", "w": 25.88, "h": 25.88, "margin": 22, "file": "assets/ui/glyph-lit/bs-sound-lit.png"}, "bs-cart": {"sel": "#bs-cart img", "w": 22.5, "h": 22.5, "margin": 22, "file": "assets/ui/glyph-lit/bs-cart-lit.png"}, "bs-account": {"sel": "#bs-account img", "w": 25.88, "h": 25.88, "margin": 22, "file": "assets/ui/glyph-lit/bs-account-lit.png"}, "acct-signin": {"sel": "#bs-acct-signin img", "w": 25.88, "h": 25.88, "margin": 22, "file": "assets/ui/glyph-lit/acct-signin-lit.png"}, "acct-details": {"sel": "#bs-acct-details img", "w": 25.88, "h": 25.88, "margin": 22, "file": "assets/ui/glyph-lit/acct-details-lit.png"}, "acct-orders": {"sel": "#bs-acct-orders img", "w": 25.88, "h": 25.88, "margin": 22, "file": "assets/ui/glyph-lit/acct-orders-lit.png"}};
+function mountGlyphSprites(){
+  Object.keys(GLYPH_SPRITES).forEach(function(id){
+    var m = GLYPH_SPRITES[id]; var el = document.querySelector(m.sel); if (!el || el.parentElement.querySelector('img.bs-lit')) return;
+    var host = el.parentElement; var img = document.createElement('img');
+    img.className = 'bs-lit'; img.src = m.file; img.alt = ''; img.setAttribute('aria-hidden', 'true');
+    function place(){
+      var gr = el.getBoundingClientRect(), hr = host.getBoundingClientRect(); var w = gr.width || m.w, h = gr.height || m.h, s = w / m.w;
+      img.style.width = (w + 2 * m.margin * s) + 'px'; img.style.height = (h + 2 * m.margin * s) + 'px';
+      img.style.left = (gr.left - hr.left - host.clientLeft - m.margin * s) + 'px'; img.style.top = (gr.top - hr.top - host.clientTop - m.margin * s) + 'px'; }
+    host.appendChild(img); place(); window.addEventListener('resize', place);
+  });
+}
 function normalizeWordGlow(){ normalizeBloom(); }
 var _bloomT = null;
 function watchBloom(){
@@ -1216,6 +1235,7 @@ function init(config){
 
   setScale();
   normalizeBloom();      // THE HOTNESS LAW — boot pass (page markup is live by now)
+  mountGlyphSprites();   // THE LIT GLYPH IS A SPRITE (Sept 7) — after the cluster and the corner exist
   watchBloom();          // …and every later render (panels, trays, sub-lists); class changes re-solve the element (selected = 600)
   bindSublistClip();     // the accordion clip is for the travel only (the emission area, Sept 3)
   bootDomCursor();       // the page-rendered cursor (see the CSS block's law comment)

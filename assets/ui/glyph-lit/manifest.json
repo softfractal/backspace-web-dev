@@ -1,0 +1,74 @@
+{
+ "corner-back": {
+  "sel": ".site-round-button svg",
+  "w": 25.88,
+  "h": 25.88,
+  "margin": 22,
+  "g": 0.843,
+  "file": "assets/ui/glyph-lit/corner-back-lit.png",
+  "bytes": 4047
+ },
+ "corner-fwd": {
+  "sel": ".site-primary-nav__forward-button svg",
+  "w": 25.88,
+  "h": 25.88,
+  "margin": 22,
+  "g": 0.905,
+  "file": "assets/ui/glyph-lit/corner-fwd-lit.png",
+  "bytes": 3325
+ },
+ "bs-sound": {
+  "sel": "#bs-sound img",
+  "w": 25.88,
+  "h": 25.88,
+  "margin": 22,
+  "g": 0.93,
+  "file": "assets/ui/glyph-lit/bs-sound-lit.png",
+  "bytes": 3483
+ },
+ "bs-cart": {
+  "sel": "#bs-cart img",
+  "w": 22.5,
+  "h": 22.5,
+  "margin": 22,
+  "g": 0.709,
+  "file": "assets/ui/glyph-lit/bs-cart-lit.png",
+  "bytes": 3830
+ },
+ "bs-account": {
+  "sel": "#bs-account img",
+  "w": 25.88,
+  "h": 25.88,
+  "margin": 22,
+  "g": 0.692,
+  "file": "assets/ui/glyph-lit/bs-account-lit.png",
+  "bytes": 3514
+ },
+ "acct-signin": {
+  "sel": "#bs-acct-signin img",
+  "w": 25.88,
+  "h": 25.88,
+  "margin": 22,
+  "g": 0.68,
+  "file": "assets/ui/glyph-lit/acct-signin-lit.png",
+  "bytes": 4004
+ },
+ "acct-details": {
+  "sel": "#bs-acct-details img",
+  "w": 25.88,
+  "h": 25.88,
+  "margin": 22,
+  "g": 0.639,
+  "file": "assets/ui/glyph-lit/acct-details-lit.png",
+  "bytes": 3909
+ },
+ "acct-orders": {
+  "sel": "#bs-acct-orders img",
+  "w": 25.88,
+  "h": 25.88,
+  "margin": 22,
+  "g": 0.572,
+  "file": "assets/ui/glyph-lit/acct-orders-lit.png",
+  "bytes": 4026
+ }
+}

@@ -322,9 +322,7 @@
     background: var(--bs-marker-blue);           /* the choice fills */
     /* The fitted spread ladder at the blue's own hue (PROVISIONAL —
        parity with the warm marker's ladder; one line strikes it). */
-    box-shadow:
-      0 0 calc(9px  * var(--ui-scale))                              rgba(18, 82, 119, .85),
-      0 0 calc(32px * var(--ui-scale)) calc(3px  * var(--ui-scale)) rgba(18, 82, 119, .42);
+    box-shadow: 0 0 calc(9px * var(--ui-scale)) rgba(18, 82, 119, .85);   /* ONE RING (Eric, Sept 7) */
   }
   /* the red side: the class menu's outline-under-the-pointer ring is THE
      TYPE 1 rule now (shared/bs-chrome.css, THE STATE TYPES); /home's
@@ -1055,6 +1053,8 @@
     #hw-coming { left: 6vw; right: 6vw; }
     #hw-tray { display: none; }     /* six slots cannot fit a phone; mobile grammar is Eric's later design */
   }
+  /* PER-ITEM LAYERS (Sept 7): a hover re-rasters the word, not the panel */
+  .hw-opt, .hw-head, .hw-unit button, .hw-tray-label, #hw-class-head, .hw-sizedims { will-change: transform; }
 </style>
 </head>
 <body data-bs-page="hardware">

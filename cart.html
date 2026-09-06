@@ -440,7 +440,7 @@
     font-family: var(--font-sans); font-weight: 300;
     font-size: calc(13px * var(--ui-scale)); line-height: 1;
     cursor: var(--cursor-target);
-    transition: color .16s;
+    transition: none;   /* THE GLOW SNAPS (Sept 7) */
   }
   .ct-card-x:hover, .ct-card-x:focus-visible { color: #fff; outline: none; text-shadow: var(--bloom-lit); }   /* HOTNESS LAW (intensity default 1 — a single glyph, not yet on the harness) */
   .ct-step {
@@ -732,7 +732,7 @@
     font-size: calc(12px * var(--ui-scale));
     letter-spacing: .04em;
     cursor: var(--cursor-target);
-    transition: text-shadow .16s;
+    transition: none;   /* THE GLOW SNAPS (Sept 7) */
     z-index: 2;
   }
   .co-exp-head:hover, .co-exp-head:focus-visible {
@@ -872,6 +872,8 @@
     #ct-summary { left: 6vw; right: 6vw; top: 74vh; }
     .ct-rail, #ct-rule { display: none; }
   }
+  /* PER-ITEM LAYERS (Sept 7) */
+  .ct-crumb-btn { will-change: transform; }
 </style>
 </head>
 <body data-bs-page="cart" data-ct-state="cart">

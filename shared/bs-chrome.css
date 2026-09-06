@@ -284,10 +284,7 @@
      dot or the outline ring — three vocabularies by design (canon §7),
      four with the blue product dot (Eric ratified Aug 28, below). */
   --bs-marker-warm: #f2e7d5;
-  --bs-marker-warm-glow:
-    0 0 calc(9px  * var(--ui-scale))                              rgba(242, 231, 213, .85),
-    0 0 calc(32px * var(--ui-scale)) calc(3px  * var(--ui-scale)) rgba(242, 231, 213, .42),
-    0 0 calc(44px * var(--ui-scale)) calc(14px * var(--ui-scale)) rgba(242, 231, 213, .16);
+  --bs-marker-warm-glow: 0 0 calc(9px * var(--ui-scale)) rgba(242, 231, 213, .85);   /* ONE RING (Eric, Sept 7): the 32 / 44px rings retired with the glow's */
   --bs-dot-rest: .45;
   /* THE BLUE DOT — vocabulary member four: right/product-menu active
      (Eric, Aug 28: "the blue dot might appear elsewhere in other pages
@@ -364,7 +361,7 @@ body[data-bs-page="home"] .bs-item, body[data-bs-page="support"] .bs-item { --bl
 .bs-plate-title { --bloom-g: 2.065; }                /* TYPE 2 hover at Light: the mean of three plates solved live (2.19–2.38); lorem strings, so the default stands */
 .bs-plate.is-open .bs-plate-title { --bloom-g: 0.927; }   /* TYPE 2 open, SemiBold, standing: the mean solved live (1.05–1.15) */
 .bs-option { --bloom-g: 0.887; }
-.bs-round img, .bs-head img, .site-round-button svg { --bloom-g: 1; }   /* per glyph via the BLOOM table (sound 2.57 · cart .84 · account .93 · ‹ 1.01) */
+.bs-round img, .bs-head img, .site-round-button svg { --bloom-g: 1; }   /* per glyph via BLOOM.glyph — the BAKE's source; the sprites carry the result */
 /* Custom properties INHERIT: a glyph inside a text surface would take the
    text's g (the account tray's icons read 2.6× at the tray words' 2.547 —
    Eric, Sept 3). Every glyph declares its own. */
@@ -476,7 +473,7 @@ a#bs-wordmark-link { display: contents; }
    one page name as each section lands (community: Aug 23). */
 body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"], [data-bs-page="cart"]) #bs-wordmark {
   pointer-events: auto; cursor: var(--cursor-target);
-  transition: filter .2s;
+  transition: none;   /* no runtime filter remains (Sept 7) */
 }
 body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"], [data-bs-page="cart"]) a#bs-wordmark-link:hover #bs-wordmark,
 body:is([data-bs-page="software"], [data-bs-page="community"], [data-bs-page="support"], [data-bs-page="hardware"], [data-bs-page="cart"]) a#bs-wordmark-link:focus-visible #bs-wordmark {
@@ -575,7 +572,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   /* Hover-glow rule (Eric): EXPANDABLE controls glow on their SUB items
      only (the heads just lift color); a NON-expandable control — the
      cart — glows itself. */
-  .bs-round:hover img { filter: var(--bloom-icon); }
+  .bs-round:hover img.bs-lit { opacity: 1; }   .bs-round:hover img:not(.bs-lit) { opacity: 0; }
 }
 /* Keyboard twins of the hover state: the native Tab cursor, and the
    A/D icon-bar cursor (.kb-hover — same class the menu rail uses).
@@ -584,19 +581,20 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    heads via the filter chain. */
 .bs-round:focus-visible, .bs-head:focus-visible,
 .bs-round.kb-hover, .bs-head.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
-.bs-round:focus-visible img, .bs-round.kb-hover img,
-.bs-head.kb-hover img { filter: var(--bloom-icon); }
-.bs-round img, .bs-head img { transition: filter 0.2s ease; }
+.bs-round:focus-visible img.bs-lit, .bs-round.kb-hover img.bs-lit, .bs-head.kb-hover img.bs-lit { opacity: 1; }
+.bs-round:focus-visible img:not(.bs-lit), .bs-round.kb-hover img:not(.bs-lit), .bs-head.kb-hover img:not(.bs-lit) { opacity: 0; }   /* the SWAP, every hook */
+.bs-round img, .bs-head img { transition: none; }   /* the swap snaps (THE GLOW SNAPS); the filter never changes now */
 /* STATE-LADDER DISCIPLINE (Eric): the outer glow is backspace's
    translation of softfractal's ink-FOCUSED state — it lives in exactly
    one place. When ANY pill is expanded, focus descends into its tray
    (items, or the volume fill), so the head hands its glow off; only the
    color lift remains on the "held" parent. */
 .bs-pill.is-open .bs-head { text-shadow: none; }
-.bs-pill.is-open .bs-head img { filter: none; }
+.bs-pill.is-open .bs-head img.bs-lit { opacity: 0; }   .bs-pill.is-open .bs-head img:not(.bs-lit) { opacity: 1; }
 /* Sound mute slash — .site-utility-nav__sound-control::after port
    (muted: slash at .9, icon dimmed to .45). */
 #bs-sound::after {
+  z-index: 4;   /* the mute slash rides over the lit sprite (z 3) */
   content: ''; position: absolute; top: 50%; left: 50%;
   width: calc(24px * var(--icons-scale)); height: 1px;
   background: currentColor; box-shadow: 0 0 5px;
@@ -604,8 +602,9 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   opacity: 0; transition: opacity 0.14s; pointer-events: none;
 }
 #bs-sound.is-off::after { opacity: 0.9; }
-#bs-sound img { transition: opacity 0.14s; }
-#bs-sound.is-off img { opacity: 0.45; }
+#bs-sound.is-off img:not(.bs-lit) { opacity: 0.45; }   /* the mute dims the LIVE glyph (an ID rule would reach the sprite) */
+#bs-sound.is-off.kb-hover img:not(.bs-lit), #bs-sound.is-off:focus-visible img:not(.bs-lit) { opacity: 0; }
+#bs-sound.is-off.kb-hover img.bs-lit, #bs-sound.is-off:focus-visible img.bs-lit { opacity: 0.45; }   /* muted AND lit: the sprite at the mute's own level */
 /* Tray — the expanded content. Items fade/slide in like the demo's
    primary-nav links (opacity + a small offset resolving on open). */
 .bs-tray { pointer-events: none; }
@@ -631,7 +630,7 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 }
 /* Sub icons match the head glyphs' size (Eric: they read undersized in
    the grown pill at 17px). */
-.bs-tray-item img { width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale)); display: block; transition: filter 0.2s ease; }
+.bs-tray-item img { width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale)); display: block; transition: none; }
 /* Breathing parity (Eric): the language rows hold ~11px text, the
    account rows 23px glyphs — equal 38px rows leave the icons visually
    tighter. Deeper rows for the icon tray give both pills the same
@@ -641,10 +640,10 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   /* HOTNESS LAW: the tray texts light on the one ring set at their solved
      intensity (EN 2.32 · ZH 2.55 · JA 2.76 · ES 2.55 — the BLOOM table). */
   .bs-tray-item:hover { color: #fff; text-shadow: var(--bloom-lit); }
-  .bs-tray-item:hover img { filter: var(--bloom-icon); }
+  .bs-tray-item:hover img.bs-lit { opacity: 1; }   .bs-tray-item:hover img:not(.bs-lit) { opacity: 0; }
 }
 .bs-tray-item:focus-visible, .bs-tray-item.kb-hover { color: #fff; outline: none; text-shadow: var(--bloom-lit); }
-.bs-tray-item:focus-visible img, .bs-tray-item.kb-hover img { filter: var(--bloom-icon); }
+.bs-tray-item:focus-visible img.bs-lit, .bs-tray-item.kb-hover img.bs-lit { opacity: 1; }   .bs-tray-item:focus-visible img:not(.bs-lit), .bs-tray-item.kb-hover img:not(.bs-lit) { opacity: 0; }
 /* Volume bar (mockup 1:1): a track filling the pill below the speaker,
    with a white capsule fill anchored at the bottom, glowing. */
 #bs-vol-track {
@@ -804,12 +803,12 @@ a#bs-wordmark-link:focus-visible { outline: none; }
 .site-primary-nav__forward-button svg {
   width: calc(23px * var(--icons-scale)); height: calc(23px * var(--icons-scale));
   /* HOTNESS LAW: no resting glow on hoverable glyphs (Eric, Sept 3). */
-  transition: filter 0.2s ease;
+  transition: none;   /* the swap snaps */
 }
 .site-round-button:hover, .site-round-button:focus-visible,
 .site-round-button.kb-hover { color: #fff; outline: none; }
-.site-round-button:hover svg, .site-round-button:focus-visible svg,
-.site-round-button.kb-hover svg { filter: var(--bloom-icon); }
+.site-round-button:focus-visible img.bs-lit, .site-round-button.kb-hover img.bs-lit { opacity: 1; }
+.site-round-button:focus-visible svg, .site-round-button.kb-hover svg { opacity: 0; }   /* the SWAP under Tab focus too */
 /* The primary pill — a cluster-size circle that grows into a capsule.
    Witness transition .19s on the house curve → the tempo tokens. */
 .site-primary-nav {
@@ -837,8 +836,8 @@ a#bs-wordmark-link:focus-visible { outline: none; }
    The mouse path stays glowless automatically: hover OPENS the pill,
    and an open pill hands its glow off to the tray (state-ladder
    discipline — the glow lives in exactly one place). */
-.site-primary-nav.kb-hover .site-primary-nav__forward-button svg { filter: var(--bloom-icon); }
-.site-primary-nav.kb-hover.is-open .site-primary-nav__forward-button svg { filter: none; }
+.site-primary-nav.kb-hover .site-primary-nav__forward-button img.bs-lit { opacity: 1; }   .site-primary-nav.kb-hover .site-primary-nav__forward-button svg { opacity: 0; }
+.site-primary-nav.kb-hover.is-open .site-primary-nav__forward-button img.bs-lit { opacity: 0; }   .site-primary-nav.kb-hover.is-open .site-primary-nav__forward-button svg { opacity: 1; }
 .site-primary-nav__forward-button {
   width: calc(35px * var(--icons-scale)); height: 100%;
   color: inherit; cursor: var(--cursor-target); pointer-events: auto;
@@ -1546,3 +1545,20 @@ a#bs-wordmark-link:focus-visible { outline: none; }
   box-sizing: border-box;
   box-shadow: 0 0 8px rgba(157, 31, 0, .35);
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE LIT GLYPH IS A SPRITE (Eric, Sept 7): every corner and tray glyph
+   has its lit state BAKED — the glyph rendered through its own filter
+   chain on a transparent ground, 2x, with a halo margin, at an intensity
+   solved so the SPRITE reads the house number in the page
+   (tools/glyph-bake/bake_glyphs.js + sprite_tune.js → assets/ui/glyph-lit/).
+   At runtime the chrome mounts the sprite beside the glyph and the states
+   SWAP by opacity under every hook — the live glyph hides while its sprite
+   shows (an overlay doubled under sub-pixel offsets on the lab) — so no
+   filter is ever applied on hover. --bloom-icon stays declared for the
+   bake alone. PER-ITEM LAYERS: every hoverable glowing item sits on its
+   own compositor layer, so a hover re-rasters the word, not the panel. */
+.bs-lit { position: absolute; pointer-events: none; opacity: 0; z-index: 3; }
+.bs-round, .site-round-button, .bs-head, .bs-tray-item { position: relative; }
+.bs-item, .bs-subitem, .bs-plate-title, .site-primary-nav__link, .bs-tray-item, .bs-option,
+.bs-head, .bs-round, .site-round-button, .bs-social-link { will-change: transform; }
