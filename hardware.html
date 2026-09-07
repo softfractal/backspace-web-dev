@@ -409,34 +409,50 @@
      once the group has finished, where it snaps. */
   .hw-view .lead { stroke-dasharray: var(--len, 0); stroke-dashoffset: var(--len, 0); }
   #hw-views.is-drawing .hw-view .lead { animation: hw-lead-draw var(--pop-duration) var(--pop-curve) var(--hw-lead-delay, 0s) both; }
-  #hw-views.is-drawing .hw-view .tick { animation: hw-tick-in var(--pop-fade-duration) ease var(--hw-lead-delay, 0s) both; }
+  #hw-views.is-drawing .hw-view .num  { animation: hw-tick-in var(--pop-fade-duration) ease var(--hw-lead-delay, 0s) both; }
   #hw-views.is-drawn .hw-view .lead { stroke-dashoffset: 0; }
   @keyframes hw-lead-draw { from { stroke-dashoffset: var(--len, 0); } to { stroke-dashoffset: 0; } }
   @keyframes hw-tick-in   { from { opacity: 0; } to { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) {
-    #hw-views.is-drawing .hw-view .lead, #hw-views.is-drawing .hw-view .tick { animation: none; }
+    #hw-views.is-drawing .hw-view .lead, #hw-views.is-drawing .hw-view .num { animation: none; }
     #hw-views.is-drawing .hw-view .lead { stroke-dashoffset: 0; }
   }
   .hw-view svg { display: block; width: 100%; height: auto; overflow: visible; }
   /* THE GLOW SNAPS: the lit state arrives whole, never eased. */
-  .hw-view svg path, .hw-view svg line { transition: none; }
-  .hw-view .lead, .hw-view .tick {
+  .hw-view svg path, .hw-view svg text { transition: none; }
+  .hw-view .lead {
     fill: none;
     stroke: rgba(255, 255, 255, 0.42);
     stroke-width: 1;
     vector-effect: non-scaling-stroke;
     stroke-linecap: butt;
   }
-  @media (hover: hover) and (pointer: fine) {
-    .hw-view:hover .lead, .hw-view:hover .tick { stroke: #fff; filter: var(--hw-lead-glow); }
+  /* THE NUMERAL IS TYPE (Eric, Sept 8): "the design team used 12px as the
+     font size" — so I · II · III are set, not drawn. Cross-referenced to the
+     house through THE TYPE PASS: a Figma 12 on /hardware is rung 12, the
+     same rung the tray's CART, view cart, total and price already stand on
+     (canon §2). Wide 300 at rest, 600 when its view is the standing one —
+     the house's own weight-is-selected grammar. */
+  .hw-view .num {
+    fill: rgba(255, 255, 255, 0.42);
+    stroke: none;
+    font-family: var(--font-ui);
+    font-size: calc(12px * var(--ui-scale));
+    font-weight: 300;
+    letter-spacing: .06em;
+    dominant-baseline: central;
   }
-  .hw-view:focus-visible .lead, .hw-view:focus-visible .tick,
-  .hw-view.kb-hover .lead, .hw-view.kb-hover .tick { stroke: #fff; filter: var(--hw-lead-glow); }
+  @media (hover: hover) and (pointer: fine) {
+    .hw-view:hover .lead { stroke: #fff; filter: var(--hw-lead-glow); }
+    .hw-view:hover .num { fill: #fff; filter: var(--hw-lead-glow); }
+  }
+  .hw-view:focus-visible .lead, .hw-view.kb-hover .lead { stroke: #fff; filter: var(--hw-lead-glow); }
+  .hw-view:focus-visible .num, .hw-view.kb-hover .num { fill: #fff; filter: var(--hw-lead-glow); }
   .hw-view:focus-visible { outline: none; }
   /* SELECTED — the standing state: lit, and the numeral doubles its weight
      (the house's bold-is-selected grammar, in a stroke's terms). */
   .hw-view.is-on .lead { stroke: #fff; filter: var(--hw-lead-glow); }
-  .hw-view.is-on .tick { stroke: #fff; stroke-width: 2; filter: var(--hw-lead-glow); }
+  .hw-view.is-on .num { fill: #fff; font-weight: 600; filter: var(--hw-lead-glow); }
   @media (max-width: 900px) { #hw-views { display: none; } }   /* the phone grammar is Eric's later design */
 
   /* ── The options panel — THE diagonal window, right-anchored on the
@@ -2118,8 +2134,12 @@ var VIEWS_BERTH = { cx: 0.47, cy: 0.55, rad: 0.21 };
 // numeral floats off its run — above it on the upper two rows, below on the
 // last — and the elbow steps from the numeral's middle to the run, which is
 // the design team's own drawing.
-var VIEW_ROW_H = 30, VIEW_TICK_H = 26, VIEW_TICK_GAP = 13, VIEW_NUM_GAP = 20, VIEW_ELBOW = 26, VIEW_TIP_GAP = 16;   // ×ui
-var VIEW_ROWS = [{ atR: -0.42, indent: 0.66, numDy: -30 }, { atR: 0.00, indent: 0.36, numDy: -24 }, { atR: 0.42, indent: 0.05, numDy: 28 }];
+// The numeral's SIZE is the rung (12px × ui, in the CSS above). What is left
+// here is only where it sits: how far it floats off its own run, and how far
+// the run reaches. The fan itself comes from the three heights the leaders
+// meet the product at.
+var VIEW_NUM_GAP = 11, VIEW_ELBOW = 24, VIEW_TIP_GAP = 16;   // ×ui
+var VIEW_ROWS = [{ atR: -0.42, indent: 0.66, numDy: -17 }, { atR: 0.00, indent: 0.36, numDy: -13 }, { atR: 0.42, indent: 0.05, numDy: 16 }];
 var viewsEl = document.getElementById('hw-views');
 var viewBtns = [], viewIdx = 0;
 function buildViews(){
@@ -2128,7 +2148,7 @@ function buildViews(){
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'hw-view' + (i === 0 ? ' is-on' : '');
     b.setAttribute('aria-label', v.name); b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
-    b.innerHTML = '<svg aria-hidden="true"><path class="lead"/><g class="ticks"></g></svg>';
+    b.innerHTML = '<svg aria-hidden="true"><path class="lead"/><text class="num"></text></svg>';
     b.addEventListener('click', function(){ chooseView(i); });
     b.addEventListener('mouseenter', function(){ if (!_touchInputHW()) b.classList.add('kb-hover'); });
     b.addEventListener('mouseleave', function(){ b.classList.remove('kb-hover'); });
@@ -2143,44 +2163,41 @@ function layoutViews(){
   var scale = stageParamsFor(SEL.parts, SEL.size, SEL.part).scale;
   var r = Math.min(W, H) * VIEWS_BERTH.rad * scale;          // the ball's radius, in viewport px
   var bx = W * VIEWS_BERTH.cx, by = H * VIEWS_BERTH.cy;
-  var tickH = VIEW_TICK_H * ui, tickGap = VIEW_TICK_GAP * ui, numGap = VIEW_NUM_GAP * ui;
-  var elbow = VIEW_ELBOW * ui, tipGap = VIEW_TIP_GAP * ui, pad = 3 * ui;
+  var numGap = VIEW_NUM_GAP * ui, elbow = VIEW_ELBOW * ui, tipGap = VIEW_TIP_GAP * ui, pad = 3 * ui;
   var railL = Math.max(34, W * 0.115);                       // clear of the class menu
   var span = Math.max(80 * ui, bx - r - railL);              // the room the fan has to spread in
   VIEW_ROWS.forEach(function(row, i){
     var b = viewBtns[i], svg = b.querySelector('svg');
+    var num = svg.querySelector('.num'), lead = svg.querySelector('.lead');
+    num.textContent = HW.views[i].numeral;
     var yRun = by + r * row.atR;                             // the height this leader flies at
     var dy = Math.abs(yRun - by);
     // THE LEADER LANDS ON THE PRODUCT: the run stops on the ball's own
     // silhouette at this row's height, never over it.
     var xTip = bx - (dy < r ? Math.sqrt(r * r - dy * dy) : 0) - tipGap;
     var xLeft = railL + span * row.indent;                   // the fan
-    var nTicks = HW.views[i].numeral.length, tickW = (nTicks - 1) * tickGap;
-    var wBox = Math.max(tickW + numGap + elbow + 24 * ui, xTip - xLeft);
+    // the numeral is set type — ask it how wide it actually is
+    var numW = 0; try { numW = num.getComputedTextLength(); } catch (e) {}
+    if (!numW) numW = 7 * ui * HW.views[i].numeral.length;
+    var numH = 12 * ui;                                      // the rung, for the box's own room
+    var wBox = Math.max(numW + numGap + elbow + 24 * ui, xTip - xLeft);
     // the numeral floats off its run; the box has to hold both
     var nDy = row.numDy * ui;
-    var yMin = Math.min(0, nDy - tickH / 2), yMax = Math.max(0, nDy + tickH / 2);
+    var yMin = Math.min(0, nDy - numH / 2), yMax = Math.max(0, nDy + numH / 2);
     var boxH = (yMax - yMin) + 2 * pad;
-    var yRunL = -yMin + pad, numC = yRunL + nDy, numTop = numC - tickH / 2;
-    var xNum = tickW + numGap;
+    var yRunL = -yMin + pad, numC = yRunL + nDy;
+    var xElbow0 = numW + numGap;
     svg.setAttribute('viewBox', '0 0 ' + wBox.toFixed(2) + ' ' + boxH.toFixed(2));
     svg.setAttribute('width', wBox.toFixed(2)); svg.setAttribute('height', boxH.toFixed(2));
-    var lead = svg.querySelector('.lead');
+    num.setAttribute('x', '0'); num.setAttribute('y', numC.toFixed(2));
     lead.setAttribute('d',
-      'M' + xNum.toFixed(2) + ',' + numC.toFixed(2) +
-      ' L' + (xNum + elbow).toFixed(2) + ',' + yRunL.toFixed(2) +
+      'M' + xElbow0.toFixed(2) + ',' + numC.toFixed(2) +
+      ' L' + (xElbow0 + elbow).toFixed(2) + ',' + yRunL.toFixed(2) +
       ' L' + wBox.toFixed(2) + ',' + yRunL.toFixed(2));
-    var t = '';
-    for (var k = 0; k < nTicks; k++){
-      var xk = (k * tickGap).toFixed(2);
-      t += '<line class="tick" x1="' + xk + '" y1="' + numTop.toFixed(2) + '" x2="' + xk + '" y2="' + (numTop + tickH).toFixed(2) + '"/>';
-    }
-    svg.querySelector('.ticks').innerHTML = t;
     b.style.left = xLeft.toFixed(2) + 'px';
     b.style.top = (yRun - yRunL).toFixed(2) + 'px';
     b.style.width = wBox.toFixed(2) + 'px';
     b.style.height = boxH.toFixed(2) + 'px';
-    // the drawn length, so the stroke can be run out from the numeral
     var len = 0; try { len = lead.getTotalLength(); } catch (e) { len = wBox; }
     b.style.setProperty('--len', len.toFixed(2));
   });
