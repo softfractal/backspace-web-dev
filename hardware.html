@@ -400,6 +400,23 @@
      solved for a 23px raster and reads as a laser on a 1px stroke. This is
      THE GLOW IS D at hairline weight — a tight core and one ring. */
   #hw-views { --hw-lead-glow: drop-shadow(0 0 3px rgba(255,255,255,0.85)) drop-shadow(0 0 9px rgba(255,255,255,0.38)); }
+  /* THE LEADER DRAWS (Eric, Sept 8): the line arrives by being drawn from
+     its numeral out to the product, never by appearing whole. The numeral
+     lands first — it is where the line comes from — then the stroke runs
+     right on the house tempo, one row after another. NOTHING GLOWS WHILE IT
+     DRAWS: a lit hairline re-rasters its halo every frame (the Sept 5
+     pointer-lag law), so the standing view's glow is put on by .is-on only
+     once the group has finished, where it snaps. */
+  .hw-view .lead { stroke-dasharray: var(--len, 0); stroke-dashoffset: var(--len, 0); }
+  #hw-views.is-drawing .hw-view .lead { animation: hw-lead-draw var(--pop-duration) var(--pop-curve) var(--hw-lead-delay, 0s) both; }
+  #hw-views.is-drawing .hw-view .tick { animation: hw-tick-in var(--pop-fade-duration) ease var(--hw-lead-delay, 0s) both; }
+  #hw-views.is-drawn .hw-view .lead { stroke-dashoffset: 0; }
+  @keyframes hw-lead-draw { from { stroke-dashoffset: var(--len, 0); } to { stroke-dashoffset: 0; } }
+  @keyframes hw-tick-in   { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    #hw-views.is-drawing .hw-view .lead, #hw-views.is-drawing .hw-view .tick { animation: none; }
+    #hw-views.is-drawing .hw-view .lead { stroke-dashoffset: 0; }
+  }
   .hw-view svg { display: block; width: 100%; height: auto; overflow: visible; }
   /* THE GLOW SNAPS: the lit state arrives whole, never eased. */
   .hw-view svg path, .hw-view svg line { transition: none; }
@@ -751,8 +768,8 @@
      "seven" is the flagged miscount). Occupancy rides the frames' tick
      grammar: lit #fefefe filled, #fefefe2b empty. The price column's
      total renders "—" to its marked seam (source unruled; the $3,499
-     bug never returns); view cart + checkout DENY to seams until the
-     cart page and the commerce ruling land. */
+     bug never returns). The tray's full-width row is VIEW CART and
+     commits to /cart (Eric, Sept 8); the real checkout lives in /cart. */
   /* EXPANDABLE (Eric's sixth word, p1): clicking the CART text calls
      the row up and collapses it. Collapsed = the B-2 strip — a slim
      surface bar at the stage's own center span (322..1379 → 18.63vw,
@@ -1051,9 +1068,9 @@
     letter-spacing: .04em;
   }
   /* Eric, Sept 5 (the design's own plate): the PRICE sits in the white
-     plate at the row's right — where checkout stood; checkout takes the
-     full second row — where view cart stood; view cart leaves the tray
-     (the corner cart glyph is the way to /cart). */
+     plate at the row's right; the full second row is the tray's button.
+     Sept 8: that row is VIEW CART, not checkout — the figma's name, not
+     its function — and it commits to /cart alongside the corner glyph. */
   #hw-total {
     position: absolute; top: 0; right: 0;
     width: calc(99px * var(--ui-scale)); height: calc(30px * var(--ui-scale));
@@ -1224,7 +1241,7 @@
            when the price-source ruling lands; never static. -->
       <span id="hw-total">—</span>
     </div>
-    <button id="hw-checkout" class="hw-tray-btn bs-fillpill" type="button" data-str="hwCheckout"></button>
+    <button id="hw-checkout" class="hw-tray-btn bs-fillpill" type="button" data-str="hwViewCart"></button>
   </div>
   </div><!-- /hw-tray-band -->
 </div>
@@ -2091,9 +2108,18 @@ function chooseCustomSub(sIdx, partOverride){
    touches the sphere at every window and at every berth. The fan (I high
    and short, III low and long) is the design team's; the numeral is the
    whole visible label, so the spoken name rides in aria-label. */
-var VIEWS_BERTH = { cx: 0.575, cy: 0.515, rad: 0.185 };   // provisional — no frame for this view yet
-var VIEW_ROW_H = 46, VIEW_TICK_H = 22, VIEW_TICK_GAP = 6, VIEW_ELBOW = 22, VIEW_TIP_GAP = 14;   // ×ui
-var VIEW_ROWS = [{ atR: -0.46, indent: 0.62 }, { atR: 0.02, indent: 0.34 }, { atR: 0.50, indent: 0.06 }];
+// THE PRODUCT DOES NOT MOVE (Eric, Sept 8): "i would like the product to
+// remain in the same position as the label lines draw." The overview keeps
+// the stage's own resting berth, and the leaders live in the room to its
+// left — shorter lines, a still product.
+var VIEWS_BERTH = { cx: 0.47, cy: 0.55, rad: 0.21 };
+// THEY ARE ROMAN NUMERALS (Eric, Sept 8), not tick marks: the strokes stand
+// at half their own height apart, so I · II · III read as numbers. The
+// numeral floats off its run — above it on the upper two rows, below on the
+// last — and the elbow steps from the numeral's middle to the run, which is
+// the design team's own drawing.
+var VIEW_ROW_H = 30, VIEW_TICK_H = 26, VIEW_TICK_GAP = 13, VIEW_NUM_GAP = 20, VIEW_ELBOW = 26, VIEW_TIP_GAP = 16;   // ×ui
+var VIEW_ROWS = [{ atR: -0.42, indent: 0.66, numDy: -30 }, { atR: 0.00, indent: 0.36, numDy: -24 }, { atR: 0.42, indent: 0.05, numDy: 28 }];
 var viewsEl = document.getElementById('hw-views');
 var viewBtns = [], viewIdx = 0;
 function buildViews(){
@@ -2117,8 +2143,8 @@ function layoutViews(){
   var scale = stageParamsFor(SEL.parts, SEL.size, SEL.part).scale;
   var r = Math.min(W, H) * VIEWS_BERTH.rad * scale;          // the ball's radius, in viewport px
   var bx = W * VIEWS_BERTH.cx, by = H * VIEWS_BERTH.cy;
-  var rowH = VIEW_ROW_H * ui, tickH = VIEW_TICK_H * ui, tickGap = VIEW_TICK_GAP * ui;
-  var elbow = VIEW_ELBOW * ui, tipGap = VIEW_TIP_GAP * ui;
+  var tickH = VIEW_TICK_H * ui, tickGap = VIEW_TICK_GAP * ui, numGap = VIEW_NUM_GAP * ui;
+  var elbow = VIEW_ELBOW * ui, tipGap = VIEW_TIP_GAP * ui, pad = 3 * ui;
   var railL = Math.max(34, W * 0.115);                       // clear of the class menu
   var span = Math.max(80 * ui, bx - r - railL);              // the room the fan has to spread in
   VIEW_ROWS.forEach(function(row, i){
@@ -2129,31 +2155,64 @@ function layoutViews(){
     // silhouette at this row's height, never over it.
     var xTip = bx - (dy < r ? Math.sqrt(r * r - dy * dy) : 0) - tipGap;
     var xLeft = railL + span * row.indent;                   // the fan
-    var wBox = Math.max(60 * ui, xTip - xLeft);
     var nTicks = HW.views[i].numeral.length, tickW = (nTicks - 1) * tickGap;
-    var yTick0 = 3 * ui, yTickEnd = yTick0 + tickH, yLine = rowH - 4 * ui;
-    var xElbow = tickW + elbow;
-    svg.setAttribute('viewBox', '0 0 ' + wBox.toFixed(2) + ' ' + rowH.toFixed(2));
-    svg.setAttribute('width', wBox.toFixed(2)); svg.setAttribute('height', rowH.toFixed(2));
-    svg.querySelector('.lead').setAttribute('d',
-      'M' + tickW.toFixed(2) + ',' + yTickEnd.toFixed(2) +
-      ' L' + xElbow.toFixed(2) + ',' + yLine.toFixed(2) +
-      ' L' + wBox.toFixed(2) + ',' + yLine.toFixed(2));
+    var wBox = Math.max(tickW + numGap + elbow + 24 * ui, xTip - xLeft);
+    // the numeral floats off its run; the box has to hold both
+    var nDy = row.numDy * ui;
+    var yMin = Math.min(0, nDy - tickH / 2), yMax = Math.max(0, nDy + tickH / 2);
+    var boxH = (yMax - yMin) + 2 * pad;
+    var yRunL = -yMin + pad, numC = yRunL + nDy, numTop = numC - tickH / 2;
+    var xNum = tickW + numGap;
+    svg.setAttribute('viewBox', '0 0 ' + wBox.toFixed(2) + ' ' + boxH.toFixed(2));
+    svg.setAttribute('width', wBox.toFixed(2)); svg.setAttribute('height', boxH.toFixed(2));
+    var lead = svg.querySelector('.lead');
+    lead.setAttribute('d',
+      'M' + xNum.toFixed(2) + ',' + numC.toFixed(2) +
+      ' L' + (xNum + elbow).toFixed(2) + ',' + yRunL.toFixed(2) +
+      ' L' + wBox.toFixed(2) + ',' + yRunL.toFixed(2));
     var t = '';
     for (var k = 0; k < nTicks; k++){
       var xk = (k * tickGap).toFixed(2);
-      t += '<line class="tick" x1="' + xk + '" y1="' + yTick0.toFixed(2) + '" x2="' + xk + '" y2="' + yTickEnd.toFixed(2) + '"/>';
+      t += '<line class="tick" x1="' + xk + '" y1="' + numTop.toFixed(2) + '" x2="' + xk + '" y2="' + (numTop + tickH).toFixed(2) + '"/>';
     }
     svg.querySelector('.ticks').innerHTML = t;
     b.style.left = xLeft.toFixed(2) + 'px';
-    b.style.top = (yRun - yLine).toFixed(2) + 'px';
+    b.style.top = (yRun - yRunL).toFixed(2) + 'px';
     b.style.width = wBox.toFixed(2) + 'px';
-    b.style.height = rowH.toFixed(2) + 'px';
+    b.style.height = boxH.toFixed(2) + 'px';
+    // the drawn length, so the stroke can be run out from the numeral
+    var len = 0; try { len = lead.getTotalLength(); } catch (e) { len = wBox; }
+    b.style.setProperty('--len', len.toFixed(2));
   });
+}
+// THE LEADERS DRAW (Eric, Sept 8): numeral first, then the stroke runs out to
+// the product, one row after the next. The stagger is the house fade's own
+// quarter — a delay, not a new duration. The standing view's glow waits for
+// the last line to land, so nothing re-rasters a halo while a stroke moves.
+var _drawT = null;
+function drawViews(){
+  if (!viewsEl || !viewBtns.length) return;
+  var cs = getComputedStyle(document.documentElement);
+  var fade = parseFloat(cs.getPropertyValue('--pop-fade-duration')) || 0.41;
+  var dur = parseFloat(cs.getPropertyValue('--pop-duration')) || 0.5;
+  var step = fade * 0.28;
+  viewBtns.forEach(function(b, i){ b.style.setProperty('--hw-lead-delay', (i * step).toFixed(3) + 's'); b.classList.remove('is-on'); b.setAttribute('aria-pressed', 'false'); });
+  viewsEl.classList.remove('is-drawn');
+  void viewsEl.offsetWidth;                                   // restart the draw
+  viewsEl.classList.add('is-drawing');
+  clearTimeout(_drawT);
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  _drawT = setTimeout(function(){
+    viewsEl.classList.remove('is-drawing'); viewsEl.classList.add('is-drawn');
+    markView();                                               // the glow snaps on, once, at the end
+  }, reduced ? 0 : (dur + step * (viewBtns.length - 1)) * 1000);
+}
+function markView(){
+  viewBtns.forEach(function(b, k){ b.classList.toggle('is-on', k === viewIdx); b.setAttribute('aria-pressed', k === viewIdx ? 'true' : 'false'); });
 }
 function chooseView(i){
   viewIdx = i;
-  viewBtns.forEach(function(b, k){ b.classList.toggle('is-on', k === i); b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+  markView();
   if (Ball.view) Ball.view(HW.views[i].view);
   SoundBus.play('commit'); hapticTick();
 }
@@ -2168,13 +2227,16 @@ function releaseView(){
 function showViews(){
   buildViews(); if (!viewsEl) return;
   viewsEl.classList.remove('is-hidden');
-  Ball.stage(VIEWS_BERTH);
+  Ball.stage(VIEWS_BERTH);                       // the resting berth — the product does not move
   if (viewIdx < 0) viewIdx = 0;
-  viewBtns.forEach(function(b, k){ b.classList.toggle('is-on', k === viewIdx); b.setAttribute('aria-pressed', k === viewIdx ? 'true' : 'false'); });
   if (Ball.view) Ball.view(HW.views[viewIdx].view, true);
   layoutViews();
+  drawViews();
 }
-function hideViews(){ if (viewsEl) viewsEl.classList.add('is-hidden'); }
+function hideViews(){
+  clearTimeout(_drawT);
+  if (viewsEl){ viewsEl.classList.add('is-hidden'); viewsEl.classList.remove('is-drawing', 'is-drawn'); }
+}
 
 var INTRO_GAP_PX = 36;                            // ×ui — the group's breathing gap
 function layoutIntroStage(){
@@ -2353,15 +2415,19 @@ panel.addEventListener('keydown', function(e){
     if (clickOk()) addToCart(b);
   });
 })();
-// VIEW CART left the tray (Eric, Sept 5 — the design's plate is total +
-// price, then checkout); the corner cart glyph routes to /cart. CHECKOUT
-// stays a deny seam until the commerce wiring ruling (phase 2+).
+// IT IS A VIEW CART BUTTON (Eric, Sept 8): "the design team called it
+// checkout in their figma build, but in actuality the checkout button in the
+// hardware page is really a view cart button, different from the actual
+// checkout button inside the full cart page." So the tray's full-width row
+// carries hwViewCart and COMMITS to /cart on the house's own navigation —
+// the deny seam it held since Sept 5 is closed. The real checkout stays
+// where it belongs, inside /cart.
 (function(){
   var co = document.getElementById('hw-checkout');
   co.addEventListener('click', function(e){
     e.stopPropagation();
     wake();
-    denyOn(co);
+    if (clickOk()) C.nav.commit('cart');
   });
 })();
 
