@@ -370,6 +370,58 @@
     background: #00000066;          /* the picture/video slot, dark at rest */
   }
 
+  /* ── THE CAMERA VIEWS (Eric, Sept 8) — the design team's leader-line
+     callout, put to work as the OVERVIEW's view switch. Three hairlines
+     fan left off the product, each tipped with its roman numeral; the
+     numeral IS the label (the design team's language — no words), so the
+     spoken name lives in aria-label for the keyboard and the reader.
+     The group's right edge is SOLVED against the ball's left edge every
+     open and every resize, so the lines always touch the product.
+     PROVISIONAL geometry: no frame exists for this view yet — the widths
+     and the fan are the code seat's reading of the screenshot, pending
+     the design team's own. */
+  #hw-views {
+    position: fixed; inset: 0;
+    z-index: 13;
+    pointer-events: none;       /* the stage keeps its own press-drag; only the leaders take the pointer */
+  }
+  #hw-views.is-hidden { display: none; }
+  /* Each leader is PLACED, not stacked — its run has to stop on the product's
+     own silhouette, and that x differs per row. */
+  .hw-view {
+    all: unset;
+    position: absolute;
+    display: block;
+    cursor: var(--cursor-target);
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* A HAIRLINE'S GLOW, not a glyph's: the glyph chain (--bloom-icon) is
+     solved for a 23px raster and reads as a laser on a 1px stroke. This is
+     THE GLOW IS D at hairline weight — a tight core and one ring. */
+  #hw-views { --hw-lead-glow: drop-shadow(0 0 3px rgba(255,255,255,0.85)) drop-shadow(0 0 9px rgba(255,255,255,0.38)); }
+  .hw-view svg { display: block; width: 100%; height: auto; overflow: visible; }
+  /* THE GLOW SNAPS: the lit state arrives whole, never eased. */
+  .hw-view svg path, .hw-view svg line { transition: none; }
+  .hw-view .lead, .hw-view .tick {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.42);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: butt;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hw-view:hover .lead, .hw-view:hover .tick { stroke: #fff; filter: var(--hw-lead-glow); }
+  }
+  .hw-view:focus-visible .lead, .hw-view:focus-visible .tick,
+  .hw-view.kb-hover .lead, .hw-view.kb-hover .tick { stroke: #fff; filter: var(--hw-lead-glow); }
+  .hw-view:focus-visible { outline: none; }
+  /* SELECTED — the standing state: lit, and the numeral doubles its weight
+     (the house's bold-is-selected grammar, in a stroke's terms). */
+  .hw-view.is-on .lead { stroke: #fff; filter: var(--hw-lead-glow); }
+  .hw-view.is-on .tick { stroke: #fff; stroke-width: 2; filter: var(--hw-lead-glow); }
+  @media (max-width: 900px) { #hw-views { display: none; } }   /* the phone grammar is Eric's later design */
+
   /* ── The options panel — THE diagonal window, right-anchored on the
      shared 3.30vw rail. ONE HEIGHT FOR EVERY VIEW (Eric, Sept 5: "they
      should all possess the same height, if the contents don't fill it
@@ -1117,6 +1169,7 @@
 <nav id="hw-product-menu" aria-label="Product menu"></nav>
 
 <!-- Introduction plates — three diagonal windows. -->
+<div id="hw-views" class="hw-views is-hidden" role="group" aria-label="Camera views"></div>
 <div id="hw-plate-1" class="hw-plate bs-window is-hidden" role="region" aria-label="Introduction">
   <div class="hw-plate-body"><div class="hw-plate-media"></div></div>
 </div>
@@ -1215,6 +1268,17 @@ var HW = {
     { key: 'hwClassSpeakers',  real: false }
   ],
   introSubs: ['hwIntroOverview', 'hwIntroDesign', 'hwIntroSpecs', 'hwIntroEco', 'hwIntroSupport'],
+  /* THE OVERVIEW IS THE MODEL (Eric, Sept 8): the company's new showcase —
+     the overview is the product itself under baked camera positions, one
+     per selling point, instead of three picture plates. Numerals are the
+     switch's only visible label; `name` is what the keyboard and the
+     screen reader say; `view` is the camera the ball travels to. The desk
+     GLB will keep this roster and only re-aim the cameras. */
+  views: [
+    { numeral: 'I',   view: 'front', name: 'Front view' },
+    { numeral: 'II',  view: 'side',  name: 'Side view' },
+    { numeral: 'III', view: 'top',   name: 'Top view' }
+  ],
   customSubs: [
     { key: 'hwSubSize',     kind: 'size', parts: [] },
     { key: 'hwSubDesktop',  kind: 'part', parts: ['III'], stages: ['I', 'II'] },
@@ -1989,7 +2053,11 @@ function chooseIntroSub(sIdx){
   if (openHead !== 0) return;
   introSub = sIdx;
   SoundBus.play('commit'); hapticTick();
-  showPlates();
+  // THE OVERVIEW IS THE MODEL (Sept 8): sub 0 shows the product under its
+  // camera roster and no plates. The other four keep today's plates until
+  // their own treatments land (exploded view · zoom · ecosystem · blank).
+  if (sIdx === 0){ hidePlatesOnly(); showViews(); }
+  else { hideViews(); showPlates(); }
   render();
 }
 function chooseCustomSub(sIdx, partOverride){
@@ -2016,9 +2084,102 @@ function chooseCustomSub(sIdx, partOverride){
 // open and every resize. Band: below the nav zone (12vh) to the cart
 // strip (95.34vh); the fixed 31.51vh plate top yields to the solve
 // while the plates stand and returns when they leave.
+/* ══ THE CAMERA VIEWS ══════════════════════════════════════════════════
+   The OVERVIEW is the product under three baked cameras (Eric, Sept 8).
+   Each leader line LANDS ON THE PRODUCT: its run ends on the ball's own
+   silhouette at that row's height — solved, not guessed, so the callout
+   touches the sphere at every window and at every berth. The fan (I high
+   and short, III low and long) is the design team's; the numeral is the
+   whole visible label, so the spoken name rides in aria-label. */
+var VIEWS_BERTH = { cx: 0.575, cy: 0.515, rad: 0.185 };   // provisional — no frame for this view yet
+var VIEW_ROW_H = 46, VIEW_TICK_H = 22, VIEW_TICK_GAP = 6, VIEW_ELBOW = 22, VIEW_TIP_GAP = 14;   // ×ui
+var VIEW_ROWS = [{ atR: -0.46, indent: 0.62 }, { atR: 0.02, indent: 0.34 }, { atR: 0.50, indent: 0.06 }];
+var viewsEl = document.getElementById('hw-views');
+var viewBtns = [], viewIdx = 0;
+function buildViews(){
+  if (viewBtns.length || !viewsEl) return;
+  HW.views.forEach(function(v, i){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'hw-view' + (i === 0 ? ' is-on' : '');
+    b.setAttribute('aria-label', v.name); b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.innerHTML = '<svg aria-hidden="true"><path class="lead"/><g class="ticks"></g></svg>';
+    b.addEventListener('click', function(){ chooseView(i); });
+    b.addEventListener('mouseenter', function(){ if (!_touchInputHW()) b.classList.add('kb-hover'); });
+    b.addEventListener('mouseleave', function(){ b.classList.remove('kb-hover'); });
+    viewsEl.appendChild(b); viewBtns.push(b);
+  });
+}
+function _touchInputHW(){ return window.matchMedia && !window.matchMedia('(hover: hover) and (pointer: fine)').matches; }
+function layoutViews(){
+  if (!viewsEl || viewsEl.classList.contains('is-hidden') || !viewBtns.length) return;
+  var W = window.innerWidth, H = window.innerHeight;
+  var ui = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale')) || 1;
+  var scale = stageParamsFor(SEL.parts, SEL.size, SEL.part).scale;
+  var r = Math.min(W, H) * VIEWS_BERTH.rad * scale;          // the ball's radius, in viewport px
+  var bx = W * VIEWS_BERTH.cx, by = H * VIEWS_BERTH.cy;
+  var rowH = VIEW_ROW_H * ui, tickH = VIEW_TICK_H * ui, tickGap = VIEW_TICK_GAP * ui;
+  var elbow = VIEW_ELBOW * ui, tipGap = VIEW_TIP_GAP * ui;
+  var railL = Math.max(34, W * 0.115);                       // clear of the class menu
+  var span = Math.max(80 * ui, bx - r - railL);              // the room the fan has to spread in
+  VIEW_ROWS.forEach(function(row, i){
+    var b = viewBtns[i], svg = b.querySelector('svg');
+    var yRun = by + r * row.atR;                             // the height this leader flies at
+    var dy = Math.abs(yRun - by);
+    // THE LEADER LANDS ON THE PRODUCT: the run stops on the ball's own
+    // silhouette at this row's height, never over it.
+    var xTip = bx - (dy < r ? Math.sqrt(r * r - dy * dy) : 0) - tipGap;
+    var xLeft = railL + span * row.indent;                   // the fan
+    var wBox = Math.max(60 * ui, xTip - xLeft);
+    var nTicks = HW.views[i].numeral.length, tickW = (nTicks - 1) * tickGap;
+    var yTick0 = 3 * ui, yTickEnd = yTick0 + tickH, yLine = rowH - 4 * ui;
+    var xElbow = tickW + elbow;
+    svg.setAttribute('viewBox', '0 0 ' + wBox.toFixed(2) + ' ' + rowH.toFixed(2));
+    svg.setAttribute('width', wBox.toFixed(2)); svg.setAttribute('height', rowH.toFixed(2));
+    svg.querySelector('.lead').setAttribute('d',
+      'M' + tickW.toFixed(2) + ',' + yTickEnd.toFixed(2) +
+      ' L' + xElbow.toFixed(2) + ',' + yLine.toFixed(2) +
+      ' L' + wBox.toFixed(2) + ',' + yLine.toFixed(2));
+    var t = '';
+    for (var k = 0; k < nTicks; k++){
+      var xk = (k * tickGap).toFixed(2);
+      t += '<line class="tick" x1="' + xk + '" y1="' + yTick0.toFixed(2) + '" x2="' + xk + '" y2="' + yTickEnd.toFixed(2) + '"/>';
+    }
+    svg.querySelector('.ticks').innerHTML = t;
+    b.style.left = xLeft.toFixed(2) + 'px';
+    b.style.top = (yRun - yLine).toFixed(2) + 'px';
+    b.style.width = wBox.toFixed(2) + 'px';
+    b.style.height = rowH.toFixed(2) + 'px';
+  });
+}
+function chooseView(i){
+  viewIdx = i;
+  viewBtns.forEach(function(b, k){ b.classList.toggle('is-on', k === i); b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+  if (Ball.view) Ball.view(HW.views[i].view);
+  SoundBus.play('commit'); hapticTick();
+}
+// The hand outranks the roster: once it moves the camera, no baked view is
+// standing any more, so the numerals drop back to rest.
+function releaseView(){
+  if (!viewBtns.length) return;
+  var any = false;
+  viewBtns.forEach(function(b){ if (b.classList.contains('is-on')){ any = true; b.classList.remove('is-on'); b.setAttribute('aria-pressed', 'false'); } });
+  if (any) viewIdx = -1;
+}
+function showViews(){
+  buildViews(); if (!viewsEl) return;
+  viewsEl.classList.remove('is-hidden');
+  Ball.stage(VIEWS_BERTH);
+  if (viewIdx < 0) viewIdx = 0;
+  viewBtns.forEach(function(b, k){ b.classList.toggle('is-on', k === viewIdx); b.setAttribute('aria-pressed', k === viewIdx ? 'true' : 'false'); });
+  if (Ball.view) Ball.view(HW.views[viewIdx].view, true);
+  layoutViews();
+}
+function hideViews(){ if (viewsEl) viewsEl.classList.add('is-hidden'); }
+
 var INTRO_GAP_PX = 36;                            // ×ui — the group's breathing gap
 function layoutIntroStage(){
   if (introSub < 0) return;
+  if (introSub === 0){ layoutViews(); return; }   // the model's own berth — no plates to balance against
   var w = window.innerWidth, h = window.innerHeight;
   var ui = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale')) || 1;
   var topBound = h * 0.12;
@@ -2041,12 +2202,16 @@ function showPlates(){
   });
   layoutIntroStage();                             // plates + ball center together
 }
-function hidePlates(){
+function hidePlatesOnly(){
   plates.forEach(function(pl){
     pl.classList.add('is-hidden');
     pl.classList.remove('is-open');
   });
   document.body.style.removeProperty('--hw-plate-top');   // the frame top returns
+}
+function hidePlates(){
+  hidePlatesOnly();
+  hideViews();
   Ball.stage({ cx: 0.47, cy: 0.55, rad: 0.21 });   // the resting berth
 }
 function closePanelLevel(){
@@ -2361,6 +2526,7 @@ Ball.boot();
   stageEl.addEventListener('pointermove', function(e){
     if (!held) return;
     Ball.orbit((e.clientX - lx) * 0.005, (e.clientY - ly) * 0.004);
+    releaseView();          // the hand has taken the camera off its baked position
     lx = e.clientX; ly = e.clientY;
   });
   var endGrab = function(){ if (held){ held = false; Ball.grab(false); } };

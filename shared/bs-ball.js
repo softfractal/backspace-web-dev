@@ -22,6 +22,24 @@ window.BSBall = function(canvas){
   // THE VIEWING HAND (Eric, Aug 31): rotX is the drag pitch; grabbed
   // pauses the presentation turn while the hand holds the model.
   var rotX = 0, grabbed = false;
+  // THE STUDIO CAMERA (Eric, Sept 8): the lights belong to the ROOM, not to
+  // the viewer. Until now every light vector lived in view space and the
+  // vertex shader turned the model — and because a featureless sphere's
+  // normal field is rotation-invariant (vN = the rotated position, and a
+  // fragment's normal is a pure function of its screen position), the drag
+  // was mathematically incapable of changing one pixel. So the hand now
+  // orbits the CAMERA through a fixed studio: uCam carries the camera's
+  // orientation into the shader, the key and fill stay put in the room, and
+  // turning the model sweeps the highlight across it. `rot` keeps its own
+  // presentation turn for the model — invisible on a sphere, and the turn
+  // the desk GLB will inherit unchanged.
+  var camYaw = 0, camPitch = 0, camYawT = 0, camPitchT = 0, camSnap = false;
+  var VIEWS = {                                  // the baked camera positions
+    front: { yaw: 0,               pitch: 0 },
+    side:  { yaw: Math.PI * 0.5,   pitch: 0 },
+    top:   { yaw: 0,               pitch: Math.PI * 0.5 }
+  };
+  var viewName = 'front';
 
   function buildSphere(rows, cols){
     var pos = [], idx = [];
@@ -66,9 +84,14 @@ window.BSBall = function(canvas){
     'precision mediump float;',
     'varying vec3 vN; varying vec3 vP;',
     'uniform vec3 uColor; uniform float uMetal; uniform float uRough;',
+    'uniform mat3 uCam;',      // camera -> room. Identity = the resting look, unchanged.
     'void main(){',
-    '  vec3 N = normalize(vN);',
-    '  vec3 V = vec3(0.0, 0.0, 1.0);',
+    '  vec3 Nc = normalize(vN);',
+    '  vec3 Vc = vec3(0.0, 0.0, 1.0);',
+    // Lighting happens in the ROOM's frame: carry the surface and the eye
+    // there, leave the lamps and the ceiling where they stand.
+    '  vec3 N = uCam * Nc;',
+    '  vec3 V = uCam * Vc;',
     '  vec3 R = reflect(-V, N);',
     '  float NdV = max(dot(N, V), 0.0);',
     '  vec3 albedo = uColor;',
@@ -120,7 +143,7 @@ window.BSBall = function(canvas){
     var aPos = gl.getAttribLocation(prog, 'aPos');
     gl.enableVertexAttribArray(aPos);
     gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
-    ['uRes', 'uCenter', 'uRadius', 'uRot', 'uRotX', 'uColor', 'uMetal', 'uRough'].forEach(function(n){
+    ['uRes', 'uCenter', 'uRadius', 'uRot', 'uRotX', 'uColor', 'uMetal', 'uRough', 'uCam'].forEach(function(n){
       U[n] = gl.getUniformLocation(prog, n);
     });
     gl.enable(gl.DEPTH_TEST);
@@ -148,6 +171,10 @@ window.BSBall = function(canvas){
     cur.cx += (tgt.cx - cur.cx) * k;
     cur.cy += (tgt.cy - cur.cy) * k;
     cur.rad += (tgt.rad - cur.rad) * k;
+    // The camera travels on the same settle as a material — a view change
+    // reads as a move through the room, not a cut.
+    if (camSnap){ camYaw = camYawT; camPitch = camPitchT; camSnap = false; }
+    else { var kc = 1 - Math.exp(-dt * 5.5); camYaw += (camYawT - camYaw) * kc; camPitch += (camPitchT - camPitch) * kc; }
     var w = canvas.width, h = canvas.height;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.uniform2f(U.uRes, w, h);
@@ -161,6 +188,13 @@ window.BSBall = function(canvas){
     gl.uniform3f(U.uColor, cur.color[0], cur.color[1], cur.color[2]);
     gl.uniform1f(U.uMetal, cur.metal);
     gl.uniform1f(U.uRough, cur.rough);
+    // camera -> room, R = Ry(yaw) . Rx(pitch), column-major
+    var ca = Math.cos(camYaw), sa = Math.sin(camYaw), cb = Math.cos(camPitch), sb = Math.sin(camPitch);
+    gl.uniformMatrix3fv(U.uCam, false, new Float32Array([
+      ca,        0,   -sa,
+      sa * sb,   cb,   ca * sb,
+      sa * cb,  -sb,   ca * cb
+    ]));
     gl.drawElements(gl.TRIANGLES, nTri, gl.UNSIGNED_SHORT, 0);
   }
   function tick(t){
@@ -194,10 +228,26 @@ window.BSBall = function(canvas){
     // on the ball's disc — the canvas is pointer-transparent, so the
     // page asks before treating a stage press as a grab.
     grab: function(on){ grabbed = !!on; },
+    // The hand orbits the CAMERA (Sept 8). Yaw runs free; pitch clamps so
+    // the room never turns past its poles. Any drag leaves the named views.
     orbit: function(dYaw, dPitch){
-      rot += dYaw;
-      rotX = Math.max(-1.1, Math.min(1.1, rotX + dPitch));
+      camYawT += dYaw; camYaw += dYaw;
+      camPitchT = Math.max(-1.1, Math.min(1.1, camPitchT + dPitch));
+      camPitch = Math.max(-1.1, Math.min(1.1, camPitch + dPitch));
+      viewName = null;
     },
+    // THE BAKED VIEWS: front / side / top. The camera travels to the named
+    // position on the material settle; instant:true places it in one frame
+    // (the witness path). Returns the name it took.
+    view: function(name, instant){
+      var v = VIEWS[name]; if (!v) return viewName;
+      // travel the short way round from wherever the hand left the camera
+      var d = v.yaw - camYawT; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+      camYawT += d; camPitchT = v.pitch;
+      if (instant) camSnap = true;
+      viewName = name; return name;
+    },
+    views: function(){ return Object.keys(VIEWS); },
     hit: function(x, y){
       var r = canvas.getBoundingClientRect();
       if (r.width <= 0 || r.height <= 0) return false;
@@ -212,7 +262,7 @@ window.BSBall = function(canvas){
     // never see rAF — the softfractal LOGGING-build precedent), and
     // the orbit state for the witness.
     frame: function(){ if (gl){ for (var i = 0; i < 40; i++) drawFrame(0.05); } },
-    state: function(){ return { rot: rot, rotX: rotX, grabbed: grabbed }; },
+    state: function(){ return { rot: rot, rotX: rotX, grabbed: grabbed, view: viewName, camYaw: camYaw, camPitch: camPitch, camYawT: camYawT, camPitchT: camPitchT }; },
     // SNAPSHOT (thirteenth word, Aug 29; alpha since the same day's
     // grey-plate ruling): render a configuration instantly and hand
     // back a PNG data URL WITH TRANSPARENCY — the product floats, so
@@ -227,6 +277,7 @@ window.BSBall = function(canvas){
       if (o.rough  != null){ cur.rough = tgt.rough = o.rough; }
       if (o.scale  != null){ cur.scale = tgt.scale = o.scale; }
       rot = 0.6; rotX = 0;                       // one consistent presentation angle
+      camYaw = camYawT = 0; camPitch = camPitchT = 0;   // and one consistent camera, so every product photo matches
       drawFrame(0);
       try { return canvas.toDataURL('image/png'); } catch (e) { return null; }
     }
