@@ -4,71 +4,103 @@
   "w": 25.88,
   "h": 25.88,
   "margin": 22,
-  "g": 0.843,
+  "ox": 22.234,
+  "oy": 22.641,
+  "cw": 71,
+  "ch": 71,
+  "g": 0.951,
   "file": "assets/ui/glyph-lit/corner-back-lit.png",
-  "bytes": 4047
+  "bytes": 4516
  },
  "corner-fwd": {
   "sel": ".site-primary-nav__forward-button svg",
   "w": 25.88,
   "h": 25.88,
   "margin": 22,
-  "g": 0.905,
+  "ox": 22.578,
+  "oy": 22.641,
+  "cw": 71,
+  "ch": 71,
+  "g": 1.045,
   "file": "assets/ui/glyph-lit/corner-fwd-lit.png",
-  "bytes": 3325
+  "bytes": 3489
  },
  "bs-sound": {
   "sel": "#bs-sound img",
   "w": 25.88,
   "h": 25.88,
   "margin": 22,
-  "g": 0.93,
+  "ox": 22.5,
+  "oy": 22.641,
+  "cw": 71,
+  "ch": 71,
+  "g": 1.176,
   "file": "assets/ui/glyph-lit/bs-sound-lit.png",
-  "bytes": 3483
+  "bytes": 3692
  },
  "bs-cart": {
   "sel": "#bs-cart img",
   "w": 22.5,
   "h": 22.5,
   "margin": 22,
-  "g": 0.709,
+  "ox": 22.531,
+  "oy": 22.328,
+  "cw": 68,
+  "ch": 67,
+  "g": 0.762,
   "file": "assets/ui/glyph-lit/bs-cart-lit.png",
-  "bytes": 3830
+  "bytes": 4063
  },
  "bs-account": {
   "sel": "#bs-account img",
   "w": 25.88,
   "h": 25.88,
   "margin": 22,
-  "g": 0.692,
+  "ox": 22.188,
+  "oy": 22.641,
+  "cw": 71,
+  "ch": 71,
+  "g": 0.869,
   "file": "assets/ui/glyph-lit/bs-account-lit.png",
-  "bytes": 3514
+  "bytes": 3775
  },
  "acct-signin": {
   "sel": "#bs-acct-signin img",
   "w": 25.88,
   "h": 25.88,
   "margin": 22,
-  "g": 0.68,
+  "ox": 22.188,
+  "oy": 22.641,
+  "cw": 71,
+  "ch": 71,
+  "g": 0.755,
   "file": "assets/ui/glyph-lit/acct-signin-lit.png",
-  "bytes": 4004
+  "bytes": 4233
  },
  "acct-details": {
   "sel": "#bs-acct-details img",
   "w": 25.88,
   "h": 25.88,
   "margin": 22,
-  "g": 0.639,
+  "ox": 22.188,
+  "oy": 22.266,
+  "cw": 71,
+  "ch": 71,
+  "g": 0.705,
   "file": "assets/ui/glyph-lit/acct-details-lit.png",
-  "bytes": 3909
+  "bytes": 4087
  },
  "acct-orders": {
   "sel": "#bs-acct-orders img",
   "w": 25.88,
   "h": 25.88,
   "margin": 22,
-  "g": 0.572,
+  "ox": 22.188,
+  "oy": 22.891,
+  "cw": 71,
+  "ch": 71,
+  "g": 0.643,
   "file": "assets/ui/glyph-lit/acct-orders-lit.png",
-  "bytes": 4026
+  "bytes": 4250
  }
 }
