@@ -972,7 +972,7 @@ var BLOOM = {   // every value re-solved LIVE under THE GLOW IS D (Eric, Sept 7)
   door:      { 'fill out form': 2.354 },   // the form door's label
   plate:     { 'support@pressbackspace.com': 1.925 },   // the support address plate
   crumb:     { CHECKOUT: 1.8 },   // /cart's away crumb
-  glyph:     { 'corner-back': 0.951, 'corner-fwd-closed': 1.045, 'bs-sound': 1.176, 'bs-cart': 0.762, 'bs-account': 0.869, 'Sign in': 0.755, 'Account details': 0.705, 'Order lookup': 0.643 },   // the glyphs' filter chain — the BAKE's source (tools/glyph-bake → assets/ui/glyph-lit; each g solved so the SPRITE reads the house number in the page — re-solved Sept 7 on the pixel-true bitmaps); not applied at runtime
+  glyph:     { 'corner-back': 0.951, 'corner-fwd-closed': 1.045, 'bs-sound': 1.207, 'bs-cart': 0.762, 'bs-account': 0.869, 'Sign in': 0.755, 'Account details': 0.705, 'Order lookup': 0.712 },   // the glyphs' filter chain — the BAKE's source (tools/glyph-bake → assets/ui/glyph-lit; each g solved so the HALO under the lifted glyph reads the house number in the page — re-solved Sept 7 on the halo-only bitmaps); not applied at runtime
   hwopt:     { 300: { compact: 1.878, wide: 1.909, studio: 1.903, 'aluminum alloy': 1.969, 'walnut wood': 1.854, PVD: 2.049, 'powder-coated': 1.754, 'metallic silver': 1.893, red: 2.048, orange: 1.739, yellow: 1.875, green: 1.739, standard: 1.802, 'stainless steel': 1.795, brushed: 1.9, 'black & white': 1.9 },
            600: { compact: 0.95, standard: 0.916, wide: 0.985, studio: 0.95, 'stainless steel': 0.917, 'aluminum alloy': 0.95, 'walnut wood': 0.931, brushed: 0.926, PVD: 0.974, 'powder-coated': 0.9, 'metallic silver': 0.95, 'black & white': 0.933, red: 1.068, orange: 0.915, yellow: 0.95, green: 0.936 } },   // the customization options, per string
   platetitle: { 300: {}, 600: {} },   // lorem placeholders — the CSS defaults stand
@@ -1010,10 +1010,10 @@ function normalizeBloom(){
    re-runs the pass, debounced. Writing --bloom-g is an attribute
    mutation, not childList, so the observer cannot feed itself. */
 
-/* THE LIT GLYPH IS A SPRITE (Eric, Sept 7) — see the css banner. The
+/* THE HALO IS A SPRITE (Eric, Sept 7) — see the css banner. The
    manifest is the bake's (tools/glyph-bake/bake_glyphs.js): per glyph its
    selector, css box and halo margin; the sprite is (box + 2·margin) wide
-   and sits centred on the glyph, placed from the rects (an svg has no
+   is the HALO ONLY, sized from the bake's integer clip and placed from the glyph's recorded offset in it, under the glyph (z -1), from the rects (an svg has no
    offsetWidth), sub-pixel. Re-bake whenever a glyph's --bloom-g or the
    filter chain changes. */
 var GLYPH_SPRITES = {"corner-back": {"sel": ".site-round-button svg", "w": 25.88, "h": 25.88, "margin": 22, "ox": 22.234, "oy": 22.641, "cw": 71, "ch": 71, "file": "assets/ui/glyph-lit/corner-back-lit.png"}, "corner-fwd": {"sel": ".site-primary-nav__forward-button svg", "w": 25.88, "h": 25.88, "margin": 22, "ox": 22.578, "oy": 22.641, "cw": 71, "ch": 71, "file": "assets/ui/glyph-lit/corner-fwd-lit.png"}, "bs-sound": {"sel": "#bs-sound img", "w": 25.88, "h": 25.88, "margin": 22, "ox": 22.5, "oy": 22.641, "cw": 71, "ch": 71, "file": "assets/ui/glyph-lit/bs-sound-lit.png"}, "bs-cart": {"sel": "#bs-cart img", "w": 22.5, "h": 22.5, "margin": 22, "ox": 22.531, "oy": 22.328, "cw": 68, "ch": 67, "file": "assets/ui/glyph-lit/bs-cart-lit.png"}, "bs-account": {"sel": "#bs-account img", "w": 25.88, "h": 25.88, "margin": 22, "ox": 22.188, "oy": 22.641, "cw": 71, "ch": 71, "file": "assets/ui/glyph-lit/bs-account-lit.png"}, "acct-signin": {"sel": "#bs-acct-signin img", "w": 25.88, "h": 25.88, "margin": 22, "ox": 22.188, "oy": 22.641, "cw": 71, "ch": 71, "file": "assets/ui/glyph-lit/acct-signin-lit.png"}, "acct-details": {"sel": "#bs-acct-details img", "w": 25.88, "h": 25.88, "margin": 22, "ox": 22.188, "oy": 22.266, "cw": 71, "ch": 71, "file": "assets/ui/glyph-lit/acct-details-lit.png"}, "acct-orders": {"sel": "#bs-acct-orders img", "w": 25.88, "h": 25.88, "margin": 22, "ox": 22.188, "oy": 22.891, "cw": 71, "ch": 71, "file": "assets/ui/glyph-lit/acct-orders-lit.png"}};
@@ -1026,10 +1026,11 @@ function mountGlyphSprites(){
       var gr = el.getBoundingClientRect(), hr = host.getBoundingClientRect(); var w = gr.width || m.w, h = gr.height || m.h, s = w / m.w;
       // PIXEL-TRUE (Eric, Sept 7 — "it seems to grow"): the bake's clip is integer CSS px and the glyph sits at (ox, oy) inside it;
       // sized from the clip and placed from the offset, the bitmap lands 1:1 on device pixels at the frame viewport — sizing it
-      // from the glyph box stretched it 1.0128× and shifted it .7px, and every stroke smeared to two device px on the swap.
+      // from the glyph box stretched it 1.0128× and shifted it .7px. (The bitmap is the halo only now; the glyph itself never moves.)
       var ox = m.ox != null ? m.ox : m.margin, oy = m.oy != null ? m.oy : m.margin, cw = m.cw || (m.w + 2 * m.margin), ch = m.ch || (m.h + 2 * m.margin);
+      var hc = getComputedStyle(host), bl = parseFloat(hc.borderLeftWidth) || 0, bt = parseFloat(hc.borderTopWidth) || 0;   // the padding box by the border's computed width (clientLeft rounds a .3px border to 1 at dpr 2 — half a px off)
       img.style.width = (cw * s) + 'px'; img.style.height = (ch * s) + 'px';
-      img.style.left = (gr.left - hr.left - host.clientLeft - ox * s) + 'px'; img.style.top = (gr.top - hr.top - host.clientTop - oy * s) + 'px'; }
+      img.style.left = (gr.left - hr.left - bl - ox * s) + 'px'; img.style.top = (gr.top - hr.top - bt - oy * s) + 'px'; }
     host.appendChild(img); place(); window.addEventListener('resize', place);
   });
 }
@@ -1239,7 +1240,7 @@ function init(config){
 
   setScale();
   normalizeBloom();      // THE HOTNESS LAW — boot pass (page markup is live by now)
-  mountGlyphSprites();   // THE LIT GLYPH IS A SPRITE (Sept 7) — after the cluster and the corner exist
+  mountGlyphSprites();   // THE HALO IS A SPRITE (Sept 7) — after the cluster and the corner exist
   watchBloom();          // …and every later render (panels, trays, sub-lists); class changes re-solve the element (selected = 600)
   bindSublistClip();     // the accordion clip is for the travel only (the emission area, Sept 3)
   bootDomCursor();       // the page-rendered cursor (see the CSS block's law comment)

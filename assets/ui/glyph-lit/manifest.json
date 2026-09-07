@@ -9,8 +9,9 @@
   "cw": 71,
   "ch": 71,
   "g": 0.951,
+  "halo": true,
   "file": "assets/ui/glyph-lit/corner-back-lit.png",
-  "bytes": 4516
+  "bytes": 4698
  },
  "corner-fwd": {
   "sel": ".site-primary-nav__forward-button svg",
@@ -22,8 +23,9 @@
   "cw": 71,
   "ch": 71,
   "g": 1.045,
+  "halo": true,
   "file": "assets/ui/glyph-lit/corner-fwd-lit.png",
-  "bytes": 3489
+  "bytes": 4408
  },
  "bs-sound": {
   "sel": "#bs-sound img",
@@ -34,9 +36,10 @@
   "oy": 22.641,
   "cw": 71,
   "ch": 71,
-  "g": 1.176,
+  "g": 1.207,
+  "halo": true,
   "file": "assets/ui/glyph-lit/bs-sound-lit.png",
-  "bytes": 3692
+  "bytes": 4416
  },
  "bs-cart": {
   "sel": "#bs-cart img",
@@ -48,8 +51,9 @@
   "cw": 68,
   "ch": 67,
   "g": 0.762,
+  "halo": true,
   "file": "assets/ui/glyph-lit/bs-cart-lit.png",
-  "bytes": 4063
+  "bytes": 3938
  },
  "bs-account": {
   "sel": "#bs-account img",
@@ -61,8 +65,9 @@
   "cw": 71,
   "ch": 71,
   "g": 0.869,
+  "halo": true,
   "file": "assets/ui/glyph-lit/bs-account-lit.png",
-  "bytes": 3775
+  "bytes": 4567
  },
  "acct-signin": {
   "sel": "#bs-acct-signin img",
@@ -74,8 +79,9 @@
   "cw": 71,
   "ch": 71,
   "g": 0.755,
+  "halo": true,
   "file": "assets/ui/glyph-lit/acct-signin-lit.png",
-  "bytes": 4233
+  "bytes": 4115
  },
  "acct-details": {
   "sel": "#bs-acct-details img",
@@ -87,8 +93,9 @@
   "cw": 71,
   "ch": 71,
   "g": 0.705,
+  "halo": true,
   "file": "assets/ui/glyph-lit/acct-details-lit.png",
-  "bytes": 4087
+  "bytes": 4175
  },
  "acct-orders": {
   "sel": "#bs-acct-orders img",
@@ -99,8 +106,9 @@
   "oy": 22.891,
   "cw": 71,
   "ch": 71,
-  "g": 0.643,
+  "g": 0.712,
+  "halo": true,
   "file": "assets/ui/glyph-lit/acct-orders-lit.png",
-  "bytes": 4250
+  "bytes": 4542
  }
 }
