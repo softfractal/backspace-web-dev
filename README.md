@@ -6,7 +6,7 @@ published separately so the demo site and the regular site never share a URL.
 | | `main` | `3d-worlds` (here) |
 |---|---|---|
 | Behind the interface | black stage | a baked 3D room per page |
-| Weight | ~8 MB | ~230 MB |
+| Weight | ~8 MB | ~125 MB |
 | Runs from `file://` | yes | **no — needs a server** |
 
 Everything in front of the stage — navigation, input, glow, cursor, i18n, routing — is unchanged
@@ -64,4 +64,6 @@ Everything else on these pages is the same interface as `main` and was signed of
 - Support's pack is named `support_v4` — the fourth and final bake of that room. The name is what
   the registry points at; it is not a draft.
 - A room can be re-graded for brightness and contrast without re-rendering, in `world/registry.json`.
-- First load of a page fetches 20–25 MB of room textures. They cache after that.
+- First load of a page fetches 15–20 MB of room textures. They cache after that.
+- Room textures ship only as KTX2 (GPU-compressed). There is no uncompressed fallback, so a
+  browser without WebGL2 shows the page chrome over the poster image instead of the room.

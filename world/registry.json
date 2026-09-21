@@ -9,9 +9,7 @@
       "glb": "home.glb",
       "beauty": {
         "ktx2": "home_beauty_rgb.ktx2",
-        "png": "home_beauty_rgb.png",
-        "rest_ktx2": "home_beauty_rest_rgb.ktx2",
-        "rest_png": "home_beauty_rest_rgb.png"
+        "rest_ktx2": "home_beauty_rest_rgb.ktx2"
       },
       "poster": "home_poster.jpg",
       "lqip": "home_lqip.jpg",
@@ -123,9 +121,7 @@
       "glb": "hardware.glb",
       "beauty": {
         "ktx2": "hardware_beauty_rgb.ktx2",
-        "png": "hardware_beauty_rgb.png",
-        "rest_ktx2": "hardware_beauty_rest_rgb.ktx2",
-        "rest_png": "hardware_beauty_rest_rgb.png"
+        "rest_ktx2": "hardware_beauty_rest_rgb.ktx2"
       },
       "poster": "hardware_poster.jpg",
       "lqip": "hardware_lqip.jpg",
@@ -237,9 +233,7 @@
       "glb": "software.glb",
       "beauty": {
         "ktx2": "software_beauty_rgb.ktx2",
-        "png": "software_beauty_rgb.png",
-        "rest_ktx2": "software_beauty_rest_rgb.ktx2",
-        "rest_png": "software_beauty_rest_rgb.png"
+        "rest_ktx2": "software_beauty_rest_rgb.ktx2"
       },
       "poster": "software_poster.jpg",
       "lqip": "software_lqip.jpg",
@@ -467,9 +461,7 @@
       "glb": "community.glb",
       "beauty": {
         "ktx2": "community_beauty_rgb.ktx2",
-        "png": "community_beauty_rgb.png",
-        "rest_ktx2": "community_beauty_rest_rgb.ktx2",
-        "rest_png": "community_beauty_rest_rgb.png"
+        "rest_ktx2": "community_beauty_rest_rgb.ktx2"
       },
       "poster": "community_poster.jpg",
       "lqip": "community_lqip.jpg",
@@ -563,9 +555,7 @@
       "glb": "support.glb",
       "beauty": {
         "ktx2": "support_beauty_rgb.ktx2",
-        "png": "support_beauty_rgb.png",
-        "rest_ktx2": "support_beauty_rest_rgb.ktx2",
-        "rest_png": "support_beauty_rest_rgb.png"
+        "rest_ktx2": "support_beauty_rest_rgb.ktx2"
       },
       "poster": "support_poster.jpg",
       "lqip": "support_lqip.jpg",
