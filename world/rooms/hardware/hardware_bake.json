@@ -1,0 +1,472 @@
+{
+ "room": "hardware",
+ "regime": "locked",
+ "placeholder": false,
+ "panel": "on",
+ "panel_note": "ON \u2014 Eric's ruling, Sept 15 2026: panel emission and screen light are ON at rest (supersedes the seed's OFF-state bake for this room); both left as authored",
+ "blend": "/Users/kvtolee/Desktop/Works/BACKSPACE/3Ds/Scenes/Hardware/Hardware.blend",
+ "blend_mtime": "2026-09-19T14:50:29",
+ "blend_size_bytes": 150576,
+ "blend_unchanged_by_run": true,
+ "fixes_applied": [],
+ "ship_objects": [
+  "bs_hardware_back",
+  "bs_hardware_ceiling",
+  "bs_hardware_floor",
+  "bs_hardware_lb",
+  "bs_hardware_lw",
+  "bs_hardware_rb",
+  "bs_hardware_rw"
+ ],
+ "front_wall": "bs_hardware_front",
+ "camera": {
+  "name": "bs_hardware_cam",
+  "position": [
+   7.0,
+   0.0,
+   1.0
+  ],
+  "rotation_euler_deg": [
+   95.0,
+   -0.0,
+   90.0
+  ],
+  "lens_display_mm": 36.0,
+  "sensor_mm": 35.99999999999999,
+  "sensor_fit": "VERTICAL",
+  "hfov_display_deg": 53.1301,
+  "vfov_display_deg": 31.4173,
+  "vfov_display_note": "vertical fov at the 3840x2160 render aspect (sensor_fit HORIZONTAL); the 36x24 sensor figure is vfov_sensor_deg",
+  "vfov_sensor_deg": 31.4173,
+  "lens_padded_mm": 17.0426,
+  "hfov_padded_deg": 93.1301,
+  "vfov_padded_deg": 61.4292,
+  "pad_yaw_deg": 20.0,
+  "pad_pitch_deg": 10.0,
+  "pitch_margin_per_side_deg": 5.0059,
+  "pitch_margin_note": "vfov_padded/2 - (vfov_display/2 + pad_pitch), per side; the total headroom is twice this"
+ },
+ "at_rest_uv": {
+  "u0": 0.263298,
+  "v0": 0.263298,
+  "u1": 0.736702,
+  "v1": 0.736702
+ },
+ "at_rest_px": {
+  "x0": 1011,
+  "y0": 569,
+  "x1": 2829,
+  "y1": 1591,
+  "w": 1818,
+  "h": 1022
+ },
+ "beauty": {
+  "width": 3840,
+  "height": 2160,
+  "phases_deg": [
+   0,
+   120,
+   240
+  ],
+  "frames": [
+   0,
+   80,
+   160
+  ],
+  "view_transform": "AgX",
+  "look": "None",
+  "exposure": 0.0,
+  "samples": 1024,
+  "adaptive_threshold": 0.01,
+  "denoiser": "OIDN",
+  "denoise_gpu": true,
+  "bit_depth_master": 16,
+  "dither": "TPDF 1 LSB",
+  "chroma_max": 0.01215,
+  "chroma_p99": 0.00142,
+  "chroma_per_phase": [
+   {
+    "phase": 0,
+    "max": 0.01077,
+    "p99": 0.00142
+   },
+   {
+    "phase": 1,
+    "max": 0.01215,
+    "p99": 0.00139
+   },
+   {
+    "phase": 2,
+    "max": 0.01082,
+    "p99": 0.00142
+   }
+  ],
+  "luma_weights": [
+   0.2126,
+   0.7152,
+   0.0722
+  ]
+ },
+ "files": {
+  "glb": "hardware.glb",
+  "png": "hardware_beauty_rgb.png",
+  "ktx2": "hardware_beauty_rgb.ktx2",
+  "poster": "hardware_poster.jpg",
+  "lqip": "hardware_lqip.jpg",
+  "rest_png": "hardware_beauty_rest_rgb.png",
+  "rest_ktx2": "hardware_beauty_rest_rgb.ktx2"
+ },
+ "sizes_bytes": {
+  "glb": 9928,
+  "png": 6026266,
+  "ktx2": 7191627,
+  "poster": 180725,
+  "lqip": 867,
+  "rest_png": 11802016,
+  "rest_ktx2": 14533602
+ },
+ "glb": {
+  "nodes": [
+   "bs_hardware_back",
+   "bs_hardware_cam",
+   "bs_hardware_ceiling",
+   "bs_hardware_floor",
+   "bs_hardware_lb",
+   "bs_hardware_lw",
+   "bs_hardware_rb",
+   "bs_hardware_rw",
+   "bs_hardware_sky"
+  ],
+  "tris": 106,
+  "texcoord_sets": 1,
+  "camera_yfov_rad": 0.548335,
+  "camera_yfov_contract_3x2_rad": 0.548335,
+  "camera_aspect_ratio": 1.7777777777777777,
+  "camera_znear": 0.10000000149011612,
+  "camera_zfar": 1000,
+  "camera_node_translation": [
+   7,
+   1,
+   0
+  ],
+  "camera_node_rotation": [
+   0.030843585729599,
+   0.7064337730407715,
+   -0.030843587592244148,
+   0.7064338326454163
+  ],
+  "camera_node_extras": {
+   "pad_yaw_deg": 20.0,
+   "pad_pitch_deg": 10.0,
+   "lens_display_mm": 36.0,
+   "lens_padded_mm": 17.04256386113808,
+   "hfov_display_deg": 53.13010235415597,
+   "vfov_display_deg_16x9": 31.41727565803149
+  },
+  "extensions_required": [
+   "EXT_meshopt_compression"
+  ],
+  "extensions_used": [
+   "EXT_meshopt_compression"
+  ],
+  "primitives": 8,
+  "size_bytes": 9928,
+  "motes_primitive": null
+ },
+ "ktx2": {
+  "skipped": false,
+  "toktx_exit": 0,
+  "ktx2check_exit": 0,
+  "ktx2check": "",
+  "cmd": "toktx --t2 --encode uastc --uastc_quality 2 --zcmp 19 --genmipmap --assign_oetf srgb --assign_primaries bt709 /Users/kvtolee/Desktop/Works/BACKSPACE/Source Codes/World/world/rooms/hardware_v5/hardware_beauty_rgb.ktx2 /Users/kvtolee/Desktop/Works/BACKSPACE/Source Codes/World/world/rooms/hardware_v5/hardware_beauty_rgb.png",
+  "size_bytes": 7191627
+ },
+ "uv_proj": {
+  "bs_hardware_floor": {
+   "u": [
+    -0.7424,
+    1.7424
+   ],
+   "v": [
+    -0.0171,
+    0.3695
+   ],
+   "loops": 24,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_hardware_ceiling": {
+   "u": [
+    -0.5584,
+    1.5584
+   ],
+   "v": [
+    0.6203,
+    1.5509
+   ],
+   "loops": 56,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_hardware_back": {
+   "u": [
+    0.3783,
+    0.6217
+   ],
+   "v": [
+    0.354,
+    0.6373
+   ],
+   "loops": 24,
+   "loops_outside_01": 0,
+   "loops_behind_cam": 0
+  },
+  "bs_hardware_lb": {
+   "u": [
+    -0.6013,
+    0.4302
+   ],
+   "v": [
+    0.5519,
+    1.5509
+   ],
+   "loops": 24,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_hardware_lw": {
+   "u": [
+    -0.7424,
+    0.3915
+   ],
+   "v": [
+    -0.0171,
+    1.5509
+   ],
+   "loops": 24,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_hardware_rb": {
+   "u": [
+    0.5698,
+    1.6013
+   ],
+   "v": [
+    0.5519,
+    1.5509
+   ],
+   "loops": 24,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_hardware_rw": {
+   "u": [
+    0.6085,
+    1.7424
+   ],
+   "v": [
+    -0.0171,
+    1.5509
+   ],
+   "loops": 24,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_hardware_sky": {
+   "u": [
+    -0.9152,
+    1.9152
+   ],
+   "v": [
+    -0.3772,
+    0.5885
+   ],
+   "loops": 4,
+   "loops_outside_01": 2,
+   "loops_behind_cam": 2
+  }
+ },
+ "sky_carrier": "bs_hardware_sky",
+ "timings_s": {
+  "fixes": 0.001,
+  "cycles_setup": 0.003,
+  "pad_camera": 0.001,
+  "render_phase0": 1869.8,
+  "render_phase1": 1955.4,
+  "render_phase2": 1991.3,
+  "render_all": 5816.394,
+  "pack": 40.636,
+  "sky": 0.003,
+  "uv_proj": 0.001,
+  "motes": 0.004,
+  "export_glb": 0.039,
+  "poster": 0.279,
+  "plate_ab": 0.237,
+  "ktx2": 5.613,
+  "total": 5863.2
+ },
+ "motes": {
+  "count": 6000,
+  "radius_m": 0.0020000000949949026,
+  "radius_jitter": [
+   0.5,
+   1.5
+  ],
+  "amplitude_m": 0.05000000074505806,
+  "noise_scale": 0.5,
+  "noise_detail": 2.0,
+  "noise_roughness": 0.5,
+  "circle_radius": 0.800000011920929,
+  "period_frames": 239.999,
+  "period_s": 10.0,
+  "bounds_world": [
+   [
+    -9.7,
+    -5.1,
+    -0.1
+   ],
+   [
+    5.1,
+    5.1,
+    10.7
+   ]
+  ],
+  "omega_per_frame": 0.026179999113082886,
+  "fps": 24.0,
+  "source": "gn",
+  "node_group": "Geometry Nodes.001",
+  "formula": "pos = home + amplitude_m * (noise3((home + circle_radius * (cos(w*f), sin(w*f), 0)) * noise_scale, detail, roughness) - 0.5); w = omega_per_frame, f = frame (Blender Z-up)"
+ },
+ "motes_export": {
+  "object": "bs_hardware_motes",
+  "count": 0,
+  "attribute": null,
+  "bbox_world": null,
+  "warnings": [
+   "instance count 0 != Points.Count 6000"
+  ]
+ },
+ "plate_ab": {
+  "plate": "/Users/kvtolee/Desktop/Works/BACKSPACE/Documents/Company/PNGs/\u573a\u666f\u56fe/oasis desk.png",
+  "plate_size": [
+   4536,
+   1944
+  ],
+  "plate_mean_luma": 0.1288,
+  "bake_mean_luma": 0.18549,
+  "rms_diff": 0.13668,
+  "rms_black_vs_plate": 0.22572,
+  "crop_size": [
+   1818,
+   1022
+  ],
+  "note": "display-referred luma in 0-1 (bake from the 16-bit master R); the crop is stretched to the plate aspect; the plate predates this blend"
+ },
+ "blender": "5.2.0 LTS",
+ "deviations": [
+  {
+   "rule": "guide \u00a78 normals+tangents ON",
+   "choice": "export_normals False, export_tangents False",
+   "why": "unlit projected shell; neither is read"
+  }
+ ],
+ "rest": {
+  "note": "at-rest half of the two-texture pack: the display camera with its vertical fov held at the at-rest aspect; the runtime samples it inside uv_rect (feathered) and the padded beauty outside",
+  "aspect": "32:9",
+  "uv_rect": {
+   "u0": 0.026595,
+   "v0": 0.263298,
+   "u1": 0.973405,
+   "v1": 0.736702
+  },
+  "width": 7680,
+  "height": 2160,
+  "samples": 1024,
+  "frames": [
+   0,
+   80,
+   160
+  ],
+  "phases_deg": [
+   0,
+   120,
+   240
+  ],
+  "panel": "on",
+  "camera": {
+   "name": "bs_hardware_cam",
+   "lens_mm": 36.0,
+   "sensor_height_mm": 20.25,
+   "sensor_fit": "VERTICAL (in memory)",
+   "aspect": "32:9",
+   "hfov_deg": 90.0,
+   "vfov_deg": 31.4173,
+   "hfov_16x9_deg": 53.1301,
+   "position": [
+    7.0,
+    0.0,
+    1.0
+   ],
+   "rotation_euler_deg": [
+    95.0,
+    -0.0,
+    90.0
+   ]
+  },
+  "chroma": [
+   {
+    "phase": 0,
+    "max": 0.01004,
+    "p99": 0.00148
+   },
+   {
+    "phase": 1,
+    "max": 0.011,
+    "p99": 0.00139
+   },
+   {
+    "phase": 2,
+    "max": 0.01273,
+    "p99": 0.00145
+   }
+  ],
+  "files": {
+   "png": "hardware_beauty_rest_rgb.png",
+   "ktx2": "hardware_beauty_rest_rgb.ktx2"
+  },
+  "sizes_bytes": {
+   "png": 11802016,
+   "ktx2": 14533602
+  },
+  "ktx2": {
+   "skipped": false,
+   "toktx_exit": 0,
+   "ktx2check_exit": 0,
+   "size_bytes": 14533602
+  },
+  "plate_ab": {
+   "plate": "/Users/kvtolee/Desktop/Works/BACKSPACE/Documents/Company/PNGs/\u573a\u666f\u56fe/oasis desk.png",
+   "plate_mean_luma": 0.1288,
+   "bake_mean_luma": 0.12705,
+   "rms_diff": 0.13806,
+   "rms_black_vs_plate": 0.22572
+  },
+  "timings_s": {
+   "fixes": 0.0,
+   "cycles_setup": 0.002,
+   "camera": 0.0,
+   "render_phase0": 4932.6,
+   "render_phase1": 4796.8,
+   "render_phase2": 4467.3,
+   "render_all": 14196.796,
+   "pack": 85.111,
+   "poster": 0.912,
+   "plate_ab": 0.431,
+   "ktx2": 12.889
+  },
+  "blend_mtime": "2026-09-19T14:50:29",
+  "blend_unchanged_by_run": true
+ },
+ "poster_source": "rest"
+}

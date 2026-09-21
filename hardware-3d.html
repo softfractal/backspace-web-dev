@@ -4,8 +4,40 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#040402">
-<title>BACKSPACE — Hardware</title>
+<title>BACKSPACE — Hardware · 3D stage</title>
 <!--
+  ╔════════════════════════════════════════════════════════════════════╗
+  ║  THIS IS THE 3D-STAGE COPY OF /hardware  (Sept 11 2026)            ║
+  ╚════════════════════════════════════════════════════════════════════╝
+  hardware.html is untouched and remains the shipped page. This copy
+  answers one order: put 3Ds/Scenes/Product/Product.blend on the stage,
+  with 桌子 — the desk — standing where the texture ball stood.
+
+  WHAT CHANGED, AND ONLY THIS:
+   · <script src="shared/bs-ball.js"> gains a sibling, bs-stage3d.js, and
+     the ONE line that builds the stage names BSStage3D instead of BSBall.
+     Everything above that line — the state model, the machine, the Esc
+     ladder, the cart, the manifest — is the shipped page, verbatim. That
+     is the whole point of the STAGE-BINDING SEAM the page has carried a
+     comment about since Aug 28; this is the swap it was written for.
+   · the class menu's onClick is THE GATEWAY: choosing DESK enters the
+     product showcase and runs the reveal (Eric, Sept 11 — it was on
+     OVERVIEW for one draft, which was the wrong door). Enter is its twin.
+     OVERVIEW goes back to being the camera-angle switch and starts
+     nothing; it only holds its numerals while a reveal is in the air.
+   · an importmap, so the vendored three.js resolves its own bare imports.
+     No CDN — the weight law holds; see assets/3d/three/.
+
+  THE ORDER'S THREE STATES (Eric, Sept 11):
+     black before the gateway · the camera animation on entering the
+     showcase · LOCKED after, so the product stays presentable under
+     every other function. The gateway is DESK, on the left.
+  They live in bs-stage3d.js as DARK / FLIGHT / LOCKED. Only OVERVIEW is
+  in scope: the material menus still walk, still select and still commit,
+  but the STAGE-BINDING SEAM is deliberately left unbound (BIND_MATERIAL
+  in the module) — the finish presets were authored for the ball, and
+  re-tinting a locked product mid-presentation is what LOCKED forbids.
+
   backspace — /hardware (page five), phase one: the OASIS catalog. The
   founder's directive made this page the reason the site exists: class
   select on the left, the stage in the center, the customization column
@@ -70,7 +102,7 @@
   anymore — it came back with the diagonal ruling.
 -->
 <!-- The vendored three.js resolves its own `three` specifier through here.
-     Must precede every module load (hardware-3d.html precedent). -->
+     Must precede every module load, so it sits above the sheet. -->
 <script type="importmap">
 { "imports": { "three": "./assets/3d/three/three.module.js" } }
 </script>
@@ -1167,17 +1199,7 @@
 
 <!-- The stage: the texture ball (the scene seam's phase-one occupant). -->
 <div id="bs-stage"></div>
-<!-- The world (the hardware room, baked): poster/LQIP under the canvas from
-     first paint, the canvas over it at z 1 — UNDER #hw-ball (also z 1, later in
-     the DOM) so the stage keeps drawing over the room, and under every chrome
-     layer. world/boot.js (classic) import()s world/world.js; data-room names
-     the registry room this page hosts. -->
-<img id="bs-world-poster" src="world/rooms/hardware/hardware_lqip.jpg" alt="" aria-hidden="true"
-     style="position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;">
-<canvas id="bs-world" aria-hidden="true"
-        style="position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0;"></canvas>
-<!-- the texture sphere's canvas — kept in the DOM for the page's references, hidden: the stage is empty for now (Eric, Sept 16) -->
-<canvas id="hw-ball" aria-hidden="true" hidden style="display:none"></canvas>
+<canvas id="hw-ball" aria-hidden="true"></canvas>
 <div id="hw-coming" aria-live="polite">
   <div class="hw-coming-head" data-str="hwComingSoon"></div>
   <div class="hw-coming-sub" data-str="hwComingSoonSub"></div>
@@ -1281,7 +1303,7 @@
 
 <script src="shared/bs-chrome.js"></script>
 <script src="shared/bs-ball.js"></script>
-<script src="world/boot.js" data-room="hardware"></script>
+<script src="shared/bs-stage3d.js"></script>
 <script>
 (function(){
 'use strict';
@@ -1428,8 +1450,12 @@ var built = C.buildSlots(classMenuEl, HW.classes, {
   onBlur:  function(idx){ if (focusIdx === idx) setFocus(-1); },
   onClick: function(idx){
     setFocus(idx);
-    if (SEL.classIdx === idx) return;          // already the selection — nothing to do
-    if (clickOk()) chooseClass(idx);
+    // THE SHOWCASE GATEWAY (Eric, Sept 11). The class item is the way IN to
+    // the product: choosing DESK runs the reveal. It fires even when desk is
+    // already the selection — desk is the resting selection at boot, so the
+    // one click that matters would otherwise be the one click swallowed.
+    if (SEL.classIdx === idx){ enterShowcase(idx); return; }
+    if (clickOk()){ chooseClass(idx); enterShowcase(idx); }
   },
   onSub: function(){}
 });
@@ -1518,31 +1544,15 @@ function setRightFocus(i){
   render();
 }
 
-// ── The ball — the shared stage module (factored Aug 28, second
-// consumer /cart); the stage-binding seam below is unchanged. ──────────────
-// THE STAGE IS EMPTY (Eric, Sept 16): the texture sphere is out of the page —
-// a whole new 3D product showcase system comes later. This stub wears the
-// seam api (boot · set · show · stage · grab · orbit · hit · view · state ·
-// frame · snap) so the interaction layer above it — the state model, the
-// machine, the views, the cart — runs unchanged; nothing is drawn and
-// nothing can be taken hold of. The world (the baked room) renders behind
-// the page on its own canvas. Re-bind the showcase HERE when it arrives.
-var Ball = (function(){
-  var visible = false, grabbed = false, viewName = 'front';
-  return {
-    boot:  function(){ return true; },
-    set:   function(){},
-    show:  function(on){ visible = !!on; },
-    stage: function(){},
-    grab:  function(on){ grabbed = !!on; },
-    orbit: function(){},
-    view:  function(name){ if (name) viewName = name; },
-    hit:   function(){ return false; },
-    frame: function(){},
-    snap:  function(){ return null; },
-    state: function(){ return { empty: true, visible: visible, grabbed: grabbed, view: viewName }; }
-  };
-})();
+// ── THE STAGE — the desk in its room, where the ball used to be.
+// ONE LINE. The seam below is unchanged, as its own comment promised.
+// (BSBall still ships: the offstage SNAPSHOT instance below renders the
+// cart's product photos, and a photo of a configuration is not a stage.)
+var Ball = BSStage3D(ballEl, { debug: /[?&]dev\b/.test(location.search) });
+// THE WITNESS HOOK, ?dev only — the same precedent bs-ball.js carries for
+// its forced-frame path: a headless capture never sees eight seconds of rAF,
+// so the flight must be reachable and skippable from outside the machine.
+if (/[?&]dev\b/.test(location.search)) window.__bsStage = Ball;
 // The SNAPSHOT ball (thirteenth word): a small offstage instance that
 // renders each added configuration once and hands back its photo.
 var snapBall = null;
@@ -2103,6 +2113,14 @@ function chooseColor(ci){
 }
 
 // ── Level moves ──────────────────────────────────────────────────────────
+// ENTERING THE SHOWCASE. Deliberately NOT inside chooseClass(): the idle
+// attract calls that to restore the resting selection, and a reveal that
+// plays itself at an empty chair is worse than no reveal. Only a hand — a
+// click or Enter on the class — opens this door.
+function enterShowcase(idx){
+  if (!realClass(idx) || !Ball.replay) return;
+  Ball.replay();
+}
 function chooseClass(idx){
   SEL.classIdx = idx;
   // Re-targeting the class folds the right column back to rest — the
@@ -2279,12 +2297,33 @@ function releaseView(){
   viewBtns.forEach(function(b){ if (b.classList.contains('is-on')){ any = true; b.classList.remove('is-on'); b.setAttribute('aria-pressed', 'false'); } });
   if (any) viewIdx = -1;
 }
+// OVERVIEW IS THE VIEW SWITCH, and only that (Eric, Sept 11: "overview is
+// still the camera angle switch function"). It does not open the showcase —
+// the class item does. What it keeps is the Sept 8 ruling that the leaders
+// LAND ON THE PRODUCT: if the reveal is still in the air, the numerals hold
+// until it lands, because there is nothing to land on until then.
+function onStageLocked(cb){
+  if (!Ball.phase || Ball.phase() === 'locked'){ cb(); return; }
+  ballEl.addEventListener('bs-stage-locked', function h(){
+    ballEl.removeEventListener('bs-stage-locked', h); cb();
+  });
+}
 function showViews(){
   buildViews(); if (!viewsEl) return;
-  viewsEl.classList.remove('is-hidden');
   Ball.stage(VIEWS_BERTH);                       // the resting berth — the product does not move
   if (viewIdx < 0) viewIdx = 0;
   if (Ball.view) Ball.view(HW.views[viewIdx].view, true);
+  if (Ball.phase && Ball.phase() !== 'locked'){
+    hideViews();
+    onStageLocked(function(){
+      if (introSub !== 0 || openHead !== 0) return;   // the ladder moved on while the shot ran
+      viewsEl.classList.remove('is-hidden');
+      layoutViews();
+      drawViews();
+    });
+    return;
+  }
+  viewsEl.classList.remove('is-hidden');
   layoutViews();
   drawViews();
 }
@@ -2562,7 +2601,8 @@ C.init({
       // selects the cursored class (door #1 has no deeper level here —
       // a class is a selection, not a window).
       if (focusIdx < 0){ setFocus(0); return; }
-      if (SEL.classIdx !== focusIdx){ chooseClass(focusIdx); return; }
+      if (SEL.classIdx !== focusIdx){ chooseClass(focusIdx); enterShowcase(focusIdx); return; }
+      enterShowcase(focusIdx);                 // the gateway, from the keyboard
     },
     verticalStep:   function(down){
       if (!down && focusIdx === 0){ setFocus(-1); C.rail.focus(0); return; }

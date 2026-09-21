@@ -1,0 +1,1 @@
+{"nx":80,"ny":32,"nz":80,"type":"half","channels":4,"layout":"rgb = in-scatter per unit length, a = extinction per unit length","min":[-50.054,-0.8,-50.0],"max":[47.946,29.2,50.0],"frame":240,"samples":256}

@@ -71,20 +71,26 @@
     text-align: center;
     color: var(--ink);
     font-family: var(--font-ui); font-weight: 300;
-    font-size: calc(16px * var(--ui-scale));
-    line-height: calc(20px * var(--ui-scale));
+    /* WORLD SEAT (Eric, Sept 19): sized like the community social row (14px/300, 15px line) now that the
+       copy sits on that row's line; the witness's 16px/20px stands in Pages/software.html. */
+    font-size: calc(14px * var(--ui-scale));
+    line-height: calc(15px * var(--ui-scale));
     letter-spacing: 0;
     text-shadow: var(--bloom-rest);   /* standing copy (HOTNESS LAW) */
     white-space: nowrap;
   }
-  #bs-coming { top: 79.32vh; }
+  /* WORLD SEAT (Eric, Sept 19): the live water's reflection band sits at ~73-88vh at 24 mm, so the two lines
+     move down to the community page's social-row position (94.72vh, the certified A-3 fraction) and the gap
+     between them is halved (8.15vh -> 4.08vh). Pages/software.html is untouched; this is the World copy. */
+  #bs-coming { top: 90.64vh; }
   /* ONE line (Eric, Aug 22 — supersedes the witness frame's two-line
      box): the sub inherits the base nowrap and sizes to its content. */
-  #bs-coming-sub { top: 87.47vh; }
+  #bs-coming-sub { top: 94.72vh; }
   @media (max-width: 560px) {
     /* PROVISIONAL: narrow portrait alone may wrap — collision rule only,
        until Eric's mobile grammar. */
-    #bs-coming-sub { width: 86vw; white-space: normal; }
+    #bs-coming-sub { width: 86vw; white-space: normal; top: 88vh; }
+    #bs-coming { top: 82vh; }
   }
 
   /* Commit-arrival resolve for browsers WITHOUT view transitions (the
@@ -99,6 +105,9 @@
     html.bs-arrive #bs-wordmark { animation: none; }
   }
 </style>
+<script type="importmap">
+{ "imports": { "three": "./assets/3d/three/three.module.js" } }
+</script>
 </head>
 <body data-bs-page="software">
 
@@ -126,6 +135,12 @@
 <!-- Blank stage — SCENE SEAM. The concrete room mounts here when Eric
      rules its file format (video / bake / still all remain possible). -->
 <div id="bs-stage"></div>
+<!-- THE WORLD (Sept 17): the baked software room behind the page. Poster (z0) then the three.js canvas (z1), under
+     every chrome layer. world/boot.js is a classic script that imports world/world.js through the importmap above. -->
+<img id="bs-world-poster" src="world/rooms/software/software_lqip.jpg" alt="" aria-hidden="true"
+     style="position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;">
+<canvas id="bs-world" aria-hidden="true"
+        style="position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0;"></canvas>
 
 <!-- Wordmark at the witness's section-scene anchor; a control here
      (witness .is-clickable grammar): it leads home. -->
@@ -162,6 +177,7 @@
 <input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
 
 <script src="shared/bs-chrome.js"></script>
+<script src="world/boot.js" data-room="software"></script>
 <script>
 (function(){
 'use strict';

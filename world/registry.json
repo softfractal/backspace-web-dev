@@ -1,0 +1,698 @@
+{
+  "version": 1,
+  "rooms": {
+    "home": {
+      "regime": "locked",
+      "module": "world/rooms/home.js",
+      "dir": "world/rooms/home/",
+      "bake": "home_bake.json",
+      "glb": "home.glb",
+      "beauty": {
+        "ktx2": "home_beauty_rgb.ktx2",
+        "png": "home_beauty_rgb.png",
+        "rest_ktx2": "home_beauty_rest_rgb.ktx2",
+        "rest_png": "home_beauty_rest_rgb.png"
+      },
+      "poster": "home_poster.jpg",
+      "lqip": "home_lqip.jpg",
+      "camera": {
+        "source": "gltf",
+        "index": 0,
+        "near": 0.1,
+        "far": 100,
+        "fit": "height"
+      },
+      "hidden_nodes": [
+        "front wall",
+        "front_wall",
+        "bs_home_frontwall"
+      ],
+      "look": {
+        "enabled": true,
+        "mode": "drag",
+        "release": "return",
+        "drag_yaw_deg_per_width": 40,
+        "drag_pitch_deg_per_height": 20,
+        "drag_speed": 14,
+        "speed": 1.5,
+        "clamp_yaw_deg": 20,
+        "clamp_pitch_deg": 10,
+        "amplitude_rad": 0.1,
+        "freq": [
+          0.26,
+          0.27,
+          0.23
+        ],
+        "parallax_yaw_deg": 10,
+        "parallax_pitch_deg": 5
+      },
+      "mix": {
+        "normalize": true,
+        "weights": "cursed-library-nested-sinusoids",
+        "mood_gain": 0.03,
+        "uv_mode": "projective",
+        "gain": 3,
+        "time_scale": 0.3,
+        "wobble": 0.3,
+        "rest_feather": 0.012,
+        "contrast": 1.3,
+        "contrast_pivot": 0.5
+      },
+      "panel": {
+        "node": "bs_home_panel",
+        "default": "off",
+        "power_on_s": 2.5,
+        "content": {
+          "desk": "assets/bs_panel_desk_1600.jpg",
+          "software": "assets/bs_panel_software_1600.jpg",
+          "community": "assets/bs_panel_community_1600.jpg",
+          "support": "assets/bs_panel_support_1600.jpg"
+        }
+      },
+      "motes": {
+        "enabled": false,
+        "count": 6000,
+        "size_px": 2.5,
+        "alpha": 0.4,
+        "beauty_gate": true,
+        "atten_ref_m": 6.0,
+        "max_scale": 1.5,
+        "gate_lo": 0.01,
+        "gate_hi": 0.12,
+        "seed": 1337
+      },
+      "governor": {
+        "dpr_cap": 2,
+        "idle_s": 10,
+        "idle_fps": 30,
+        "resolve_s": 0.6,
+        "blur": "idle"
+      },
+      "budget": {
+        "wire_bytes": 9000000,
+        "vram_bytes": 83886080,
+        "tris": 5000
+      },
+      "variants": {
+        "paneloff": {
+          "dir": "world/rooms/home_paneloff/"
+        },
+        "w1920": {
+          "dir": "world/rooms/home_1920/"
+        },
+        "s256": {
+          "dir": "world/rooms/home_256/"
+        },
+        "v1": {
+          "dir": "world/rooms/home_v1/"
+        },
+        "v2": {
+          "dir": "world/rooms/home/"
+        }
+      },
+      "grain": {
+        "amount": 0,
+        "size_px": 1.5
+      }
+    },
+    "hardware": {
+      "regime": "locked",
+      "module": "world/rooms/home.js",
+      "dir": "world/rooms/hardware/",
+      "bake": "hardware_bake.json",
+      "glb": "hardware.glb",
+      "beauty": {
+        "ktx2": "hardware_beauty_rgb.ktx2",
+        "png": "hardware_beauty_rgb.png",
+        "rest_ktx2": "hardware_beauty_rest_rgb.ktx2",
+        "rest_png": "hardware_beauty_rest_rgb.png"
+      },
+      "poster": "hardware_poster.jpg",
+      "lqip": "hardware_lqip.jpg",
+      "camera": {
+        "source": "gltf",
+        "index": 0,
+        "near": 0.1,
+        "far": 100,
+        "fit": "height"
+      },
+      "hidden_nodes": [
+        "bs_hardware_front"
+      ],
+      "look": {
+        "enabled": true,
+        "mode": "drag",
+        "release": "return",
+        "drag_yaw_deg_per_width": 40,
+        "drag_pitch_deg_per_height": 20,
+        "drag_speed": 14,
+        "speed": 1.5,
+        "clamp_yaw_deg": 20,
+        "clamp_pitch_deg": 10,
+        "amplitude_rad": 0.1,
+        "freq": [
+          0.26,
+          0.27,
+          0.23
+        ],
+        "parallax_yaw_deg": 10,
+        "parallax_pitch_deg": 5
+      },
+      "mix": {
+        "normalize": true,
+        "weights": "cursed-library-nested-sinusoids",
+        "mood_gain": 0.03,
+        "uv_mode": "projective",
+        "gain": 3,
+        "time_scale": 0.3,
+        "wobble": 0.3,
+        "rest_feather": 0.012,
+        "contrast": 1.2,
+        "contrast_pivot": 0.5
+      },
+      "motes": {
+        "enabled": false,
+        "count": 6000,
+        "size_px": 2.5,
+        "alpha": 0.4,
+        "beauty_gate": true,
+        "atten_ref_m": 6.0,
+        "max_scale": 1.5,
+        "gate_lo": 0.01,
+        "gate_hi": 0.12,
+        "seed": 1337
+      },
+      "governor": {
+        "dpr_cap": 2,
+        "idle_s": 10,
+        "idle_fps": 30,
+        "resolve_s": 0.6,
+        "blur": "idle"
+      },
+      "budget": {
+        "wire_bytes": 9000000,
+        "vram_bytes": 83886080,
+        "tris": 5000
+      },
+      "variants": {
+        "s256": {
+          "dir": "world/rooms/hardware_256/"
+        },
+        "v1": {
+          "dir": "world/rooms/hardware_v1/"
+        },
+        "v2": {
+          "dir": "world/rooms/hardware_v2/"
+        },
+        "v3": {
+          "dir": "world/rooms/hardware_v3/"
+        },
+        "v4": {
+          "dir": "world/rooms/hardware_v4/"
+        },
+        "w32": {
+          "dir": "world/rooms/hardware_v4w/"
+        },
+        "v5": {
+          "dir": "world/rooms/hardware/"
+        },
+        "preview": {
+          "dir": "world/rooms/hardware_preview/",
+          "_status": "LOW-QUALITY composition preview (1920 / 32 spp, padded only) of Eric's reworked camera; not for shipping"
+        }
+      },
+      "grain": {
+        "amount": 0,
+        "size_px": 1.5
+      },
+      "sky": {
+        "override": "white"
+      }
+    },
+    "software": {
+      "regime": "locked",
+      "module": "world/rooms/home.js",
+      "dir": "world/rooms/software/",
+      "bake": "software_bake.json",
+      "glb": "software.glb",
+      "beauty": {
+        "ktx2": "software_beauty_rgb.ktx2",
+        "png": "software_beauty_rgb.png",
+        "rest_ktx2": "software_beauty_rest_rgb.ktx2",
+        "rest_png": "software_beauty_rest_rgb.png"
+      },
+      "poster": "software_poster.jpg",
+      "lqip": "software_lqip.jpg",
+      "camera": {
+        "source": "gltf",
+        "index": 0,
+        "near": 0.1,
+        "far": 100,
+        "fit": "height"
+      },
+      "hidden_nodes": [],
+      "look": {
+        "enabled": true,
+        "mode": "drag",
+        "release": "return",
+        "drag_yaw_deg_per_width": 40,
+        "drag_pitch_deg_per_height": 20,
+        "drag_speed": 14,
+        "speed": 1.5,
+        "clamp_yaw_deg": 20,
+        "clamp_pitch_deg": 10,
+        "amplitude_rad": 0.1,
+        "freq": [
+          0.26,
+          0.27,
+          0.23
+        ],
+        "parallax_yaw_deg": 10,
+        "parallax_pitch_deg": 5
+      },
+      "mix": {
+        "normalize": true,
+        "weights": "cursed-library-nested-sinusoids",
+        "mood_gain": 0.03,
+        "uv_mode": "projective",
+        "gain": 3,
+        "time_scale": 0.6,
+        "wobble": 0.3,
+        "rest_feather": 0.012,
+        "contrast": 1.1,
+        "contrast_pivot": 0.5
+      },
+      "panel": {
+        "node": "bs_software_panel",
+        "default": "off",
+        "power_on_s": 2.5,
+        "content": {}
+      },
+      "motes": {
+        "enabled": false,
+        "count": 6000,
+        "size_px": 2.5,
+        "alpha": 0.4,
+        "beauty_gate": true,
+        "atten_ref_m": 6.0,
+        "max_scale": 1.5,
+        "gate_lo": 0.01,
+        "gate_hi": 0.12,
+        "seed": 1337
+      },
+      "governor": {
+        "dpr_cap": 2,
+        "idle_s": 10,
+        "idle_fps": 30,
+        "resolve_s": 0.6,
+        "blur": "idle"
+      },
+      "budget": {
+        "wire_bytes": 9000000,
+        "vram_bytes": 83886080,
+        "tris": 5000
+      },
+      "variants": {
+        "v1": {
+          "dir": "world/rooms/software_v1/"
+        },
+        "v2": {
+          "dir": "world/rooms/software_v2/"
+        },
+        "v3": {
+          "dir": "world/rooms/software_v3/",
+          "_note": "the 36 mm / 4 m-room v3 plate pack (Sept 18 12:05); its water values: strip y 2.0, core half_h 0.005 / half_w 2.25 / radiance 60, reflect_gain 0.8 (set live if compared)"
+        },
+        "v5": {
+          "dir": "world/rooms/software/"
+        }
+      },
+      "grain": {
+        "amount": 0,
+        "size_px": 1.5
+      },
+      "water": {
+        "mesh": "water",
+        "enabled": true,
+        "mode": "material",
+        "loop_s": 10.0,
+        "noise": {
+          "type": "cycles_perlin_fbm",
+          "scale": 6.0,
+          "detail": 2,
+          "roughness": 0.6,
+          "lacunarity": 2.0,
+          "normalize": true,
+          "distortion": 0
+        },
+        "travel_m": 0.6,
+        "travel_axis": "blender+Y (three -Z) lookup offset; the pattern is SEEN travelling toward three +Z = camera-left",
+        "field": "layers4d",
+        "field_note": "layers4d = three single-octave 4D Noise layers sampled on a (z,W) circle (in-place morph) with a per-layer cos/sin drift crossfade: exact 10 s loop, flat variance, features born and gone in 2-4 s; fbm3d = the Sept 17 two-copy crossfade of the 3D fBm (noise/travel_m), kept live for A/B. Rule: travel_m*scale*cos(spread_deg) >= 2 cells; morph_r <= 0.5",
+        "layers4d": {
+          "gain": 0.97,
+          "circle_centre": [
+            0.5,
+            0.5
+          ],
+          "layers": [
+            {
+              "scale": 6,
+              "amp": 1.0,
+              "travel_m": 0.35,
+              "morph_r": 0.3,
+              "stagger": 0.0,
+              "morph_phase": 0.0,
+              "spread_deg": -8
+            },
+            {
+              "scale": 12,
+              "amp": 0.6,
+              "travel_m": 0.45,
+              "morph_r": 0.35,
+              "stagger": 0.3333333333333333,
+              "morph_phase": 0.08333333333333333,
+              "spread_deg": 0
+            },
+            {
+              "scale": 24,
+              "amp": 0.36,
+              "travel_m": 0.55,
+              "morph_r": 0.4,
+              "stagger": 0.6666666666666666,
+              "morph_phase": 0.16666666666666666,
+              "spread_deg": 8
+            }
+          ],
+          "fallback_drop_middle": {
+            "gain": 0.776,
+            "layers": "entries 0 and 2 with stagger 0 / 0.5 and morph_phase 0 / 0.125 (measured std 0.0939 at G 0.97 -> 0.776 restores 0.075; tempo 0.94x today, 64 hash4)"
+          }
+        },
+        "bump": {
+          "strength": 0.16,
+          "distance": 0.08,
+          "invert": false
+        },
+        "ior": 4.0,
+        "roughness": 0.06,
+        "alpha": 0.5,
+        "base": 0.00077,
+        "strip": {
+          "x": -4.78,
+          "y": 1.2,
+          "half_h": 0.05,
+          "half_w": 4.8,
+          "radiance": 3.0,
+          "spread": 2.0,
+          "core": {
+            "x": -4.75,
+            "y": 1.2,
+            "half_h": 0.0125,
+            "half_w": 4.85,
+            "radiance": 25.0
+          },
+          "radiance_note": "v5 (24 mm, lamp 0.025 x 9.7 m): core radiance re-fit 60 -> 25 (the lamp has 2.4x the v3 area at the same 60 W, and 25 is the blurred-envelope optimum vs a Cycles full-water reference at 24 mm), reflect_gain 0.8 -> 1.0 (matches the reference's mean 59.8 vs 59.5); slit radiance 3 unchanged",
+          "geometry_note": "Sept 19 02:36 file: slit 1.15..1.25 (10 cm, centre 1.2) between slabbottom (-2.85..1.15) and slabtop (1.25..5.25), slabs y +-6.5, panel +-5, visible width clipped by the rear beams at y +-4.8; lamp bs_software_light_env 60 W 0.025 x 9.7 m at (-4.75, 0, 1.2); camera 24 mm at (7,0,2)"
+        },
+        "reflect_gain": 1.0,
+        "reflect_lod_bias": 0.0,
+        "rest_lod_bias": 1.08,
+        "plate_cap": 1.0,
+        "plate_note": "1.0 since the v3 plate bake (Sept 18 12:05): the sheet's baked pixel holds fog + the 50 % floor-through + the body only (water split on Light Path > Is Camera Ray in _work/Software_v3plate.blend), so the live reflection carries all of the glints; 0.09 was the stopgap over the v2 plate (?variant=v2), which still needs mix.gain_overrides {\"water\": 1}",
+        "source_note": "defaults mirror M_bs_software_water in Software.blend 2026-09-17T23:06 (the baked file): Roughness 0.06, Alpha 0.5, Base 0.000774, IOR 1.8, Specular IOR Level 0.5, Multi-GGX; Bump 0.16 / 0.08 / Filter Width 0.1; clock 0.0041667 (1/240 = 240 frames at 24 fps = 10 s); water object (0,0,0.21), trapezoid (-5,+-3)..(5,+-5)",
+        "legacy": {
+          "reflect": {
+            "bump": 0.2,
+            "reflect_lod": 2.0,
+            "base": 0.006,
+            "ripple_scale": 6.0,
+            "ripple_speed": 0.06,
+            "ripple_dir": [
+              0,
+              -1
+            ]
+          },
+          "displace": {
+            "phase": 0,
+            "ripple_amp": 0.004,
+            "ripple_scale": 6.0,
+            "ripple_speed": 0.06,
+            "ripple_dir": [
+              0,
+              -1
+            ],
+            "glint": 0.35,
+            "atten_ref_m": 6.0
+          }
+        },
+        "ripple_scale": 6.0,
+        "ripple_speed": 0.06,
+        "ripple_dir": [
+          0,
+          -1
+        ],
+        "ripple_amp": 0.004,
+        "glint": 0.35,
+        "atten_ref_m": 6.0,
+        "reflect_lod": 2.0,
+        "phase": 0
+      }
+    },
+    "community": {
+      "regime": "locked",
+      "module": "world/rooms/home.js",
+      "dir": "world/rooms/community/",
+      "bake": "community_bake.json",
+      "glb": "community.glb",
+      "beauty": {
+        "ktx2": "community_beauty_rgb.ktx2",
+        "png": "community_beauty_rgb.png",
+        "rest_ktx2": "community_beauty_rest_rgb.ktx2",
+        "rest_png": "community_beauty_rest_rgb.png"
+      },
+      "poster": "community_poster.jpg",
+      "lqip": "community_lqip.jpg",
+      "camera": {
+        "source": "gltf",
+        "index": 0,
+        "near": 0.1,
+        "far": 100,
+        "fit": "height"
+      },
+      "hidden_nodes": [],
+      "look": {
+        "enabled": true,
+        "mode": "drag",
+        "release": "return",
+        "drag_yaw_deg_per_width": 40,
+        "drag_pitch_deg_per_height": 20,
+        "drag_speed": 14,
+        "speed": 1.5,
+        "clamp_yaw_deg": 20,
+        "clamp_pitch_deg": 10,
+        "amplitude_rad": 0.1,
+        "freq": [
+          0.26,
+          0.27,
+          0.23
+        ],
+        "parallax_yaw_deg": 10,
+        "parallax_pitch_deg": 5
+      },
+      "mix": {
+        "normalize": true,
+        "weights": "cursed-library-nested-sinusoids",
+        "mood_gain": 0.03,
+        "uv_mode": "projective",
+        "gain": 7,
+        "time_scale": 0.6,
+        "wobble": 0.3,
+        "rest_feather": 0.012,
+        "contrast": 1.4,
+        "contrast_pivot": 0.5
+      },
+      "panel": {
+        "node": "bs_community_panel",
+        "default": "off",
+        "power_on_s": 2.5,
+        "content": {}
+      },
+      "motes": {
+        "enabled": false,
+        "count": 6000,
+        "size_px": 2.5,
+        "alpha": 0.4,
+        "beauty_gate": true,
+        "atten_ref_m": 6.0,
+        "max_scale": 1.5,
+        "gate_lo": 0.01,
+        "gate_hi": 0.12,
+        "seed": 1337
+      },
+      "governor": {
+        "dpr_cap": 2,
+        "idle_s": 10,
+        "idle_fps": 30,
+        "resolve_s": 0.6,
+        "blur": "idle"
+      },
+      "budget": {
+        "wire_bytes": 9000000,
+        "vram_bytes": 83886080,
+        "tris": 5000
+      },
+      "variants": {
+        "v1": {
+          "dir": "world/rooms/community_v1/"
+        },
+        "v2": {
+          "dir": "world/rooms/community/"
+        }
+      },
+      "grain": {
+        "amount": 0,
+        "size_px": 1.5
+      }
+    },
+    "support": {
+      "regime": "locked",
+      "module": "world/rooms/home.js",
+      "dir": "world/rooms/support_v4/",
+      "bake": "support_bake.json",
+      "glb": "support.glb",
+      "beauty": {
+        "ktx2": "support_beauty_rgb.ktx2",
+        "png": "support_beauty_rgb.png",
+        "rest_ktx2": "support_beauty_rest_rgb.ktx2",
+        "rest_png": "support_beauty_rest_rgb.png"
+      },
+      "poster": "support_poster.jpg",
+      "lqip": "support_lqip.jpg",
+      "camera": {
+        "source": "gltf",
+        "index": 0,
+        "near": 0.1,
+        "far": 100,
+        "fit": "height"
+      },
+      "hidden_nodes": [],
+      "look": {
+        "enabled": true,
+        "mode": "drag",
+        "release": "return",
+        "drag_yaw_deg_per_width": 40,
+        "drag_pitch_deg_per_height": 20,
+        "drag_speed": 14,
+        "speed": 1.5,
+        "clamp_yaw_deg": 20,
+        "clamp_pitch_deg": 10,
+        "amplitude_rad": 0.1,
+        "freq": [
+          0.26,
+          0.27,
+          0.23
+        ],
+        "parallax_yaw_deg": 10,
+        "parallax_pitch_deg": 5
+      },
+      "mix": {
+        "normalize": true,
+        "weights": "cursed-library-nested-sinusoids",
+        "mood_gain": 0.03,
+        "uv_mode": "projective",
+        "gain": 7,
+        "time_scale": 0.6,
+        "wobble": 0.3,
+        "rest_feather": 0.012,
+        "contrast": 1.2,
+        "contrast_pivot": 0.5,
+        "exposure": 1.0
+      },
+      "panel": {
+        "node": "bs_support_panel",
+        "default": "off",
+        "power_on_s": 2.5,
+        "content": {}
+      },
+      "motes": {
+        "enabled": false,
+        "count": 6000,
+        "size_px": 2.5,
+        "alpha": 0.4,
+        "beauty_gate": true,
+        "atten_ref_m": 6.0,
+        "max_scale": 1.5,
+        "gate_lo": 0.01,
+        "gate_hi": 0.12,
+        "seed": 1337
+      },
+      "governor": {
+        "dpr_cap": 2,
+        "idle_s": 10,
+        "idle_fps": 30,
+        "resolve_s": 0.6,
+        "blur": "idle"
+      },
+      "budget": {
+        "wire_bytes": 9000000,
+        "vram_bytes": 83886080,
+        "tris": 5000
+      },
+      "variants": {
+        "preview": {
+          "dir": "world/rooms/support_preview/",
+          "_status": "low-quality preview slot (1920 / 32 spp) -- not for shipping"
+        },
+        "v1": {
+          "dir": "world/rooms/support_v1/",
+          "_status": "the first bake (one room-filling fog 0.08, 600 W; padded only)"
+        },
+        "previewB": {
+          "dir": "world/rooms/support_previewB/",
+          "_status": "low-quality preview slot (1920 / 32 spp) -- not for shipping"
+        },
+        "v2": {
+          "dir": "world/rooms/support/",
+          "_status": "the L12 reference-matched look (padded + 32:9), Sept 20 10:22"
+        },
+        "previewC": {
+          "dir": "world/rooms/support_previewC/",
+          "_status": "low-quality preview slot (1920 / 32 spp) -- not for shipping"
+        },
+        "v3": {
+          "dir": "world/rooms/support_v3/",
+          "_status": "the previous room (4 m, lights at 50 %), padded + 32:9"
+        },
+        "v4": {
+          "dir": "world/rooms/support_v4/"
+        }
+      },
+      "grain": {
+        "amount": 0,
+        "size_px": 1.5
+      },
+      "_status": "Sept 21 08:20: V4 CANONICAL -- Eric's 03:00 room (5 m tall, lights 150/150/50 W, floor-ish fog in the bake), padded 3840/1024 + 32:9 rest, 41 MB. Grade: mix.exposure 1.00 + contrast 1.20 @ pivot 0.5 (the dim itself lives in the bake). v3/v2/v1 kept as variants",
+      "floor_fog": {
+        "enabled": false,
+        "spread_m": 1.4,
+        "height_m": 0.55,
+        "steps": 16,
+        "density": 3.2,
+        "scale_m": 4.5,
+        "speed": 0.05,
+        "lit_gain": 1.0,
+        "gate": [
+          0.05,
+          0.35
+        ],
+        "color": "#ffffff",
+        "_note": "DISABLED Sept 21 (Eric wanted the baked room clean). enabled:true brings it back with these values; nothing is created while it is false.",
+        "threshold": 0.5,
+        "soften": 0.22,
+        "back_bias": 0.75,
+        "near_fade_m": 2.5
+      }
+    }
+  }
+}

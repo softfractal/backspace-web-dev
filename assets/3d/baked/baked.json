@@ -1,0 +1,56 @@
+{
+ "objects": {
+  "bottom": {
+   "tex": "baked_bottom.jpg",
+   "res": 1024,
+   "scale": 1.874361
+  },
+  "top": {
+   "tex": "baked_top.jpg",
+   "res": 1024,
+   "scale": 4.215533
+  },
+  "left": {
+   "tex": "baked_left.jpg",
+   "res": 1024,
+   "scale": 0.192644
+  },
+  "right": {
+   "tex": "baked_right.jpg",
+   "res": 1024,
+   "scale": 0.197613
+  },
+  "back": {
+   "tex": "baked_back.jpg",
+   "res": 1024,
+   "scale": 0.19687
+  },
+  "beam left": {
+   "tex": "baked_beam_left.jpg",
+   "res": 1024,
+   "scale": 0.105654
+  },
+  "beam right": {
+   "tex": "baked_beam_right.jpg",
+   "res": 1024,
+   "scale": 0.130056
+  },
+  "cover left": {
+   "tex": "baked_cover_left.jpg",
+   "res": 1024,
+   "scale": 0.105393
+  },
+  "cover right": {
+   "tex": "baked_cover_right.jpg",
+   "res": 1024,
+   "scale": 0.118556
+  },
+  "product_desk": {
+   "tex": "baked_product_desk.jpg",
+   "res": 2048,
+   "scale": 5.6641
+  }
+ },
+ "frame": 240,
+ "glb": "product_baked.glb"
+}

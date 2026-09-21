@@ -28,6 +28,11 @@
   the shipped default is ratified; the overlay-then-navigate variant is
   retired (nothing architecturally precluded it, none needed).
 -->
+<!-- The vendored three.js resolves its own `three` specifier through here.
+     Must precede every module load (hardware-3d.html precedent). -->
+<script type="importmap">
+{ "imports": { "three": "./assets/3d/three/three.module.js" } }
+</script>
 <link rel="stylesheet" href="shared/bs-chrome.css">
 <style>
   /* ── Film-selection strip — .horizontal-strip port, rules verbatim ──
@@ -122,6 +127,16 @@
      the panel frame and its per-section content binding were removed on
      Eric's ruling (Aug 20) and return with the real scene work. -->
 <div id="bs-stage"></div>
+<!-- The world: poster/LQIP UNDER the canvas from first paint (static src,
+     no script needed), the canvas over it (opacity 0 until the first frame;
+     world.js fades only the canvas in, then hides the poster), both under
+     every chrome layer (wordmark z10 … cursor z99). world/boot.js is a
+     CLASSIC script so file:// and no-WebGL2 fail visibly; it import()s
+     world/world.js through the importmap above. -->
+<img id="bs-world-poster" src="world/rooms/home/home_lqip.jpg" alt="" aria-hidden="true"
+     style="position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;">
+<canvas id="bs-world" aria-hidden="true"
+        style="position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0;"></canvas>
 
 <img id="bs-wordmark" src="assets/bs_wordmark.svg" alt="backspace">
 
@@ -147,6 +162,7 @@
 <input type="checkbox" switch id="bs-haptic" aria-hidden="true" tabindex="-1">
 
 <script src="shared/bs-chrome.js"></script>
+<script src="world/boot.js"></script>
 <script>
 (function(){
 'use strict';

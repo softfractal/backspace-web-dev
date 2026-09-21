@@ -1,0 +1,489 @@
+{
+ "room": "home",
+ "regime": "locked",
+ "placeholder": false,
+ "panel": "on",
+ "panel_note": "ON \u2014 Eric's ruling, Sept 15 2026: panel emission and screen light are ON at rest (supersedes the seed's OFF-state bake for this room); both left as authored",
+ "blend": "/Users/kvtolee/Desktop/Works/BACKSPACE/3Ds/Scenes/Home/Home.blend",
+ "blend_mtime": "2026-09-17T11:38:57",
+ "blend_size_bytes": 154390,
+ "blend_unchanged_by_run": true,
+ "fixes_applied": [
+  "panel UV layer 'uv_proj' created: quad 0-1 (axes u=y+ v=z+, extents (0.0, 4.8, 2.7))"
+ ],
+ "ship_objects": [
+  "bs_home_back",
+  "bs_home_ceiling",
+  "bs_home_floor",
+  "bs_home_lw",
+  "bs_home_panel",
+  "bs_home_rw"
+ ],
+ "front_wall": "bs_home_front",
+ "camera": {
+  "name": "bs_home_cam",
+  "position": [
+   6.0,
+   0.0,
+   1.5
+  ],
+  "rotation_euler_deg": [
+   90.0,
+   -0.0,
+   90.0
+  ],
+  "lens_display_mm": 36.0,
+  "sensor_mm": 35.99999999999999,
+  "sensor_fit": "VERTICAL",
+  "hfov_display_deg": 53.1301,
+  "vfov_display_deg": 31.4173,
+  "vfov_display_note": "vertical fov at the 3840x2160 render aspect (sensor_fit HORIZONTAL); the 36x24 sensor figure is vfov_sensor_deg",
+  "vfov_sensor_deg": 31.4173,
+  "lens_padded_mm": 17.0426,
+  "hfov_padded_deg": 93.1301,
+  "vfov_padded_deg": 61.4292,
+  "pad_yaw_deg": 20.0,
+  "pad_pitch_deg": 10.0,
+  "pitch_margin_per_side_deg": 5.0059,
+  "pitch_margin_note": "vfov_padded/2 - (vfov_display/2 + pad_pitch), per side; the total headroom is twice this"
+ },
+ "at_rest_uv": {
+  "u0": 0.263298,
+  "v0": 0.263298,
+  "u1": 0.736702,
+  "v1": 0.736702
+ },
+ "at_rest_px": {
+  "x0": 1011,
+  "y0": 569,
+  "x1": 2829,
+  "y1": 1591,
+  "w": 1818,
+  "h": 1022
+ },
+ "beauty": {
+  "width": 3840,
+  "height": 2160,
+  "phases_deg": [
+   0,
+   120,
+   240
+  ],
+  "frames": [
+   0,
+   80,
+   160
+  ],
+  "view_transform": "AgX",
+  "look": "None",
+  "exposure": 0.0,
+  "samples": 1024,
+  "adaptive_threshold": 0.01,
+  "denoiser": "OIDN",
+  "denoise_gpu": true,
+  "bit_depth_master": 16,
+  "dither": "TPDF 1 LSB",
+  "chroma_max": 0.0081,
+  "chroma_p99": 0.00192,
+  "chroma_per_phase": [
+   {
+    "phase": 0,
+    "max": 0.00798,
+    "p99": 0.00191
+   },
+   {
+    "phase": 1,
+    "max": 0.0081,
+    "p99": 0.00188
+   },
+   {
+    "phase": 2,
+    "max": 0.00804,
+    "p99": 0.00192
+   }
+  ],
+  "luma_weights": [
+   0.2126,
+   0.7152,
+   0.0722
+  ]
+ },
+ "files": {
+  "glb": "home.glb",
+  "png": "home_beauty_rgb.png",
+  "ktx2": "home_beauty_rgb.ktx2",
+  "poster": "home_poster.jpg",
+  "lqip": "home_lqip.jpg",
+  "rest_png": "home_beauty_rest_rgb.png",
+  "rest_ktx2": "home_beauty_rest_rgb.ktx2"
+ },
+ "sizes_bytes": {
+  "glb": 19104,
+  "png": 10310366,
+  "ktx2": 8462183,
+  "poster": 519008,
+  "lqip": 996,
+  "rest_png": 18040871,
+  "rest_ktx2": 16374995
+ },
+ "glb": {
+  "nodes": [
+   "bs_home_back",
+   "bs_home_cam",
+   "bs_home_ceiling",
+   "bs_home_floor",
+   "bs_home_lw",
+   "bs_home_motes",
+   "bs_home_panel",
+   "bs_home_rw",
+   "bs_home_sky"
+  ],
+  "tris": 120,
+  "texcoord_sets": 1,
+  "camera_yfov_rad": 0.548335,
+  "camera_yfov_contract_3x2_rad": 0.548335,
+  "camera_aspect_ratio": 1.7777777777777777,
+  "camera_znear": 0.10000000149011612,
+  "camera_zfar": 1000,
+  "camera_node_translation": [
+   6,
+   1.5,
+   0
+  ],
+  "camera_node_rotation": [
+   0,
+   0.7071068286895752,
+   0,
+   0.7071068286895752
+  ],
+  "camera_node_extras": {
+   "pad_yaw_deg": 20.0,
+   "pad_pitch_deg": 10.0,
+   "lens_display_mm": 36.0,
+   "lens_padded_mm": 17.04256386113808,
+   "hfov_display_deg": 53.13010235415597,
+   "vfov_display_deg_16x9": 31.41727565803149
+  },
+  "extensions_required": [
+   "EXT_meshopt_compression"
+  ],
+  "extensions_used": [
+   "EXT_meshopt_compression"
+  ],
+  "primitives": 8,
+  "size_bytes": 19104,
+  "motes_primitive": {
+   "mesh": "bs_home_motes",
+   "mode": 0,
+   "position_count": 880,
+   "attributes": [
+    "POSITION",
+    "_JITTER"
+   ],
+   "has_indices": false
+  }
+ },
+ "ktx2": {
+  "skipped": false,
+  "toktx_exit": 0,
+  "ktx2check_exit": 0,
+  "ktx2check": "",
+  "cmd": "toktx --t2 --encode uastc --uastc_quality 2 --zcmp 19 --genmipmap --assign_oetf srgb --assign_primaries bt709 /Users/kvtolee/Desktop/Works/BACKSPACE/Source Codes/World/world/rooms/home_v2/home_beauty_rgb.ktx2 /Users/kvtolee/Desktop/Works/BACKSPACE/Source Codes/World/world/rooms/home_v2/home_beauty_rgb.png",
+  "size_bytes": 8462183
+ },
+ "uv_proj": {
+  "bs_home_floor": {
+   "u": [
+    -1.867,
+    2.867
+   ],
+   "v": [
+    -0.7624,
+    0.4005
+   ],
+   "loops": 24,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_home_back": {
+   "u": [
+    0.3685,
+    0.6315
+   ],
+   "v": [
+    0.3831,
+    0.6948
+   ],
+   "loops": 136,
+   "loops_outside_01": 0,
+   "loops_behind_cam": 0
+  },
+  "bs_home_lw": {
+   "u": [
+    -1.867,
+    0.3795
+   ],
+   "v": [
+    -0.7624,
+    2.604
+   ],
+   "loops": 24,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_home_rw": {
+   "u": [
+    0.6205,
+    2.867
+   ],
+   "v": [
+    -0.7624,
+    2.604
+   ],
+   "loops": 24,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_home_ceiling": {
+   "u": [
+    -1.867,
+    2.867
+   ],
+   "v": [
+    0.676,
+    2.604
+   ],
+   "loops": 24,
+   "loops_outside_01": 12,
+   "loops_behind_cam": 0
+  },
+  "bs_home_sky": {
+   "u": [
+    -0.5415,
+    1.5415
+   ],
+   "v": [
+    -0.005,
+    0.6485
+   ],
+   "loops": 4,
+   "loops_outside_01": 2,
+   "loops_behind_cam": 2
+  }
+ },
+ "sky_carrier": "bs_home_sky",
+ "timings_s": {
+  "fixes": 0.001,
+  "cycles_setup": 0.002,
+  "pad_camera": 0.0,
+  "render_phase0": 1066.6,
+  "render_phase1": 1077.5,
+  "render_phase2": 1070.3,
+  "render_all": 3214.342,
+  "pack": 11.364,
+  "sky": 0.001,
+  "uv_proj": 0.001,
+  "motes": 0.01,
+  "export_glb": 0.047,
+  "poster": 0.281,
+  "plate_ab": 0.047,
+  "ktx2": 5.85,
+  "total": 3231.9
+ },
+ "motes": {
+  "count": 6000,
+  "radius_m": 0.0020000000949949026,
+  "radius_jitter": [
+   0.5,
+   1.5
+  ],
+  "amplitude_m": 0.05000000074505806,
+  "noise_scale": 0.5,
+  "noise_detail": 2.0,
+  "noise_roughness": 0.5,
+  "circle_radius": 0.800000011920929,
+  "period_frames": 239.999,
+  "period_s": 10.0,
+  "bounds_world": [
+   [
+    -4.7391,
+    -4.6022,
+    0.2575
+   ],
+   [
+    4.7296,
+    4.4484,
+    3.7472
+   ]
+  ],
+  "omega_per_frame": 0.026179999113082886,
+  "fps": 24.0,
+  "source": "gn",
+  "node_group": "Geometry Nodes.001",
+  "formula": "pos = home + amplitude_m * (noise3((home + circle_radius * (cos(w*f), sin(w*f), 0)) * noise_scale, detail, roughness) - 0.5); w = omega_per_frame, f = frame (Blender Z-up)"
+ },
+ "motes_export": {
+  "object": "bs_home_motes",
+  "count": 880,
+  "attribute": "_JITTER",
+  "bbox_world": [
+   [
+    -4.7391,
+    -4.6022,
+    0.2575
+   ],
+   [
+    4.7296,
+    4.4484,
+    3.7472
+   ]
+  ],
+  "warnings": [],
+  "jitter_range": [
+   0.5001,
+   1.5
+  ],
+  "interior": {
+   "x": [
+    -4.8,
+    4.8
+   ],
+   "z": [
+    0.2,
+    3.8
+   ],
+   "halfwidth_back_front": [
+    2.8,
+    4.8
+   ],
+   "taper_x": [
+    -5.0,
+    5.0
+   ],
+   "margin_m": 0.05
+  },
+  "culled": 5120
+ },
+ "plate_ab": {
+  "plate": "/Users/kvtolee/Desktop/Works/BACKSPACE/Documents/Company/PNGs/\u573a\u666f\u56fe/homepage.png",
+  "plate_size": [
+   1910,
+   823
+  ],
+  "plate_mean_luma": 0.08498,
+  "bake_mean_luma": 0.43566,
+  "rms_diff": 0.40099,
+  "rms_black_vs_plate": 0.11413,
+  "crop_size": [
+   1818,
+   1022
+  ],
+  "note": "display-referred luma in 0-1 (bake from the 16-bit master R); the crop is stretched to the plate aspect; the plate predates this blend"
+ },
+ "blender": "5.2.0 LTS",
+ "deviations": [
+  {
+   "rule": "guide \u00a78 normals+tangents ON",
+   "choice": "export_normals False, export_tangents False",
+   "why": "unlit projected shell; neither is read"
+  }
+ ],
+ "rest": {
+  "note": "at-rest half of the two-texture pack: the display camera with its vertical fov held at the at-rest aspect; the runtime samples it inside uv_rect (feathered) and the padded beauty outside",
+  "aspect": "32:9",
+  "uv_rect": {
+   "u0": 0.026595,
+   "v0": 0.263298,
+   "u1": 0.973405,
+   "v1": 0.736702
+  },
+  "width": 7680,
+  "height": 2160,
+  "samples": 1024,
+  "frames": [
+   0,
+   80,
+   160
+  ],
+  "phases_deg": [
+   0,
+   120,
+   240
+  ],
+  "panel": "on",
+  "camera": {
+   "name": "bs_home_cam",
+   "lens_mm": 36.0,
+   "sensor_height_mm": 20.25,
+   "sensor_fit": "VERTICAL (in memory)",
+   "aspect": "32:9",
+   "hfov_deg": 90.0,
+   "vfov_deg": 31.4173,
+   "hfov_16x9_deg": 53.1301,
+   "position": [
+    6.0,
+    0.0,
+    1.5
+   ],
+   "rotation_euler_deg": [
+    90.0,
+    -0.0,
+    90.0
+   ]
+  },
+  "chroma": [
+   {
+    "phase": 0,
+    "max": 0.01086,
+    "p99": 0.00174
+   },
+   {
+    "phase": 1,
+    "max": 0.01015,
+    "p99": 0.00172
+   },
+   {
+    "phase": 2,
+    "max": 0.01088,
+    "p99": 0.00174
+   }
+  ],
+  "files": {
+   "png": "home_beauty_rest_rgb.png",
+   "ktx2": "home_beauty_rest_rgb.ktx2"
+  },
+  "sizes_bytes": {
+   "png": 18040871,
+   "ktx2": 16374995
+  },
+  "ktx2": {
+   "skipped": false,
+   "toktx_exit": 0,
+   "ktx2check_exit": 0,
+   "size_bytes": 16374995
+  },
+  "plate_ab": {
+   "plate": "/Users/kvtolee/Desktop/Works/BACKSPACE/Documents/Company/PNGs/\u573a\u666f\u56fe/homepage.png",
+   "plate_mean_luma": 0.08498,
+   "bake_mean_luma": 0.29568,
+   "rms_diff": 0.2759,
+   "rms_black_vs_plate": 0.11413
+  },
+  "timings_s": {
+   "fixes": 0.001,
+   "cycles_setup": 0.004,
+   "camera": 0.0,
+   "render_phase0": 2469.3,
+   "render_phase1": 2483.3,
+   "render_phase2": 2481.2,
+   "render_all": 7433.792,
+   "pack": 32.443,
+   "poster": 0.927,
+   "plate_ab": 0.29,
+   "ktx2": 12.854
+  },
+  "blend_mtime": "2026-09-17T12:38:28",
+  "blend_unchanged_by_run": true
+ },
+ "poster_source": "rest"
+}
